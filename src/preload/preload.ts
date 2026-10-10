@@ -37,6 +37,7 @@ const api = {
   hideBrowser: () => ipcRenderer.invoke('browser:hide'),
   setBrowserFullscreen: (value: boolean) => ipcRenderer.invoke('browser:set-fullscreen', value),
   openSettings: () => ipcRenderer.invoke('settings:open'),
+  openDonation: () => ipcRenderer.invoke('donation:open'),
   setAccountShortcut: (index: number, shortcut: string) => ipcRenderer.invoke('settings:account-shortcut', index, shortcut),
   resetAccountShortcuts: () => ipcRenderer.invoke('settings:account-shortcuts-reset'),
   onAccountOpened: (listener: (accountId: number) => void) => { const handler = (_event: Electron.IpcRendererEvent, accountId: number) => listener(accountId); ipcRenderer.on('account:opened', handler); return () => ipcRenderer.removeListener('account:opened', handler); },

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Check, FolderOpen, GripVertical, MonitorPlay, Plus, Settings, Sparkles, Upload } from 'lucide-react';
+import { Check, FolderOpen, GripVertical, Heart, MonitorPlay, Plus, Settings, Sparkles, Upload } from 'lucide-react';
 import type { Account, DownloadStatus } from '../shared/types';
 import './style.css';
 import { UpscaleNotice } from './upscale-notice';
@@ -10,6 +10,7 @@ import { ImageAssetsBar } from './image-assets-bar';
 import { MessageSyncPanel } from './message-sync-panel';
 import { AccountShortcutInput, ResetAccountShortcuts } from './account-shortcut-settings';
 import { accountShortcut } from '../shared/account-shortcuts';
+import { DonationPanel } from './donation-panel';
 
 type Workspace = { accounts: Account[]; downloadDirectory: string; accountShortcuts: Record<string,string> };
 const downloadNoticeTitle: Record<DownloadStatus['state'], string> = { started: '正在下载视频', completed: '视频已保存', duplicate: '已阻止重复下载', failed: '视频下载失败' };
@@ -51,7 +52,7 @@ function App() {
     <header className="topbar" style={{ height: accountBar.height, '--account-scale': Math.max(0.75, Math.min(2.5, accountBar.height / 58)) } as React.CSSProperties}><div className="brand"><Sparkles size={19} /><span>Doubao Video Workspace</span></div>
       <div className="account-tabs">{data.accounts.map((account, index) => <button key={account.id} className={account.id === currentAccountId ? 'account active' : 'account'} onClick={() => void openAccount(account)} title={accountShortcut(index, data.accountShortcuts || {}) || undefined}><span className={account.isLoggedIn ? 'login-dot on' : 'login-dot'} />{account.name}</button>)}
         <button className="add-account" onClick={() => setShowNewAccount(true)} title="添加账号"><Plus size={15} />添加账号</button></div>
-      <div className="topbar-actions"><button className="watermark-shortcut" onClick={() => void window.workspace.openImageAssets()}><Upload size={15} />图片资产</button>
+      <div className="topbar-actions"><button className="watermark-shortcut donation-button" onClick={() => void window.workspace.openDonation()}><Heart size={15} />打赏作者</button><button className="watermark-shortcut" onClick={() => void window.workspace.openImageAssets()}><Upload size={15} />图片资产</button>
       <button className="browser-size-toggle" title="设置" onClick={() => void window.workspace.openSettings()}><Settings size={15} />设置</button></div>
       <BarResizer bar={accountBar} />
     </header>
@@ -132,7 +133,7 @@ function SettingsApp() {
 }
 
 const settingsPanel = new URLSearchParams(window.location.search).get('panel') === 'settings';
-createRoot(document.getElementById('root')!).render(new URLSearchParams(window.location.search).get('panel') === 'message-sync' ? <MessageSyncPanel /> : new URLSearchParams(window.location.search).get('panel') === 'image-assets' ? <ImageAssetsPanel /> : settingsPanel ? <SettingsApp /> : <App />);
+createRoot(document.getElementById('root')!).render(new URLSearchParams(window.location.search).get('panel') === 'donation' ? <DonationPanel /> : new URLSearchParams(window.location.search).get('panel') === 'message-sync' ? <MessageSyncPanel /> : new URLSearchParams(window.location.search).get('panel') === 'image-assets' ? <ImageAssetsPanel /> : settingsPanel ? <SettingsApp /> : <App />);
 
 
 

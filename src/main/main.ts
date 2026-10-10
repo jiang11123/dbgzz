@@ -42,6 +42,7 @@ const upscaleQueue = new UpscaleQueue(upscaleTools, () => {
 let windowRef: BrowserWindow | null = null;
 let settingsWindow: BrowserWindow | null = null;
 let assetsWindow: BrowserWindow | null = null;
+let donationWindow: BrowserWindow | null = null;
 let imageAssets: ImageAssetStore;
 let assetUploading = false;
 const stagedImageAssets = new Map<number, string[]>();
@@ -237,6 +238,18 @@ function openAccountBrowser(accountId: number, background = false, preloadOnly =
   windowRef.webContents.send('browser:fullscreen-changed', browserFullscreen);
   windowRef.webContents.send('account:opened', accountId);
   return view;
+}
+function openDonationWindow() {
+  if (!windowRef) return;
+  if (donationWindow && !donationWindow.isDestroyed()) { donationWindow.show(); donationWindow.focus(); return; }
+  const panel = new BrowserWindow({ parent: windowRef, modal: true, width: 420, height: 680,
+    resizable: false, title: '打赏作者', autoHideMenuBar: true, backgroundColor: '#ffffff', show: false,
+    webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false } });
+  donationWindow = panel;
+  const url = new URL(rendererUrl()); url.searchParams.set('panel', 'donation');
+  void panel.loadURL(url.toString());
+  panel.once('ready-to-show', () => { if (!panel.isDestroyed()) { panel.show(); panel.focus(); } });
+  panel.on('closed', () => { donationWindow = null; });
 }
 function openSettingsWindow() {
   if (!windowRef) return;
@@ -506,6 +519,7 @@ function setupIpc() {
   });
   ipcMain.handle('accounts:create', (_e, data) => { const next = db.createAccount(data); windowRef?.webContents.send('workspace:changed'); return next; });
   ipcMain.handle('settings:open', () => { openSettingsWindow(); return true; });
+  ipcMain.handle('donation:open', () => { openDonationWindow(); return true; });
   ipcMain.handle('accounts:open', (_e, id) => { if (!openAccountBrowser(id)) throw new Error('账号不存在或窗口尚未就绪'); return true; });
   ipcMain.handle('browser:hide', () => { hideBrowser(); return true; });
   ipcMain.handle('browser:set-fullscreen', (_e, value) => {

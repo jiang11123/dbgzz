@@ -31,6 +31,7 @@ declare global {
     onBrowserError: (listener: (message: string) => void) => () => void;
     setBrowserFullscreen: (value: boolean) => Promise<boolean>;
     openSettings: () => Promise<boolean>;
+    openDonation: () => Promise<boolean>;
     setAccountShortcut: (index: number, shortcut: string) => Promise<Record<string,string>>;
     resetAccountShortcuts: () => Promise<Record<string,string>>;
     onAccountOpened: (listener: (accountId: number) => void) => () => void;
