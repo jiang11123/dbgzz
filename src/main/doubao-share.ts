@@ -20,7 +20,7 @@ export function normalizeShareUrl(input: string): string {
 
 function validateResource(value: string, kind: 'media' | 'playback'): URL {
   const url = new URL(value);
-  const domains = kind === 'media' ? ['doubao.com', 'byteimg.com', 'ibytedtos.com', '365yg.com', 'douyinvod.com'] : ['snssdk.com'];
+  const domains = kind === 'media' ? ['doubao.com', 'byteimg.com', 'ibytedtos.com', '365yg.com', 'douyinvod.com', 'douyin.com'] : ['snssdk.com'];
   if (url.protocol !== 'https:' || url.username || url.password || (url.port && url.port !== '443') || !domains.some((domain) => url.hostname.endsWith(`.${domain}`))) {
     throw new Error('豆包返回了不受支持的资源地址');
   }
@@ -95,12 +95,14 @@ export function selectCleanVideo(model: JsonObject) {
     || (positive(b.real_bitrate) || positive(b.bitrate)) - (positive(a.real_bitrate) || positive(a.bitrate))
     || positive(b.size) - positive(a.size));
   for (const entry of choices) {
-    if (entry.logo_type || entry.encryption_method || entry.vtype !== 'mp4') continue;
+    // New clean renditions may explicitly label logo_type instead of leaving it empty.
+    const logoType = String(entry.logo_type ?? '').trim().toLowerCase();
+    if ((logoType && logoType !== '0' && logoType !== 'unwatermarked') || entry.encryption_method || entry.vtype !== 'mp4') continue;
     for (const encoded of [entry.main_url, entry.backup_url_1]) {
       if (typeof encoded !== 'string' || !encoded) continue;
       try {
         const url = decodePlaybackUrl(encoded, model.key_seed);
-        const watermarkLabel = new URL(url).searchParams.get('lr') || '';
+        const watermarkLabel = (new URL(url).searchParams.get('lr') || '').trim().toLowerCase();
         if (watermarkLabel !== 'unwatermarked' && /watermark/i.test(watermarkLabel)) continue;
         return { url, width: Number(entry.vwidth) || 0, height: Number(entry.vheight) || 0, definition: String(entry.definition || '') };
       } catch { /* try backup or another rendition */ }

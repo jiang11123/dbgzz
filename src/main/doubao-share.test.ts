@@ -90,3 +90,45 @@ test('chooses highest clean MP4 and never silently returns a watermarked or encr
   assert.throws(() => selectCleanVideo({ video_list: { a: stream(720, { main_url: Buffer.from('https://v11-vdl.doubao.com/video/test.mp4?lr=watermark').toString('base64') }) } }), /无水印/);
   assert.match(selectCleanVideo({ video_list: { a: stream(720, { main_url: Buffer.from('https://v11-vdl.doubao.com/video/test.mp4?lr=unwatermarked').toString('base64') }) } }).url, /lr=unwatermarked/);
 });
+
+test('recognizes the new Douyin CDN clean rendition and rejects conflicting watermark labels', () => {
+  const url = 'https://v3-default.douyin.com/f6e586accc0671b16711c8afa9677317/6ac9b169/video/tos/cn/tos-cn-v-9ecd54/4ed69768565f4df081ed34befef20be7/?lr=unwatermarked&mime_type=video_mp4&br=6419';
+  const entry = { main_url: Buffer.from(url).toString('base64'), logo_type: 'unwatermarked', vtype: 'mp4', vwidth: 1920, vheight: 1080 };
+  assert.equal(selectCleanVideo({ video_list: { clean: entry } }).url, url);
+  assert.equal(selectCleanVideo({ video_list: { clean: { ...entry, main_url: 'invalid', backup_url_1: entry.main_url } } }).url, url);
+  assert.throws(() => selectCleanVideo({ video_list: { bad: { ...entry, main_url: Buffer.from(url.replace('lr=unwatermarked', 'lr=watermark')).toString('base64') } } }), /无水印/);
+  assert.throws(() => selectCleanVideo({ video_list: { bad: { ...entry, logo_type: 'video_gen_watermark_dyn' } } }), /无水印/);
+  assert.throws(() => decodePlaybackUrl(Buffer.from(url.replace('v3-default.douyin.com', 'v3-default.douyin.com.evil.test')).toString('base64')));
+});
+
+test('resolves and saves an explicitly clean Douyin CDN video through the HD download service', async () => {
+  const originalFetch = globalThis.fetch;
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'doubao-clean-toggle-'));
+  const url = 'https://v3-default.douyin.com/video/tos/clean/?lr=unwatermarked&mime_type=video_mp4';
+  const mp4 = Buffer.concat([Buffer.from([0, 0, 0, 32]), Buffer.from('ftypisom'), Buffer.alloc(32)]);
+  const requests: string[] = [];
+  globalThis.fetch = async (input) => {
+    const address = String(input);
+    requests.push(address);
+    if (new URL(address).pathname.startsWith('/video/fplay/')) {
+      return Response.json({ code: 0, video_info: { code: 0, data: { video_id: 'toggle_video', video_list: {
+        clean: { main_url: Buffer.from(url).toString('base64'), logo_type: 'unwatermarked', vtype: 'mp4', vwidth: 1920, vheight: 1080 },
+      } } } });
+    }
+    assert.equal(address, url);
+    return new Response(mp4, { headers: { 'content-length': String(mp4.length) } });
+  };
+  try {
+    const service = new DoubaoShareService();
+    const video = await service.resolveVideo({ vid: 'toggle_video', model: { fallback_api: 'https://vas-lf-x.snssdk.com/video/fplay/1/test/toggle_video?key_seed=test' } });
+    assert.equal(video.width, 1920);
+    assert.equal(video.url, url);
+    const saved = await service.save(video.id, directory);
+    assert.deepEqual(fs.readFileSync(saved.path), mp4);
+    assert.equal(requests.length, 2);
+  } finally {
+    globalThis.fetch = originalFetch;
+    for (const file of fs.readdirSync(directory)) fs.unlinkSync(path.join(directory, file));
+    fs.rmdirSync(directory);
+  }
+});
