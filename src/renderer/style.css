@@ -118,6 +118,7 @@ body:has(.gateway-window){overflow:auto}
 /* Overrides .app-shell, which hardcodes a 3-column layout for account mode. */
 .gateway-shell{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:56px auto minmax(0,1fr);height:100vh;background:var(--canvas);overflow:hidden}
 .gateway-shell .image-assets-bar{grid-column:1/-1}
+.gateway-shell .download-notice{right:20px;left:auto;bottom:20px}
 .gateway-topbar{display:flex;align-items:center;gap:16px;padding:0 16px;background:#f9fbfe;border-bottom:1px solid var(--line)}
 .gateway-topbar .brand{display:flex;align-items:center;gap:7px;font-weight:650;color:var(--text);white-space:nowrap}
 .gateway-topbar .topbar-actions{margin-left:auto;display:flex;gap:9px;align-items:center}
@@ -174,7 +175,13 @@ body:has(.gateway-window){overflow:auto}
 /* Absolute so the notice never participates in .chat-main's grid rows: it renders
    conditionally, and as a grid row it would collapse to 0 when absent and shove the
    composer out of the window. */
-.chat-alert{position:absolute;top:59px;left:18px;right:18px;z-index:3;margin:0;padding:9px 12px;border-radius:8px;background:#fdecee;border:1px solid #f5c9cd;color:#a5323a;font-size:12px;overflow-wrap:anywhere;box-shadow:0 6px 18px rgba(15,23,42,.08)}
+.chat-alert{position:absolute;top:59px;left:18px;right:18px;z-index:3;margin:0;padding:9px 12px;border-radius:8px;background:#fdecee;border:1px solid #f5c9cd;color:#a5323a;font-size:12px;overflow-wrap:anywhere;box-shadow:0 6px 18px rgba(15,23,42,.08);display:flex;align-items:center;gap:10px}
+.chat-alert.success{background:#edf9f4;border-color:#b9e7d4;color:#247352}
+.chat-alert-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.chat-alert-action{display:inline-flex;align-items:center;gap:5px;flex-shrink:0;padding:4px 10px;border-radius:6px;background:#247352;color:#fff;font-size:12px;font-weight:500}
+.chat-alert-action:hover{background:#1d6144}
+.chat-alert-close{background:transparent;color:inherit;font-size:16px;line-height:1;padding:2px 4px;opacity:.7;cursor:pointer;flex-shrink:0}
+.chat-alert-close:hover{opacity:1}
 .chat-scroll{overflow:auto;padding:18px;display:grid;gap:16px;align-content:start}
 .chat-empty{display:grid;gap:8px;justify-items:center;text-align:center;color:var(--muted);padding:56px 20px}
 .chat-empty h2{margin:0;font-size:16px;color:var(--text)}
@@ -189,6 +196,13 @@ body:has(.gateway-window){overflow:auto}
 .chat-msg-media figure{margin:0;display:grid;gap:5px;width:min(260px,100%)}
 .chat-msg-media img,.chat-msg-media video{width:100%;border-radius:9px;border:1px solid var(--line);background:#f2f4f7;display:block}
 .chat-msg-media figcaption{display:flex;align-items:center;gap:5px;font-size:11px;color:#8896a8;overflow-wrap:anywhere}
+.chat-msg-media figcaption .chat-media-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat-media-download{flex-shrink:0;display:inline-flex;align-items:center;gap:3px;height:22px;padding:0 7px;border-radius:6px;border:1px solid #cfe0f6;background:#eef5ff;color:#2f6ac2;font-size:11px;line-height:1;white-space:nowrap}
+.chat-media-download:hover:not(:disabled){background:#e2eefe;border-color:#b7d2f4}
+.chat-media-download:disabled{opacity:.55;cursor:default}
+.chat-download-latest{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px;border-radius:8px;border:1px solid #cfe0f6;background:#f2f8ff;color:#2f6ac2;font-size:12px;white-space:nowrap}
+.chat-download-latest:hover:not(:disabled){background:#e4f0ff;border-color:#b7d2f4}
+.chat-download-latest:disabled{opacity:.5;cursor:default}
 .chat-msg-md{padding:11px 13px;background:#f6f8fb;border:1px solid var(--line);border-radius:10px;font-size:13px;line-height:1.75;overflow-wrap:anywhere}
 .chat-msg.user .chat-msg-md{background:#eef4ff;border-color:#d3e2fb}
 .chat-msg-md .chat-md-p{margin:0 0 8px}
@@ -281,6 +295,11 @@ body:has(.settings-window){overflow:auto;background:var(--canvas)}
 .settings-window>h2{margin:0 0 18px;font-size:24px;line-height:1.3;font-weight:700;color:var(--text)}
 .settings-window>.add-account-settings{margin:0 0 24px;height:42px;padding:0 17px;border-radius:10px;font-size:14px}
 .settings-window>.chat-alert{position:static;margin:0 0 16px}
+.download-settings-card{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 22px;background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:8px}
+.download-settings-info{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+.download-settings-label{font-size:14px;font-weight:600;color:var(--text)}
+.download-settings-path{font-size:13px;color:#6b788e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:Consolas, Monaco, monospace}
+.download-settings-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .account-settings{display:grid;gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#fff;border-radius:12px;overflow:hidden}
 .account-setting{display:grid;grid-template-columns:32px minmax(180px,1fr) minmax(180px,.8fr) 56px;align-items:center;gap:18px;min-height:76px;padding:14px 18px;border-bottom:1px solid #edf1f6;color:var(--text)}
 .account-setting:last-child{border-bottom:0}

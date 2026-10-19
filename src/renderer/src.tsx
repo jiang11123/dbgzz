@@ -14,7 +14,14 @@ import { GatewayPanel } from './gateway-panel';
 import { GatewayChat, ModeSwitch } from './gateway-chat';
 
 type Workspace = { accounts: Account[]; downloadDirectory: string; accountShortcuts: Record<string,string> };
-const downloadNoticeTitle: Record<DownloadStatus['state'], string> = { started: '正在下载视频', completed: '视频已保存', duplicate: '已阻止重复下载', failed: '视频下载失败' };
+function getDownloadNoticeTitle(status: DownloadStatus): string {
+  const isImage = Boolean(status.name && /\.(png|jpe?g|webp|gif)$/i.test(status.name));
+  const media = isImage ? '图片' : '视频';
+  if (status.state === 'started') return `正在下载${media}`;
+  if (status.state === 'completed') return `${media}已保存`;
+  if (status.state === 'duplicate') return '已阻止重复下载';
+  return `${media}下载失败`;
+}
 
 function App() {
   // Secondary windows (设置 / API 网关 / 消息同步) render a single panel by query
@@ -86,6 +93,9 @@ function App() {
     <ImageAssetsBar accountId={data?.accounts[0]?.id ?? null} message={message}
       onStage={items => setStagedImages(current => [...current, ...items.filter(item => !current.some(x => x.id === item.id)).map(item => ({ id: item.id, assetId: item.id, name: item.name, mimeType: item.name.match(/\.(png|jpe?g|webp|gif)$/i)?.[0] ? 'image/' + item.name.split('.').pop()!.toLowerCase().replace('jpg', 'jpeg') : 'application/octet-stream', url: item.url }))])} />
     <GatewayChat mode={mode} onModeChange={changeMode} stagedImages={stagedImages} onStagedChange={setStagedImages} />
+    {downloadNotice && <div className={`download-notice ${downloadNotice.state}`} role="status"><div><b>{getDownloadNoticeTitle(downloadNotice)}</b><span>{downloadNotice.name}</span></div>
+      {downloadNotice.state === 'completed' && downloadNotice.path && <button className="download-location" onClick={() => void window.workspace.openFolder(downloadNotice.path as string)}><FolderOpen size={13} />打开下载位置</button>}
+      <button className="download-dismiss" aria-label="关闭下载提示" onClick={() => setDownloadNotice(null)}>×</button></div>}
     {toast && <div className="toast"><Check size={16} />{toast}</div>}
   </main>;
 
@@ -101,7 +111,7 @@ function App() {
     </header>
     <ImageAssetsBar accountId={currentAccountId} message={message} />
     {showNewAccount && <NewAccount onClose={() => setShowNewAccount(false)} onCreated={async account => { const next = await window.workspace.createAccount(account); setShowNewAccount(false); await refresh(); await openAccount(next); }} />}
-    {downloadNotice && <div className={`download-notice ${downloadNotice.state}`} role="status"><div><b>{downloadNoticeTitle[downloadNotice.state]}</b><span>{downloadNotice.name}</span></div>
+    {downloadNotice && <div className={`download-notice ${downloadNotice.state}`} role="status"><div><b>{getDownloadNoticeTitle(downloadNotice)}</b><span>{downloadNotice.name}</span></div>
       {downloadNotice.state === 'completed' && downloadNotice.path && <button className="download-location" onClick={() => void window.workspace.openFolder(downloadNotice.path as string)}><FolderOpen size={13} />打开下载位置</button>}
       <button className="download-dismiss" aria-label="关闭下载提示" onClick={() => setDownloadNotice(null)}>×</button></div>}
     {toast && <div className="toast"><Check size={16} />{toast}</div>}
@@ -146,14 +156,28 @@ function NameInput({ ariaLabel, initial, onCommit }: { ariaLabel: string; initia
 function SettingsPage() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [accountShortcuts, setAccountShortcuts] = useState<Record<string, string>>({});
+  const [downloadDirectory, setDownloadDirectory] = useState('');
   const [message, setMessage] = useState('');
   const [showNewAccount, setShowNewAccount] = useState(false);
   const refresh = async () => {
     const next = await window.workspace.load();
     setAccounts(next.accounts);
     setAccountShortcuts(next.accountShortcuts ?? {});
+    setDownloadDirectory(next.downloadDirectory ?? '');
   };
   useEffect(() => { void refresh().catch(error => setMessage(String(error))); }, []);
+  const setDownloads = async () => {
+    try {
+      const folder = await window.workspace.selectDirectory();
+      if (folder) {
+        await window.workspace.watchDownloads(folder);
+        await refresh();
+        setMessage('下载目录已更新并开始监听');
+      }
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : String(error));
+    }
+  };
   const rename = async (id: number, name: string) => {
     try { await window.workspace.renameAccount(id, name); await refresh(); }
     catch (error) { setMessage(error instanceof Error ? error.message : String(error)); }
@@ -170,8 +194,22 @@ function SettingsPage() {
   const indexKeyedShortcuts: Record<string, string> = {};
   accounts.forEach((account, i) => { const s = accountShortcuts[String(account.id)]; if (s) indexKeyedShortcuts[String(i)] = s; });
   return <div className="settings-window">
-    <h2>账号管理</h2>
+    <h2>下载设置</h2>
     {message && <div className="chat-alert">{message}</div>}
+    <div className="download-settings-card">
+      <div className="download-settings-info">
+        <span className="download-settings-label">视频保存与监听目录</span>
+        <span className="download-settings-path" title={downloadDirectory || '未设置'}>
+          {downloadDirectory || '未设置。选择豆包视频下载保存的本地目录。'}
+        </span>
+      </div>
+      <div className="download-settings-actions">
+        {downloadDirectory && <button type="button" className="outline" onClick={() => void window.workspace.openFolder(downloadDirectory)} title="在资源管理器中打开"><FolderOpen size={15} />打开目录</button>}
+        <button type="button" className="outline" onClick={() => void setDownloads()}><FolderOpen size={15} />选择目录</button>
+      </div>
+    </div>
+
+    <h2 style={{ marginTop: 32 }}>账号管理</h2>
     <button className="primary add-account-settings" onClick={() => setShowNewAccount(true)}><Plus size={15} />添加账号</button>
     <div className="account-settings">
       {accounts.map((account, index) => <div key={account.id} className="account-setting" data-account-id={account.id}

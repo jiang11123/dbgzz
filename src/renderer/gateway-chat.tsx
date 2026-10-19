@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Image as ImageIcon, Loader2, Plus, Send, Settings, Sparkles, Trash2, Video } from 'lucide-react';
+import { ArrowLeft, Download, FolderOpen, Image as ImageIcon, Loader2, Plus, Send, Settings, Sparkles, Trash2, Video } from 'lucide-react';
 import type { GatewayAttachment, GatewayMessage, GatewayThread, StagedAttachment } from '../shared/types';
 import { renderMarkdown } from './markdown';
 
@@ -27,6 +27,38 @@ export function toStagedGeneratedImage(item: GatewayAttachment, asset: { id: str
   return { id: item.id, assetId: asset.id, name: asset.name, mimeType: mimeTypeForName(asset.name), url: asset.url };
 }
 
+/** Unscoped deltas must never leak into whichever thread happens to be open. */
+export function threadDelta(activeId: string | null, payload: { threadId?: string; full: string }): string | null {
+  return activeId && payload.threadId === activeId ? payload.full : null;
+}
+
+/** A turn only blocks its own thread; other threads stay sendable and the bridge queues them. */
+export function composerAction(prompt: string, threadBusy: boolean, forwarding = false): 'send' | 'continue' | 'none' {
+  if (!prompt.trim() || forwarding) return 'none';
+  return threadBusy ? 'continue' : 'send';
+}
+
+/** Preserve visible local feedback until its newly persisted user row arrives. */
+export function reconcileMessages(current: GatewayMessage[], saved: GatewayMessage[]): GatewayMessage[] {
+  const known = new Set(current.filter(message => message.id >= 0).map(message => message.id));
+  const echoed = saved.filter(message => message.role === 'user' && !known.has(message.id));
+  const local = current.filter(message => message.id < 0).filter(message => {
+    const index = echoed.findIndex(row => row.threadId === message.threadId && row.content === message.content);
+    if (index < 0) return true;
+    echoed.splice(index, 1);
+    return false;
+  });
+  return [...saved, ...local];
+}
+
+/** Activation happens before invoking any long-running turn IPC. */
+export async function ensureChatThread(activeId: string | null, create: () => Promise<GatewayThread>, activate: (thread: GatewayThread) => void): Promise<string> {
+  if (activeId) return activeId;
+  const thread = await create();
+  activate(thread);
+  return thread.id;
+}
+
 /**
  * Gateway mode: a chat window backed by the Doubao account pool.
  *
@@ -46,8 +78,35 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
   const [messages, setMessages] = useState<GatewayMessage[]>([]);
   const [draft, setDraft] = useState('');
   const [streaming, setStreaming] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState('');
+  // Busy is tracked per thread so one long video turn cannot lock the whole window.
+  const [busyThreads, setBusyThreads] = useState<string[]>([]);
+  const [forwarding, setForwarding] = useState(false);
+  const [notice, setNoticeState] = useState<{ text: string; path?: string; kind?: 'info' | 'error' | 'success' } | null>(null);
+  const setNotice = useCallback((val: string | { text: string; path?: string; kind?: 'info' | 'error' | 'success' } | null) => {
+    if (!val) setNoticeState(null);
+    else if (typeof val === 'string') setNoticeState({ text: val, kind: val.startsWith('正在') ? 'info' : 'error' });
+    else setNoticeState(val);
+  }, []);
+  const activeIdRef = useRef<string | null>(null);
+  const busyRef = useRef(new Set<string>());
+  const markBusy = useCallback((threadId: string, on: boolean) => {
+    const next = new Set(busyRef.current);
+    if (on) next.add(threadId); else next.delete(threadId);
+    busyRef.current = next;
+    setBusyThreads([...next]);
+  }, []);
+  const forwardingRef = useRef(false);
+  const localId = useRef(0);
+  const streams = useRef<Record<string, string>>({});
+  const messageLoad = useRef(0);
+  const selectThread = useCallback((id: string | null) => {
+    activeIdRef.current = id;
+    messageLoad.current++;
+    setActiveId(id);
+    setMessages([]);
+    setStreaming(id ? streams.current[id] ?? '' : '');
+    setNotice('');
+  }, []);
   const [deepThink, setDeepThink] = useState(false);
   const [composerMode, setComposerMode] = useState<'text' | 'image' | 'video'>('text');
   const [imageRatio, setImageRatio] = useState('1:1');
@@ -66,6 +125,8 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
   const scroller = useRef<HTMLDivElement | null>(null);
 
   const active = useMemo(() => threads.find(thread => thread.id === activeId) ?? null, [threads, activeId]);
+  // Only this thread's own in-flight turn changes the composer; other threads keep sending.
+  const busy = useMemo(() => (activeId ? busyThreads.includes(activeId) : false), [busyThreads, activeId]);
   const accountNames = useMemo(() => {
     const map: Record<number, string> = {};
     for (const account of accounts) map[account.id] = account.name;
@@ -75,15 +136,14 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
   const refreshThreads = useCallback(async (selectFirst = false) => {
     const next = await window.workspace.chatThreads();
     setThreads(next);
-    setActiveId(current => {
-      if (current && next.some((t: GatewayThread) => t.id === current)) return current;
-      return selectFirst ? next[0]?.id ?? null : current;
-    });
-  }, []);
+    if (selectFirst && !activeIdRef.current && busyRef.current.size === 0) selectThread(next[0]?.id ?? null);
+  }, [selectThread]);
 
   const loadMessages = useCallback(async (threadId: string) => {
-    setMessages(await window.workspace.chatMessages(threadId));
-    setStreaming('');
+    const request = ++messageLoad.current;
+    const saved = await window.workspace.chatMessages(threadId);
+    if (activeIdRef.current !== threadId || request !== messageLoad.current) return;
+    setMessages(current => reconcileMessages(current.filter(message => message.threadId === threadId), saved));
   }, []);
 
   useEffect(() => {
@@ -91,16 +151,26 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
     void window.workspace.load().then(data => {
       const list = (data.accounts ?? []).filter((a: { platform?: string }) => (a.platform ?? 'doubao') === 'doubao');
       setAccounts(list.map((a: { id: number; name: string }) => ({ id: a.id, name: a.name })));
-      setPinnedAccountId(current => current ?? list[0]?.id ?? null);
+      setPinnedAccountId(current => current ?? null);
     }).catch(() => undefined);
   }, []);
 
   useEffect(() => {
     void refreshThreads(true).catch(error => setNotice(String(error)));
-    return window.workspace.onChatDelta(payload => {
-      setStreaming(current => (payload.threadId && payload.threadId !== activeId ? current : payload.full));
-    });
-  }, [activeId, refreshThreads]);
+  }, [refreshThreads]);
+
+  useEffect(() => window.workspace.onChatDelta(payload => {
+    if (payload.threadId && payload.videoTaskId) {
+      const running = !['completed','failed','cancelled','needs_attention'].includes(payload.videoStatus || '');
+      markBusy(payload.threadId, running);
+      if (!running && activeIdRef.current === payload.threadId) void loadMessages(payload.threadId);
+    }
+    if (payload.threadId) {
+      streams.current[payload.threadId] = payload.full;
+    }
+    const full = threadDelta(activeIdRef.current, payload);
+    if (full !== null) setStreaming(full);
+  }), []);
 
   useEffect(() => {
     if (activeId) void loadMessages(activeId).catch(error => setNotice(String(error)));
@@ -113,16 +183,16 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
 
   const startNew = async () => {
     const thread = await window.workspace.chatCreate();
+    selectThread(thread.id);
     await refreshThreads();
-    setActiveId(thread.id);
-    setMessages([]);
     setNotice('');
   };
 
   const removeThread = async (id: string) => {
     await window.workspace.chatDelete(id);
+    if (activeIdRef.current === id) selectThread(null);
+    delete streams.current[id];
     await refreshThreads(true);
-    if (activeId === id) setActiveId(null);
   };
 
   /** Accepts drops from the quick-preview bar (asset ids) and from the OS (file paths). */
@@ -179,75 +249,111 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
     }
   };
 
+  const appendUser = (threadId: string, text: string) => {
+    const id = --localId.current;
+    setMessages(current => [...current, {
+      id, threadId, role: 'user', content: text, attachments: [], status: 'pending',
+      error: '', createdAt: new Date().toISOString(), accountId: null,
+    }]);
+    return id;
+  };
+
   const handleConfirm = async (text: string) => {
+    const threadId = activeIdRef.current;
+    if (!threadId || composerAction(text, busyRef.current.has(threadId), forwardingRef.current) !== 'continue') return;
+    forwardingRef.current = true;
+    setForwarding(true);
+    const id = appendUser(threadId, text);
+    setDraft('');
     try {
-      setNotice('正在向豆包发送确认...');
-      const ok = await window.workspace.chatConfirm({ threadId: activeId ?? undefined, text });
-      if (ok) {
-        setNotice('已确认视频参数，豆包开始生成视频...');
-      } else {
-        setNotice('未找到等待确认的任务，豆包可能已开始生成');
+      setNotice('正在发送你的补充消息...');
+      const ok = await window.workspace.chatConfirm({ threadId, text });
+      if (!ok) throw new Error('未找到本会话可接收补充消息的任务，消息未发送，请稍后重试');
+      if (activeIdRef.current === threadId) {
+        setMessages(current => current.map(message => message.id === id ? { ...message, status: 'done' } : message));
+        setNotice('补充消息已转交，请等待豆包实际回复；这不代表视频已开始或已完成生成。');
+        await loadMessages(threadId);
       }
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : String(error));
+      if (activeIdRef.current === threadId) {
+        const detail = error instanceof Error ? error.message : String(error);
+        setMessages(current => current.map(message => message.id === id ? { ...message, status: 'failed', error: detail } : message));
+        setNotice(detail);
+      }
+    } finally {
+      forwardingRef.current = false;
+      setForwarding(false);
     }
   };
 
   const send = async () => {
     const prompt = draft.trim();
-    if (!prompt) return;
-    if (busy) {
-      if (/^(确认|直接开始|开始生成|确认生成|同意|确定|好|好的|ok)$/i.test(prompt)) {
-        setDraft('');
-        void handleConfirm(prompt);
-        return;
-      }
-      return;
-    }
-    setBusy(true); setNotice(''); setStreaming('');
+    const current = activeIdRef.current;
+    const action = composerAction(prompt, current ? busyRef.current.has(current) : false, forwardingRef.current);
+    if (action === 'none') return;
+    if (action === 'continue') { await handleConfirm(prompt); return; }
+    setNotice('');
+    let threadId = activeIdRef.current;
+    let userId: number | undefined;
     try {
-      // Show the user's line immediately; the server echoes the persisted rows back.
-      setMessages(current => [...current, {
-        id: -Date.now(), threadId: activeId ?? '', role: 'user', content: prompt,
-        attachments: [], status: 'done', error: '', createdAt: new Date().toISOString(), accountId: null,
-      }]);
+      threadId = await ensureChatThread(threadId, () => window.workspace.chatCreate(), thread => {
+        setThreads(current => [thread, ...current.filter(item => item.id !== thread.id)]);
+        selectThread(thread.id);
+      });
+      markBusy(threadId, true);
+      if (activeIdRef.current === threadId) setStreaming('');
+      streams.current[threadId] = '';
+      userId = appendUser(threadId, prompt);
       setDraft('');
-      const targetAccount = pinnedAccountId;
       const attachments = toIpcAttachments(stagedImages);
-      const result = composerMode === 'image'
-        ? await window.workspace.chatImages({ threadId: activeId ?? undefined, prompt, ratio: imageRatio, accountId: targetAccount, attachments })
-        : composerMode === 'video'
-          ? await window.workspace.chatVideos({ threadId: activeId ?? undefined, prompt, ratio: videoRatio, duration: videoDuration, model: videoModel, accountId: targetAccount, attachments })
-          : await window.workspace.chatSend({ threadId: activeId ?? undefined, prompt, deepThink, accountId: targetAccount, attachments });
-      setActiveId(result.thread.id);
+      // Consume only this turn's attachments, not anything staged during generation.
       setStagedImages([]);
+      if (composerMode === 'image') {
+        await window.workspace.chatImages({ threadId, prompt, ratio: imageRatio, accountId: pinnedAccountId, attachments });
+      } else if (composerMode === 'video') {
+        await window.workspace.chatVideos({ threadId, prompt, ratio: videoRatio, duration: videoDuration, model: videoModel, accountId: pinnedAccountId, attachments });
+      } else {
+        await window.workspace.chatSend({ threadId, prompt, deepThink, accountId: pinnedAccountId, attachments });
+      }
       await refreshThreads();
-      await loadMessages(result.thread.id);
+      if (activeIdRef.current === threadId) await loadMessages(threadId);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : String(error));
-      if (activeId) await loadMessages(activeId).catch(() => undefined);
+      if (activeIdRef.current === threadId) {
+        const detail = error instanceof Error ? error.message : String(error);
+        setNotice(detail);
+        setMessages(current => current.map(message => message.id === userId ? { ...message, status: 'failed', error: detail } : message));
+        if (threadId) await loadMessages(threadId).catch(() => undefined);
+      }
     } finally {
-      setBusy(false); setStreaming('');
+      if (threadId) { markBusy(threadId, false); delete streams.current[threadId]; }
+      if (activeIdRef.current === threadId) setStreaming('');
     }
   };
 
-  const stageGeneratedImage = async (item: GatewayAttachment) => {
-    if (!item.path) {
-      setNotice('该图片没有可引用的本地文件');
-      return;
-    }
+  /** Downloads a generated image/video to the configured download folder. */
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const downloadMedia = async (item: GatewayAttachment) => {
+    if (downloadingId) return;
+    setDownloadingId(item.id);
     try {
-      const imported = await window.workspace.importImagePaths([item.path]);
-      const asset = imported[0];
-      if (!asset) throw new Error('图片导入失败');
-      setStagedImages(current => current.some(existing => existing.assetId === asset.id)
-        ? current
-        : [...current, toStagedGeneratedImage(item, asset)]);
-      setNotice('图片已加入下一条消息，可切换视频模式引用');
+      setNotice(item.kind === 'video' ? '正在按高清下载保存无水印视频...' : '正在保存图片到下载目录...');
+      const result = await window.workspace.downloadMedia(item);
+      if (result?.error) throw new Error(result.error);
+      setNotice({ text: result?.path ? `已保存到：${result.path}` : '已保存到下载目录', path: result?.path, kind: 'success' });
     } catch (error) {
       setNotice(error instanceof Error ? error.message : String(error));
+    } finally {
+      setDownloadingId(null);
     }
   };
+  // The newest finished image/video in this thread, for the toolbar shortcut.
+  const latestMedia = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i -= 1) {
+      const found = messages[i].attachments.find(item => item.kind === 'video' || item.kind === 'image');
+      if (found) return found;
+    }
+    return null;
+  }, [messages]);
 
   return <main className="gateway-chat">
     <aside className="chat-threads">
@@ -257,7 +363,7 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
       </div>
       <div className="chat-threads-list">
         {threads.length ? threads.map(thread => <div key={thread.id} className={`chat-thread ${thread.id === activeId ? 'active' : ''}`}>
-          <button className="chat-thread-open" onClick={() => setActiveId(thread.id)} title={thread.title}>
+          <button className="chat-thread-open" onClick={() => selectThread(thread.id)} title={thread.title}>
             <b>{thread.title}</b>
             <small>{thread.messageCount ?? 0} 条{thread.doubaoConversationId ? ' · 有上下文' : ''}</small>
           </button>
@@ -279,7 +385,11 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
         </div>
       </header>
 
-      {notice && <div className="chat-alert">{notice}</div>}
+      {notice && <div className={`chat-alert ${notice.kind || 'error'}`}>
+        <span className="chat-alert-text">{notice.text}</span>
+        {notice.path && <button type="button" className="chat-alert-action" onClick={() => void window.workspace.openFolder(notice.path!)} title="在资源管理器中打开所在文件夹"><FolderOpen size={13} />打开文件夹</button>}
+        <button type="button" className="chat-alert-close" aria-label="关闭提示" onClick={() => setNotice(null)}>×</button>
+      </div>}
 
       <div className="chat-scroll" ref={scroller}>
         {!messages.length && !streaming && <div className="chat-empty">
@@ -287,10 +397,16 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
           <h2>通过网关和豆包对话</h2>
           <p>消息由已登录的账号池发出，支持文字、图片与视频结果。</p>
         </div>}
-        {messages.map(message => <MessageBubble key={message.id} message={message} accountName={accountNames[message.accountId ?? -1]} streamed={message.role === 'assistant' && message.id === messages[messages.length - 1]?.id ? streaming : ''} onStageGeneratedImage={stageGeneratedImage} onConfirm={handleConfirm} />)}
+        {messages.filter(message => !(streaming && message.role === 'assistant' && (message.status === 'pending' || message.status === 'streaming'))).map(message => <MessageBubble key={message.id} message={message} accountName={accountNames[message.accountId ?? -1]} streamed="" onDownload={item => void downloadMedia(item)} downloadingId={downloadingId} onConfirm={!streaming && busy && !forwarding && message.id === messages[messages.length - 1]?.id ? handleConfirm : undefined} />)}
+        {streaming && <MessageBubble message={{ id: 0, threadId: activeId ?? '', role: 'assistant', content: streaming, attachments: [], status: 'streaming', error: '', createdAt: '', accountId: active?.accountId ?? null }} streamed="" onDownload={item => void downloadMedia(item)} downloadingId={downloadingId} onConfirm={busy && !forwarding ? handleConfirm : undefined} />}
       </div>
 
       <div className="chat-options">
+        <button type="button" className="chat-download-latest" disabled={!latestMedia || Boolean(downloadingId)}
+          onClick={() => { if (latestMedia) void downloadMedia(latestMedia); }}
+          title={latestMedia ? (latestMedia.kind === 'video' ? '下载本会话最新生成的高清无水印视频' : '下载本会话最新生成的图片') : '本会话还没有可下载的生成结果'}>
+          {downloadingId ? <Loader2 size={13} className="spin" /> : <Download size={13} />}下载{latestMedia ? (latestMedia.kind === 'video' ? '视频' : '图片') : ''}
+        </button>
         <label className="chat-toggle" title="开启后生成图片而不是文字">
           <input type="checkbox" checked={composerMode === 'image'} onChange={event => setComposerMode(event.target.checked ? 'image' : 'text')} /><ImageIcon size={13} />图片模式
         </label>
@@ -324,9 +440,10 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
             aria-label="视频时长（秒）" />
           <output>{videoDuration} 秒</output>
         </label>}
-        <label className="chat-account-pick" title="消息固定发送到此账号">
+        <label className="chat-account-pick" title="消息固定发送到此账号，或选择自动调度以多账号并发">
           <span>发送账号</span>
-          <select value={pinnedAccountId ?? ''} onChange={event => setPinnedAccountId(Number(event.target.value) || null)}>
+          <select value={pinnedAccountId ?? ''} onChange={event => setPinnedAccountId(event.target.value ? Number(event.target.value) : null)}>
+            <option value="">自动调度（并发账号池）</option>
             {accounts.map(account => <option key={account.id} value={account.id}>{account.name}</option>)}
           </select>
         </label>
@@ -354,13 +471,13 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
             <button type="button" className="chat-attach" title="添加文件（图片 / 文档 / 代码 / 音频）发给模型" onClick={() => void pickImages()}>
               <ImageIcon size={15} />
             </button>
-            <textarea value={draft} placeholder={composerMode === 'image' ? '描述要生成的图片，Enter 生成' : composerMode === 'video' ? '描述要生成的视频，Enter 生成（约 1-5 分钟）' : stagedImages.length ? '描述你想让模型怎么处理这些附件，Enter 发送' : '输入消息，Enter 发送，Shift+Enter 换行'}
+            <textarea value={draft} placeholder={busy ? '可输入确认、修改要求或追问，Enter 发送补充（仅文字）' : composerMode === 'image' ? '描述要生成的图片，Enter 生成' : composerMode === 'video' ? '描述要生成的视频，Enter 生成（约 1-5 分钟）' : stagedImages.length ? '描述你想让模型怎么处理这些附件，Enter 发送' : '输入消息，Enter 发送，Shift+Enter 换行'}
           onChange={event => setDraft(event.target.value)}
           onKeyDown={event => {
             if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); void send(); }
           }} />
-        <button className="primary" disabled={busy || !draft.trim()} onClick={() => void send()}>
-          {busy ? <Loader2 size={15} className="spin" /> : composerMode === 'image' ? <ImageIcon size={15} /> : composerMode === 'video' ? <Video size={15} /> : <Send size={15} />}{busy ? '生成中' : composerMode === 'image' ? '生成图片' : composerMode === 'video' ? '生成视频' : '发送'}
+        <button className="primary" disabled={composerAction(draft, busy, forwarding) === 'none'} onClick={() => void send()}>
+          {busy ? <Loader2 size={15} className="spin" /> : composerMode === 'image' ? <ImageIcon size={15} /> : composerMode === 'video' ? <Video size={15} /> : <Send size={15} />}{busy ? (forwarding ? '发送中' : '发送补充') : composerMode === 'image' ? '生成图片' : composerMode === 'video' ? '生成视频' : '发送'}
             </button>
           </div>
         </div>
@@ -369,7 +486,7 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
   </main>;
 }
 
-function MessageBubble({ message, streamed, accountName, onStageGeneratedImage, onConfirm }: { message: GatewayMessage; streamed: string; accountName?: string; onStageGeneratedImage: (item: GatewayAttachment) => void; onConfirm?: (text: string) => void }) {
+function MessageBubble({ message, streamed, accountName, onDownload, downloadingId, onConfirm }: { message: GatewayMessage; streamed: string; accountName?: string; onDownload?: (item: GatewayAttachment) => void; downloadingId?: string | null; onConfirm?: (text: string) => void }) {
   const pending = message.status === 'streaming' || message.status === 'pending';
   const text = streamed || message.content;
   // Assistant replies are labelled with the account that produced them.
@@ -378,12 +495,23 @@ function MessageBubble({ message, streamed, accountName, onStageGeneratedImage, 
     <div className="chat-msg-role">{label}</div>
     <div className="chat-msg-body">
       {text ? <div className="chat-msg-md">{renderMarkdown(text)}</div> : pending ? <p className="muted"><Loader2 size={13} className="spin" /> 正在生成...</p> : null}
-      {message.role === 'assistant' && /视频生成参数确认|请先确认.*参数|确认后我再开始|确认后.*(?:开始|生成)|请确认/i.test(text) && onConfirm && <div className="chat-confirm-action" style={{ marginTop: '10px' }}><button type="button" className="primary" style={{ padding: '6px 14px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }} onClick={() => onConfirm('确认生成，直接开始')}>✓ 立即确认生成</button></div>}
+      {message.role === 'assistant' && /视频生成参数确认|请先确认.*参数|确认后我再开始|确认后.*(?:开始|生成)|请确认/i.test(text) && onConfirm && <div className="chat-confirm-action" style={{ marginTop: '10px' }}><button type="button" className="primary" style={{ padding: '6px 14px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }} onClick={() => onConfirm('确认生成，直接开始')}>发送确认</button></div>}
       {message.status === 'failed' && message.error && <div className="chat-alert bad">{message.error}</div>}
       {message.attachments.length > 0 && <div className="chat-msg-media">
-        {message.attachments.map(item => item.kind === 'video'
-          ? <figure key={item.id}><video src={item.url} controls preload="metadata" /><figcaption><Video size={12} />{item.name}</figcaption></figure>
-          : <figure key={item.id}><img src={item.url} alt={item.name} /><figcaption><ImageIcon size={12} />{item.name}{item.path && <button type="button" className="outline" onClick={() => onStageGeneratedImage(item)} title="加入下一条消息作为参考图">加入下一条消息</button>}</figcaption></figure>)}
+        {message.attachments.map(item => <figure key={item.id}>
+          {item.kind === 'video'
+            ? <video src={item.url} controls preload="metadata" />
+            : <img src={item.url} alt={item.name} />}
+          <figcaption>
+            {onDownload && <button type="button" className="chat-media-download" disabled={downloadingId === item.id}
+              onClick={() => onDownload(item)}
+              title={item.kind === 'video' ? '按高清下载保存到本地（无水印原视频）' : '保存图片到本地下载目录'}>
+              {downloadingId === item.id ? <Loader2 size={12} className="spin" /> : <Download size={12} />}{item.kind === 'video' ? '高清下载' : '下载'}
+            </button>}
+            {item.kind === 'video' ? <Video size={12} /> : <ImageIcon size={12} />}
+            <span className="chat-media-name" title={item.name}>{item.name}</span>
+          </figcaption>
+        </figure>)}
       </div>}
     </div>
   </article>;
