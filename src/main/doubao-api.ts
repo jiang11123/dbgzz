@@ -120,7 +120,52 @@ export type ParsedEvent = {
   finished: boolean;
   conversationId?: string;
   messageId?: string;
+  /** Image or media URLs found in this event's blocks or attachments. */
+  mediaUrls?: string[];
 };
+
+/**
+ * Recursively scans an event node for image and media URLs.
+ */
+export function extractMediaUrlsFromNode(node: any, limit = 8): string[] {
+  const urls: string[] = [];
+  const check = (val: unknown) => {
+    if (typeof val === 'string' && val.startsWith('http') && /(byteimg|imagex|tos-cn|doubao|[.](png|jpe?g|webp|gif|mp4|webm|mov))/i.test(val)) {
+      const clean = val.replace(/\\u0026/g, '&').replace(/&amp;/g, '&');
+      if (!urls.includes(clean)) urls.push(clean);
+    }
+  };
+
+  const walk = (item: any, depth = 0) => {
+    if (!item || depth > limit) return;
+    if (typeof item === 'string') {
+      if (item.startsWith('http')) check(item);
+      else if (item.startsWith('{') || item.startsWith('[')) {
+        try { walk(JSON.parse(item), depth + 1); } catch {}
+      }
+      return;
+    }
+    if (Array.isArray(item)) {
+      for (const el of item) walk(el, depth + 1);
+      return;
+    }
+    if (typeof item === 'object') {
+      if (item.image_ori?.url) check(item.image_ori.url);
+      if (item.image_raw?.url) check(item.image_raw.url);
+      if (item.image_thumb?.url) check(item.image_thumb.url);
+      if (typeof item.url === 'string') check(item.url);
+      if (item.attachment_block?.attachments) walk(item.attachment_block.attachments, depth + 1);
+      if (item.image) walk(item.image, depth + 1);
+      for (const k of Object.keys(item)) {
+        if (k === 'text_block' || k === 'local_message_id' || k === 'conversation_id' || k === 'client_meta') continue;
+        walk(item[k], depth + 1);
+      }
+    }
+  };
+
+  walk(node);
+  return urls;
+}
 
 /**
  * Extracts answer text from one SSE event.
@@ -133,6 +178,10 @@ export type ParsedEvent = {
  */
 export function parseEvent(event: any): ParsedEvent {
   const result: ParsedEvent = { delta: '', finished: false };
+  if (!event || typeof event !== 'object') return result;
+
+  const foundUrls = extractMediaUrlsFromNode(event);
+  if (foundUrls.length) result.mediaUrls = foundUrls;
 
   if (!event || typeof event !== 'object') return result;
 
@@ -246,7 +295,7 @@ const pause = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
  * window.__DSBUF while this side polls it. That avoids needing a preload bridge on a
  * remote origin (the page cannot reach our IPC) and still yields live deltas.
  */
-export async function streamChat(view: BrowserView, text: string, options: StreamChatOptions = {}): Promise<{ answer: string; conversationId: string; messageId: string }> {
+export async function streamChat(view: BrowserView, text: string, options: StreamChatOptions = {}): Promise<{ answer: string; conversationId: string; messageId: string; mediaUrls: string[] }> {
   const timeoutMs = options.timeoutMs ?? 180_000;
   const pollMs = options.pollMs ?? 120;
   const prompt = text.trim();
@@ -277,6 +326,7 @@ export async function streamChat(view: BrowserView, text: string, options: Strea
   let messageId = '';
   let finished = false;
   let failure: Error | null = null;
+  const collectedMediaUrls = new Set<string>();
 
   const consume = (raw: string) => {
     let event: any;
@@ -288,6 +338,9 @@ export async function streamChat(view: BrowserView, text: string, options: Strea
       failure = parsed.error.riskControl
         ? new Error(`豆包触发人机验证（${parsed.error.code}），请在豆包窗口完成验证后重试`)
         : new Error(`豆包返回错误 ${parsed.error.code}：${parsed.error.message}`);
+    }
+    if (parsed.mediaUrls?.length) {
+      for (const u of parsed.mediaUrls) collectedMediaUrls.add(u);
     }
     if (parsed.delta) {
       answer += parsed.delta;
@@ -350,7 +403,7 @@ export async function streamChat(view: BrowserView, text: string, options: Strea
   // truncated answer instead of a retry on another account.
   if (!finished) throw new Error('豆包响应超时');
   if (!answer) throw new Error('豆包没有返回内容，请检查账号状态');
-  return { answer, conversationId, messageId };
+  return { answer, conversationId, messageId, mediaUrls: Array.from(collectedMediaUrls) };
 }
 
 /** Script that starts the fetch and streams SSE frames into window.__DSBUF[requestId]. */

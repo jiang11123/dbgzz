@@ -222,7 +222,11 @@ export function createGatewayChat(store: ThreadStore, runtime: GatewayChatRuntim
       if (answeredBy != null) store.updateGatewayMessage(assistantId, { accountId: answeredBy });
       const attachments: GatewayAttachment[] = [];
       if (runtime.saveRemoteMedia) {
-        for (const url of extractMediaUrls(result.answer)) {
+        const candidateUrls = new Set<string>([
+          ...extractMediaUrls(result.answer),
+          ...(result.mediaUrls ?? []),
+        ]);
+        for (const url of candidateUrls) {
           try {
             const saved = await runtime.saveRemoteMedia(url, /[.](mp4|mov|webm)/i.test(url) ? 'video' : 'image');
             if (saved) attachments.push(saved);

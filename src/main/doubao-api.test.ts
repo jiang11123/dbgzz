@@ -104,3 +104,37 @@ test('reads the bare text delta that carries most of the answer', () => {
   ];
   assert.equal(collectAnswer(events), '1、2、3、4、5、6、7、8、9、10');
 });
+
+test('extracts media URLs from content_block attachments in parseEvent', () => {
+  const event = {
+    content: {
+      content_block: [
+        { block_type: 10000, content: { text_block: { text: '好的' } } },
+        {
+          block_type: 10052,
+          content: {
+            attachment_block: {
+              attachments: [
+                {
+                  type: 1,
+                  image: {
+                    name: 'test.png',
+                    image_ori: {
+                      url: 'https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rabbit.png?rk3s=1',
+                      width: 1024,
+                      height: 1024,
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  };
+  const parsed = parseEvent(event);
+  assert.equal(parsed.delta, '好的');
+  assert.ok(parsed.mediaUrls?.length === 1);
+  assert.equal(parsed.mediaUrls[0], 'https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rabbit.png?rk3s=1');
+});
