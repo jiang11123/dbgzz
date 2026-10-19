@@ -319,7 +319,7 @@ export async function streamChat(view: BrowserView, text: string, options: Strea
     if (typeof payloadFromPage.error === 'string') { streamError = payloadFromPage.error; streamDone = true; }
     if (payloadFromPage.done) streamDone = true;
   };
-  ipcMain.on('doubao:stream', onPush);
+  ipcMain?.on?.('doubao:stream', onPush);
 
   let answer = '';
   let conversationId = '';
@@ -394,7 +394,7 @@ export async function streamChat(view: BrowserView, text: string, options: Strea
       if (pulled.done && streamDone === false) { streamDone = true; }
     }
   } finally {
-    ipcMain.removeListener('doubao:stream', onPush);
+    ipcMain?.removeListener?.('doubao:stream', onPush);
     await view.webContents.executeJavaScript(`(() => { try { delete window.__DSBUF?.[${JSON.stringify(requestId)}]; } catch {} return true; })()`).catch(() => undefined);
   }
 

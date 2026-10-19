@@ -135,3 +135,87 @@ test('a thread cannot run two video turns at once', async () => {
   release();
   await first;
 });
+
+test('chat send captures mediaUrls returned by streamChat and attaches saved remote images to assistant message', async () => {
+  const store = memoryStore();
+  const mockImageUrl = 'https://p3-flow-imagex-sign.byteimg.com/tos-cn-i/rabbit-blue.png';
+  const savedAttachment = { id: 'img-1', kind: 'image' as const, url: 'file:///userData/gateway-media/rabbit.png', name: 'rabbit.png', path: 'C:/userData/gateway-media/rabbit.png' };
+  
+  let savedKind = '';
+  let savedUrl = '';
+  
+  const chat = createGatewayChat(store, {
+    pickAccount: () => ({ id: 1 }),
+    viewForAccount: () => ({
+      webContents: {
+        isDestroyed: () => false,
+        executeJavaScript: async (script: string) => {
+          if (script.includes('frontierSign')) return true;
+          if (script.includes('__DSBUF')) return {
+            events: [
+              JSON.stringify({
+                text: '已换成蓝色背景，主体和紫色帽子保持不变。',
+                content: {
+                  content_block: [
+                    {
+                      block_type: 10052,
+                      content: {
+                        attachment_block: {
+                          attachments: [
+                            {
+                              type: 1,
+                              image: {
+                                name: 'rabbit-blue.png',
+                                image_ori: { url: mockImageUrl, width: 1024, height: 1024 }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                },
+                end_type: 3
+              })
+            ],
+            done: true,
+            error: null
+          };
+          return true;
+        }
+      }
+    }),
+    markAccountOk: () => undefined,
+    markAccountFailure: () => undefined,
+    saveRemoteMedia: async (url, kind) => {
+      savedUrl = url;
+      savedKind = kind;
+      return savedAttachment;
+    }
+  });
+
+  const res = await chat.send({ prompt: '保留兔子和紫色帽子，把背景换成蓝色' });
+  
+  assert.equal(res.assistantMessage.status, 'done');
+  assert.match(res.assistantMessage.content, /已换成蓝色背景/);
+  assert.equal(savedUrl, mockImageUrl);
+  assert.equal(savedKind, 'image');
+  assert.equal(res.assistantMessage.attachments.length, 1);
+  assert.deepEqual(res.assistantMessage.attachments[0], savedAttachment);
+});
+
+test('image generation mode returns generated image attachment with done status', async () => {
+  const store = memoryStore();
+  const imageAttachment = { id: 'img-gen', kind: 'image' as const, url: 'file:///media/img.png', name: 'img.png' };
+  const chat = createGatewayChat(store, {
+    viewForAccount: () => null,
+    pickAccount: () => null,
+    markAccountOk: () => undefined,
+    markAccountFailure: () => undefined,
+    generateImages: async () => [imageAttachment],
+  });
+  const result = await chat.generateImages({ prompt: '一只可爱的白色小兔子' });
+  assert.equal(result.assistantMessage.status, 'done');
+  assert.equal(result.assistantMessage.content, '已生成图片');
+  assert.deepEqual(result.assistantMessage.attachments, [imageAttachment]);
+});
