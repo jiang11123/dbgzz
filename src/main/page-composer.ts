@@ -21,23 +21,35 @@ async function clickPoint(view: BrowserView, point: unknown) {
 }
 
 export const composerSettingsScript = `(() => {
-  const visible = n => n.getBoundingClientRect().width > 0 && n.getBoundingClientRect().height > 0;
+  const visible = n => { const r = n.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+  const norm = s => (s || '').replace(/\\s+/g, ' ').trim();
   const input = [...document.querySelectorAll('[contenteditable=true],textarea')].find(n => visible(n) && !n.disabled);
   if (!input) return {mode:'chat'};
+  // The active skill renders as an exit chip in the composer toolbar: <div data-testid=skill_input_exit_button>视频生成</div>.
+  const chip = [...document.querySelectorAll('[data-testid=skill_input_exit_button]')].find(visible);
+  const chipText = chip ? norm(chip.innerText) : '';
+  const modeBtn = [...document.querySelectorAll('#chat_input_action_mode,[data-testid=chat_input_action_mode]')].find(visible);
+  const modeBtnText = modeBtn ? norm(modeBtn.innerText) : '';
+  const placeholder = input.getAttribute('placeholder') || input.getAttribute('data-placeholder') || '';
   const rect = input.getBoundingClientRect();
-  const nearby = [...document.querySelectorAll('button,[role=button],[aria-selected=true],[aria-pressed=true],[data-state=active],div,span')].filter(n => visible(n) && Math.abs(n.getBoundingClientRect().bottom-rect.bottom)<260 && (n.innerText || '').trim().length<90);
-  const labels = nearby.map(n => (n.innerText || n.getAttribute('aria-label') || '').trim());
-  const rawModel = labels.filter(s=>/Seedance|即梦|视频.*模型|Video.*model|^\\d+\\.\\d+(?:\\s*(Fast|Mini|Pro|极速|标准))?$/i.test(s) && !/[\\n\\r]/.test(s) && s.length < 90).sort((a,b)=>a.length-b.length)[0];
-  // The chip reads "模型 Seedance 2.0 Fast"; strip the prefix so verification compares names.
-  const model = rawModel ? rawModel.replace(/^模型\\s*|^model\\s*/i, '').trim() : undefined;
-  const modeName = /^(对话|聊天|视频生成|生成视频|图像生成|图片生成|生成图片|帮我写作|PPT\\s*生成|录音转写|解题答疑|Chat|Video generation|Image generation)$/i;
-  const active = nearby.find(n=>modeName.test((n.innerText || '').trim()) && (n.matches('[aria-selected=true],[aria-pressed=true],[data-state=active],[aria-current=true]') || /(^|[ _-])(active|selected|checked)([ _-]|$)/i.test(n.className || '')));
-  const activeText=(active?.innerText || '').trim();
-  const video = Boolean(model) || /视频生成|生成视频|video/i.test(activeText) || labels.some(s => /^(?:📹\\s*)?视频生成/i.test(s));
-  const image = !video && (/图像生成|图片生成|生成图片|画图|image/i.test(activeText) || labels.some(s => /^(?:🎨\\s*)?图像生成/i.test(s)));
-  const ratio=labels.find(s=>/^\\d+\\s*[:：]\\s*\\d+$/.test(s))?.replace(/\\s+/g,'').replace('：',':');
-  return {mode:video?'video':image?'image':activeText && !/对话|聊天|chat/i.test(activeText)?'other':'chat', modeLabel:activeText || undefined,
-    model:model || undefined, ratio};
+  // Model / duration chips live in the same toolbar row as the skill chip, never in the sidebar.
+  // Without an active skill there are no model/duration chips: a stray model label elsewhere
+  // must never make a plain chat composer look like a video composer.
+  const near = chip
+    ? [...document.querySelectorAll('button,[role=button]')].filter(n => visible(n) && Math.abs(n.getBoundingClientRect().bottom - chip.getBoundingClientRect().bottom) < 24)
+    : [];
+  const nearTexts = near.map(n => norm(n.innerText)).filter(Boolean);
+  const modelRaw = nearTexts.find(s => /^模型\\s*\\S/.test(s)) || '';
+  const model = modelRaw ? modelRaw.replace(/^模型\\s*/, '').trim() : undefined;
+  const ratio = nearTexts.map(s => s.replace(/\\s+/g, '').replace('：', ':')).find(s => /^\\d+:\\d+$/.test(s));
+  // 'auto · 10s' carries the duration the page will actually use.
+  const durationRaw = nearTexts.find(s => /^(?:自动|auto)\\s*[·.]?\\s*\\d+\\s*s?$/i.test(s)) || '';
+  const duration = (() => { const m = /(\\d+)\\s*s?$/i.exec(durationRaw); return m ? Number(m[1]) : undefined; })();
+  const video = /视频生成|生成视频|video/i.test(chipText) || /视频生成|生成视频/i.test(modeBtnText) || (!chipText && /描述你想要的视频|视频/.test(placeholder));
+  const image = !video && (/图像生成|图片生成|生成图片|画图|image/i.test(chipText) || /图像生成|图片生成/i.test(modeBtnText));
+  const modeLabel = chipText || modeBtnText || undefined;
+  const mode = video ? 'video' : image ? 'image' : chipText ? 'other' : 'chat';
+  return {mode, modeLabel, model, ratio, duration: duration && duration > 0 ? duration : undefined};
 })()`;
 
 export async function readComposerSettings(view: BrowserView): Promise<ComposerSettings> {
@@ -51,73 +63,130 @@ export async function waitForComposer(view: BrowserView) {
     if (!view.webContents.isLoading() && await view.webContents.executeJavaScript(`Boolean([...document.querySelectorAll('[contenteditable=true],textarea')].find(n=>n.getBoundingClientRect().width>0 && !n.disabled))`)) return;
     await pause(250);
   }
-  throw new Error('目标账号未出现输入框，请先登录或完成页面验证');
+  throw new Error('目标账号未出现输入框，请打开执行账号检查页面加载状态');
+}
+
+/** Centre point of the first visible element matching the given skill label inside the composer toolbar. */
+const skillButtonPointScript = (label: string) => `(() => {
+  const visible = n => { const r = n.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+  const want = ${JSON.stringify(label)};
+  const norm = s => (s || '').replace(/\\s+/g, ' ').trim();
+  const isMatch = s => {
+    const text = norm(s);
+    if (!text) return false;
+    if (text === want) return true;
+    if (want === '视频生成' || want === '生成视频') {
+      return /^(?:AI\\s*)?(?:视频生成|生成视频)/i.test(text) || text.includes('视频生成');
+    }
+    if (want === '图像生成' || want === '图片生成') {
+      return /^(?:AI\\s*)?(?:图像生成|图片生成|生成图片)/i.test(text) || text.includes('图像生成') || text.includes('图片生成');
+    }
+    return text.includes(want);
+  };
+  const input = [...document.querySelectorAll('[contenteditable=true],textarea')].find(n => visible(n));
+  const rect = input?.getBoundingClientRect();
+  const nodes = [...document.querySelectorAll('[data-testid^=skill_bar_button_],button,[role=button],[role=menuitem],[role=option]')]
+    .filter(n => visible(n) && isMatch(n.innerText || n.getAttribute('aria-label') || n.getAttribute('title') || ''))
+    .filter(n => !rect || n.getBoundingClientRect().bottom > rect.top - 200);
+  if (!nodes.length) return null;
+  const target = nodes[nodes.length - 1];
+  const r = target.getBoundingClientRect();
+  const pt = { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
+  const opts = { bubbles: true, cancelable: true, clientX: pt.x, clientY: pt.y };
+  try {
+    target.dispatchEvent(new PointerEvent('pointerdown', opts));
+    target.dispatchEvent(new MouseEvent('mousedown', opts));
+    target.dispatchEvent(new PointerEvent('pointerup', opts));
+    target.dispatchEvent(new MouseEvent('mouseup', opts));
+    target.dispatchEvent(new MouseEvent('click', opts));
+    if (typeof target.click === 'function') target.click();
+  } catch (_) {}
+  return pt;
+})()`;
+
+/** Makes the composer's skill bar visible: it only renders once the editor has been focused/expanded. */
+async function expandSkillBar(view: BrowserView) {
+  const count = () => view.webContents.executeJavaScript(
+    `document.querySelectorAll('[data-testid^=skill_bar_button_]').length`).catch(() => 0);
+  if (await count() > 0) return true;
+  if (!view.webContents.isDestroyed()) view.webContents.focus();
+  const clickCoords = await view.webContents.executeJavaScript(`(() => {
+    const all = [...document.querySelectorAll('[contenteditable=true],textarea')].filter(n => n.getBoundingClientRect().width > 0 && !n.disabled);
+    const ed = all.find(n => n.getAttribute('contenteditable') === 'true') || all[all.length - 1];
+    if (!ed) return null;
+    ed.focus();
+    const rect = ed.getBoundingClientRect();
+    const pt = { x: Math.round(rect.left + Math.min(50, rect.width / 2)), y: Math.round(rect.top + rect.height / 2) };
+    const opts = { bubbles: true, cancelable: true, clientX: pt.x, clientY: pt.y };
+    ed.dispatchEvent(new PointerEvent('pointerdown', opts));
+    ed.dispatchEvent(new MouseEvent('mousedown', opts));
+    ed.dispatchEvent(new PointerEvent('pointerup', opts));
+    ed.dispatchEvent(new MouseEvent('mouseup', opts));
+    ed.dispatchEvent(new MouseEvent('click', opts));
+    return pt;
+  })()`).catch(() => null);
+  if (clickCoords) {
+    await clickPoint(view, clickCoords);
+  }
+  for (let attempt = 0; attempt < 8; attempt++) {
+    await pause(250);
+    if (await count() > 0) return true;
+  }
+  return false;
 }
 
 export async function ensureComposerMode(view: BrowserView, settings: ComposerSettings) {
   await waitForComposer(view);
+  const matches = (state: ComposerSettings) => state.mode === settings.mode && (settings.mode !== 'other' || state.modeLabel === settings.modeLabel);
   let current = await readComposerSettings(view);
-  if (current.mode === settings.mode && (settings.mode !== 'other' || current.modeLabel === settings.modeLabel)) return;
-  const label = settings.mode === 'video' ? '视频生成|生成视频|video generation|create video' : settings.mode === 'image' ? '图像生成|图片生成|生成图片|画图|image generation|create image' : settings.mode === 'chat' ? '对话|聊天|普通聊天|chat' : settings.modeLabel;
+  if (matches(current)) return;
+  const label = settings.mode === 'video' ? '视频生成' : settings.mode === 'image' ? '图像生成' : settings.mode === 'chat' ? '对话' : settings.modeLabel;
   if (!label) throw new Error('未识别到来源模式，请先在目标账号手动选择模式');
 
-  for (let attempt = 0; attempt < 3; attempt++) {
-    // 1. Try finding a direct button or toolbar item with trusted mouse click
-    const point = await view.webContents.executeJavaScript(`(() => {
-      const input = [...document.querySelectorAll('[contenteditable=true],textarea')].find(n => n.getBoundingClientRect().width > 0);
-      const bottom = input?.getBoundingClientRect().bottom || window.innerHeight;
-      const re = new RegExp(${JSON.stringify(`(?:${label})`)}, 'i');
-      const nodes = [...document.querySelectorAll('button,[role=button],a,div,span')].filter(n => {
-        const r = n.getBoundingClientRect();
-        return r.width > 0 && r.height > 0 && re.test((n.innerText || n.getAttribute('aria-label') || '').trim());
-      }).sort((a,b) => Math.abs(a.getBoundingClientRect().bottom - bottom) - Math.abs(b.getBoundingClientRect().bottom - bottom));
-      if (!nodes.length) return null;
-      const r = nodes[0].getBoundingClientRect();
-      return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
-    })()`);
-
+  if (!view.webContents.isDestroyed()) view.webContents.focus();
+  for (let attempt = 0; attempt < 4; attempt++) {
+    await expandSkillBar(view);
+    // 1. The skill bar exposes the mode directly as a chip button (视频生成 / PPT 生成 / 图像生成 ...).
+    let point = await view.webContents.executeJavaScript(skillButtonPointScript(label));
+    if (!point) {
+      // 2. Otherwise open the composer menu through the mode button or the '+' tool button.
+      const opener = await view.webContents.executeJavaScript(`(() => {
+        const visible = n => { const r = n.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+        const norm = s => (s || '').replace(/\\s+/g, ' ').trim();
+        const input = [...document.querySelectorAll('[contenteditable=true],textarea')].find(n => visible(n));
+        const rect = input?.getBoundingClientRect();
+        const candidates = [...document.querySelectorAll('button,[role=button]')].filter(n => visible(n));
+        const target = candidates.find(n => n.id === 'chat_input_action_mode' || n.getAttribute('data-testid') === 'chat_input_action_mode')
+          || candidates.find(n => /^(?:更多|More|Tools)$/i.test(norm(n.innerText)))
+          || candidates.find(n => n.getAttribute('data-testid') === 'upload_file_button')
+          || candidates.find(n => /^[+＋]$/.test(norm(n.innerText)) && (!rect || Math.abs(n.getBoundingClientRect().bottom - rect.bottom) < 120));
+        if (!target) return null;
+        const r = target.getBoundingClientRect();
+        const pt = { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
+        const opts = { bubbles: true, cancelable: true, clientX: pt.x, clientY: pt.y };
+        try {
+          target.dispatchEvent(new PointerEvent('pointerdown', opts));
+          target.dispatchEvent(new MouseEvent('mousedown', opts));
+          target.dispatchEvent(new PointerEvent('pointerup', opts));
+          target.dispatchEvent(new MouseEvent('mouseup', opts));
+          target.dispatchEvent(new MouseEvent('click', opts));
+          if (typeof (target as any).click === 'function') (target as any).click();
+        } catch (_) {}
+        return pt;
+      })()`);
+      if (opener) {
+        await clickPoint(view, opener);
+        await pause(700);
+        point = await view.webContents.executeJavaScript(skillButtonPointScript(label));
+      }
+    }
     if (point) {
       await clickPoint(view, point);
-      await pause(800);
-      current = await readComposerSettings(view);
-      if (current.mode === settings.mode && (settings.mode !== 'other' || current.modeLabel === settings.modeLabel)) return;
-    }
-
-    // 2. If direct click wasn't found or didn't switch, try clicking '+' button to open tool menu
-    const plusPoint = await view.webContents.executeJavaScript(`(() => {
-      const input = [...document.querySelectorAll('[contenteditable=true],textarea')].find(n => n.getBoundingClientRect().width > 0);
-      const rect = input?.getBoundingClientRect();
-      const buttons = [...document.querySelectorAll('button,[role=button]')].filter(n => {
-        const r = n.getBoundingClientRect();
-        return r.width > 0 && r.height > 0 && (!rect || Math.abs(r.bottom - rect.bottom) < 260);
-      });
-      const plus = buttons.find(b => {
-        const text = (b.innerText || b.getAttribute('aria-label') || '').trim();
-        return /^[+＋]$/i.test(text) || /添加|更多|功能|插件/i.test(text) || Boolean(b.querySelector('svg path[d*="M12"]'));
-      });
-      if (!plus) return null;
-      const r = plus.getBoundingClientRect();
-      return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
-    })()`);
-
-    if (plusPoint) {
-      await clickPoint(view, plusPoint);
-      await pause(600);
-      const menuPoint = await view.webContents.executeJavaScript(`(() => {
-        const re = new RegExp(${JSON.stringify(`(?:${label})`)}, 'i');
-        const nodes = [...document.querySelectorAll('[role=menuitem],[role=option],button,div,span')].filter(n => {
-          const r = n.getBoundingClientRect();
-          return r.width > 0 && r.height > 0 && re.test((n.innerText || n.getAttribute('aria-label') || '').trim());
-        });
-        if (!nodes.length) return null;
-        const r = nodes[nodes.length - 1].getBoundingClientRect();
-        return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
-      })()`);
-      if (menuPoint) {
-        await clickPoint(view, menuPoint);
-        await pause(800);
+      // Entering a video skill re-renders the composer; give it time to settle.
+      for (let wait = 0; wait < 20; wait++) {
+        await pause(400);
         current = await readComposerSettings(view);
-        if (current.mode === settings.mode && (settings.mode !== 'other' || current.modeLabel === settings.modeLabel)) return;
+        if (matches(current)) return;
       }
     }
     await pause(300);
@@ -125,8 +194,8 @@ export async function ensureComposerMode(view: BrowserView, settings: ComposerSe
 
   for (let attempt = 0; attempt < 12; attempt++) {
     await pause(250);
-    const after = await readComposerSettings(view);
-    if (after.mode === settings.mode && (settings.mode !== 'other' || after.modeLabel === settings.modeLabel)) return;
+    current = await readComposerSettings(view);
+    if (matches(current)) return;
   }
   throw new Error(`无法确认目标账号已进入【${settings.mode === 'video' ? '视频生成' : settings.mode === 'image' ? '图像生成' : settings.mode}】模式，已停止发送。请在目标窗口手动选择模式后重试`);
 }
