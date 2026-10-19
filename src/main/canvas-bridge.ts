@@ -4,17 +4,19 @@ import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import type { BrowserView } from 'electron';
 import type { Account } from '../shared/types';
-import { ensureComposerMode, readComposerSettings, selectPageSetting, selectVideoDuration, selectDoubaoVideoSettings, prepareText, clickComposerSend, waitForComposer } from './page-composer';
+import { ensureComposerMode, readComposerSettings, selectPageSetting, selectVideoDuration, selectDoubaoVideoSettings, prepareText, clickComposerSend, waitForComposer, assertEmptyDraft } from './page-composer';
 import { reimportOrderedImages } from './chat-images';
+import { pageReplySnapshotScript, createPageReplyBaseline, collectPageReplies, normalizePageReplyText, type PageReplyBaseline, type PageReplySnapshot } from './page-replies';
+import { uploadVideoReferences } from './video-reference';
 import { submitVideoTask } from './doubao-video';
 import { AccountPool, type FailureKind } from './account-pool';
 
 export type CanvasBridgeStatus =
-  | 'queued' | 'assigned' | 'submitting' | 'generating' | 'downloading'
+  | 'queued' | 'assigned' | 'submitting' | 'awaiting_reply' | 'awaiting_confirmation' | 'generating' | 'downloading'
   | 'completed' | 'needs_attention' | 'failed' | 'cancelled';
 
 type CanvasReference = { src: string; mediaType?: 'image' | 'video'; name?: string };
-export type CanvasTaskRequest = { targetAccountId?: number; sourceAccountId?: number; sourceUrl?: string; sourceDraftText?: string; referencePaths?: string[]; prompt?: string; model?: string; ratio?: string; duration?: number; referenceAssets?: CanvasReference[] };
+export type CanvasTaskRequest = { gatewayThreadId?: string; gatewayReplyMessageId?: number; conversationId?: string; targetAccountId?: number; sourceAccountId?: number; sourceUrl?: string; sourceDraftText?: string; referencePaths?: string[]; prompt?: string; model?: string; ratio?: string; duration?: number; referenceAssets?: CanvasReference[] };
 
 export type CanvasBridgeTask = {
   id: string;
@@ -33,6 +35,13 @@ export type CanvasBridgeTask = {
   pageUrl: string | null;
   referencePaths: string[];
   latestReply?: string | null;
+  latestReplyId?: string;
+  replyBaseline?: PageReplyBaseline;
+  sentPrompt?: string;
+  referenceUploaded?: boolean;
+  gatewayThreadId?: string;
+  conversationId?: string;
+  gatewayReplyMessageId?: number;
   videoPath: string | null;
   error: string | null;
   createdAt: string;
@@ -45,8 +54,17 @@ type Runtime = {
   viewForAccount: (accountId: number) => BrowserView | null;
   /** True when the view is attached to a window; capturePage needs that. */
   isViewAttached?: (view: BrowserView) => boolean;
-  onTaskChanged: () => void;
+  onTaskChanged: (task?: CanvasBridgeTask) => void;
+  downloadHDVideo?: (view: BrowserView, task: CanvasBridgeTask) => Promise<string | null>;
 };
+
+export function videoReplyState(text: string): Pick<CanvasBridgeTask, 'status' | 'statusText'> {
+  if (/请[^。！？]*确认|[^。！？]*确认[^。！？]*(?:后|再)[^。！？]*(?:生成|开始)|是否[^。！？]*(?:生成|上传|开始)|请[^。！？]*(?:上传|提供|补充)[^。！？]*(?:图片|参考图)/.test(text))
+    return { status: 'awaiting_confirmation', statusText: '豆包等待你的回复，请直接在此发送补充消息' };
+  if (/正在生成|已开始生成|生成中|正在排队|排队中|预计等待|生成进度/.test(text))
+    return { status: 'generating', statusText: '豆包已返回生成进度' };
+  return { status: 'awaiting_reply', statusText: '已收到豆包回复，可继续发送消息' };
+}
 
 const terminal = new Set<CanvasBridgeStatus>(['completed', 'needs_attention', 'failed', 'cancelled']);
 const contentType = (filePath: string) => /\.webm$/i.test(filePath) ? 'video/webm' : /\.mov$/i.test(filePath) ? 'video/quicktime' : 'video/mp4';
@@ -206,11 +224,7 @@ export function formatVideoPrompt(prompt: string, ratio?: string, duration?: num
 
 export async function uploadTaskReferences(view: BrowserView, paths: string[]) {
   if (!paths || !paths.length) return;
-  try {
-    await uploadReferences(view, paths, false);
-  } catch {
-    await reimportOrderedImages(view, paths);
-  }
+  await uploadVideoReferences(view, paths);
 }
 
 async function selectDoubaoVideoAspectRatio(view: BrowserView, ratio: string) {
@@ -302,8 +316,11 @@ export class CanvasBridge {
   private downloadPaths = new Map<string, string>();
   private videoBaselines = new Map<string, string[]>();
   private downloadBaselines = new Map<string, number>();
+  /** HD (shareService) attempts per task, so a slow player cannot block the fallback forever. */
+  private hdAttempts = new Map<string, number>();
   private taskPageRecoveryAttempts = new Map<string, number>();
-  private autoConfirmedTasks = new Set<string>();
+  private pollingAccounts = new Set<number>();
+  private followingUp = new Set<string>();
   /** Last time the poller actually looked at each task, to spot ghost tasks holding an account. */
   private lastPolledAt = new Map<string, number>();
   private lastPollError: string | null = null;
@@ -399,35 +416,80 @@ export class CanvasBridge {
   attachResult(id: string, videoPath: string) {
     const task = this.task(id);
     if (!task || !existsSync(videoPath)) throw new Error('任务或视频文件不存在');
-    if (!['generating', 'downloading', 'needs_attention'].includes(task.status)) throw new Error('该任务当前不能关联结果');
+    if (!['awaiting_reply', 'awaiting_confirmation', 'generating', 'downloading', 'needs_attention'].includes(task.status)) throw new Error('该任务当前不能关联结果');
     Object.assign(task, { status: 'completed' as const, statusText: '已手动关联视频结果', videoPath, error: null, updatedAt: new Date().toISOString() });
     if (task.accountId) this.busyAccountIds.delete(task.accountId);
     this.persistTasks(); this.runtime.onTaskChanged(); this.dispatchNextQueuedTask();
   }
 
-  async confirmTask(taskId: string, text = '确认生成，直接开始'): Promise<boolean> {
+  linkChatTask(taskId: string, threadId: string, replyMessageId: number, resetReply = false) {
     const task = this.task(taskId);
-    if (!task || !task.accountId) return false;
-    const view = this.runtime.viewForAccount(task.accountId);
-    if (!view || view.webContents.isDestroyed()) return false;
-    this.autoConfirmedTasks.add(task.id);
-    view.webContents.send('account-send:bypass', true);
+    if (!task) throw new Error('视频任务不存在');
+    this.update(task, { gatewayThreadId: threadId, gatewayReplyMessageId: replyMessageId, ...(resetReply ? {latestReply:null,latestReplyId:undefined,statusText:'正在转交补充消息…'} : {}) });
+  }
+
+  async confirmTask(taskId: string, text: string): Promise<boolean> {
+    const task = this.task(taskId);
+    if (!task?.accountId || !task.pageUrl || !text.trim() || !['awaiting_reply', 'awaiting_confirmation', 'generating'].includes(task.status)) return false;
+    if (this.followingUp.has(taskId)) throw new Error('上一条补充消息正在发送，请稍候');
+    this.followingUp.add(taskId);
+    let view: BrowserView | null = null;
     try {
-      await prepareText(view, text);
-      await clickComposerSend(view, text);
-      this.update(task, { statusText: '已发送确认，豆包正在生成视频' });
+      view = this.runtime.viewForAccount(task.accountId);
+      if (!view || view.webContents.isDestroyed()) return false;
+      if (normalizeTaskUrl(view.webContents.getURL()) !== normalizeTaskUrl(task.pageUrl)) {
+        await view.webContents.loadURL(task.pageUrl);
+        await waitForComposer(view);
+      }
+      await assertEmptyDraft(view);
+      if (task.referencePaths.length && !task.referenceUploaded) {
+        await uploadTaskReferences(view, task.referencePaths);
+        this.update(task, { referenceUploaded: true });
+      }
+      const snapshot = await runInPage(view, pageReplySnapshotScript) as PageReplySnapshot;
+      const baseline = createPageReplyBaseline(snapshot, { prompt: text.trim() });
+      await prepareText(view, text.trim());
+      view.webContents.send('account-send:bypass', true);
+      await clickComposerSend(view, text.trim());
+      this.update(task, { replyBaseline: baseline, sentPrompt: text.trim(), latestReply: null, latestReplyId: undefined,
+        status: 'awaiting_reply', statusText: '补充消息已转交，等待豆包实际回复', pageUrl: view.webContents.getURL() });
       return true;
-    } catch {
-      return false;
     } finally {
-      if (!view.webContents.isDestroyed()) view.webContents.send('account-send:bypass', false);
+      this.followingUp.delete(taskId);
+      if (view && !view.webContents.isDestroyed()) view.webContents.send('account-send:bypass', false);
+    }
+  }
+
+  private async syncTaskReply(task: CanvasBridgeTask, view: BrowserView) {
+    if (this.followingUp.has(task.id)) return;
+    const snapshot = await runInPage(view, pageReplySnapshotScript) as PageReplySnapshot;
+    if (snapshot.error) throw new Error('读取豆包回复失败：' + snapshot.error);
+    let baseline = task.replyBaseline;
+    if (!baseline) {
+      const prompt = task.sentPrompt || formatVideoPrompt(task.prompt, task.ratio, task.duration, task.model, Boolean(task.referencePaths.length));
+      let anchor = -1;
+      for (let i = snapshot.messages.length - 1; i >= 0; i--) { const m = snapshot.messages[i]; if (m.role === 'user' && normalizePageReplyText(m.text) === normalizePageReplyText(prompt)) { anchor = i; break; } }
+      baseline = createPageReplyBaseline({ ...snapshot, messages: anchor >= 0 ? snapshot.messages.slice(0, anchor) : snapshot.messages }, { prompt });
+    }
+    const result = collectPageReplies(baseline, snapshot);
+    task.replyBaseline = result.baseline;
+    if (result.latestText) {
+      const state = videoReplyState(result.latestText);
+      this.update(task, { latestReply: result.latestText, latestReplyId: result.replies.at(-1)?.id, ...state });
     }
   }
 
   async tryDownloadCompletedVideo(accountId: number) {
-    const task = [...this.tasks.values()].find(candidate => candidate.accountId === accountId && ['generating', 'downloading'].includes(candidate.status));
+    if (this.pollingAccounts.has(accountId)) return false;
+    this.pollingAccounts.add(accountId);
+    try { return await this.pollVideoTask(accountId); }
+    finally { this.pollingAccounts.delete(accountId); }
+  }
+
+  private async pollVideoTask(accountId: number) {
+    const task = [...this.tasks.values()].find(candidate => candidate.accountId === accountId && ['awaiting_reply', 'awaiting_confirmation', 'generating', 'downloading'].includes(candidate.status));
     if (!task) return false;
-    if (Date.now() - Date.parse(task.createdAt) > 30 * 60 * 1000 || (task.status === 'downloading' && Date.now() - Date.parse(task.updatedAt) > 3 * 60 * 1000)) {
+    if ((task.status !== 'awaiting_confirmation' && Date.now() - Date.parse(task.updatedAt) > 30 * 60 * 1000) || (task.status === 'downloading' && Date.now() - Date.parse(task.updatedAt) > 3 * 60 * 1000)) {
       this.update(task, { status: 'needs_attention', statusText: '等待生成或下载超时，请检查执行账号并手动关联结果', error: '未能确认视频结果' });
       this.busyAccountIds.delete(accountId); this.dispatchNextQueuedTask(); return false;
     }
@@ -463,8 +525,8 @@ export class CanvasBridge {
         this.dispatchNextQueuedTask();
         return false;
       }
-      const pageState = await runInPage(view, `(() => (document.body?.innerText || '').replace(/\\s+/g, ' ').slice(-6000))()`);
-      const message = String(pageState);
+      await this.syncTaskReply(task, view);
+      const message = task.latestReply || '';
       if (/免费次数用完|额度不足|额度用完|创作额度|额度已用|暂时无法使用.*视频|视频生成失败|生成失败/.test(message)) {
         this.busyAccountIds.delete(accountId);
         this.pool.markFailure(accountId, 'quota', '豆包页面提示：当前账号视频生成额度不足或不可用');
@@ -479,92 +541,23 @@ export class CanvasBridge {
         this.dispatchNextQueuedTask();
         return false;
       }
-      const latestText = await runInPage(view, `(() => {
-        try {
-          const assistantCards = [...document.querySelectorAll('[data-message-role="assistant"], [class*="message-assistant"], [class*="assistant-message"], [class*="bot-message"]')].filter(n => {
-            const r = n.getBoundingClientRect();
-            return r.width > 0 && r.height > 0;
-          });
+      if (['awaiting_reply', 'awaiting_confirmation'].includes(task.status) && !/视频[^。！？]*(?:已生成|生成好了)|你的视频生成好了/.test(message)) return false;
 
-          let targetContainer = null;
-          if (assistantCards.length) {
-            targetContainer = assistantCards[assistantCards.length - 1];
-          } else {
-            const copyBtns = [...document.querySelectorAll('button,[role=button]')].filter(b => {
-              const label = b.getAttribute('aria-label') || b.getAttribute('title') || b.innerText || '';
-              return /复制|朗读|赞|踩|重新生成/i.test(label);
-            });
-            if (copyBtns.length) {
-              const lastCopy = copyBtns[copyBtns.length - 1];
-              targetContainer = lastCopy.closest('[data-message-id],[data-message-role],article,section,div[class*="message"],div[class*="item"]');
-              if (!targetContainer) {
-                let parent = lastCopy.parentElement;
-                for (let i = 0; parent && i < 5; i++, parent = parent.parentElement) {
-                  if (parent.innerText && parent.innerText.length > 20) { targetContainer = parent; break; }
-                }
-              }
-            }
+      // Prefer the user's HD unwatermarked method (shareService) over the site's own
+      // watermarked download button. The player data can lag the "生成好了" message, so
+      // retry a bounded number of polls before falling back to the regular download.
+      if (/你的视频生成好了|视频生成好了|视频已生成|生成好了/.test(message) && this.runtime.downloadHDVideo) {
+        const attempts = this.hdAttempts.get(task.id) ?? 0;
+        if (attempts < 8) {
+          this.hdAttempts.set(task.id, attempts + 1);
+          const hdPath = await this.runtime.downloadHDVideo(view, task).catch(() => null);
+          if (hdPath && existsSync(hdPath)) {
+            this.hdAttempts.delete(task.id);
+            this.update(task, { status: 'completed', statusText: task.sourceAccountId ? '视频已返回共享工作区' : '视频已高清下载（无水印）', videoPath: hdPath, error: null });
+            this.busyAccountIds.delete(accountId);
+            this.dispatchNextQueuedTask();
+            return true;
           }
-
-          if (targetContainer) {
-            const clone = targetContainer.cloneNode(true);
-            clone.querySelectorAll('button, [role="button"], img, svg, [class*="action"], [class*="toolbar"], [class*="footer"], [class*="time"], [class*="date"]').forEach(n => n.remove());
-            const contentEl = clone.querySelector('[class*="content"], [class*="markdown"], [class*="text-content"]') || clone;
-
-            const isJunkLine = (line) => {
-              const s = (line || '').trim();
-              if (!s) return true;
-              if (/^(今天|昨天|前天|刚刚|\d{1,2}月\d{1,2}日|\d{4}-\d{2}-\d{2})?\s*\d{1,2}:\d{2}(:\d{2})?$/i.test(s)) return true;
-              if (/^(今天|昨天|前天|刚刚|\d+\s*分钟前|\d+\s*小时前)$/i.test(s)) return true;
-              if (/^(复制|朗读|赞|踩|重新生成|分享|转发|发消息|按住空格|Shift\+Enter)$/i.test(s)) return true;
-              if (s.length <= 8 && /^\d{1,2}:\d{2}$/.test(s)) return true;
-              return false;
-            };
-
-            const lines = (contentEl.innerText || '').split(/\r?\n/).map(s => s.trim()).filter(s => !isJunkLine(s));
-            const t = lines.join('\n').trim();
-            if (t.length >= 4) return t;
-          }
-
-          const bodyText = document.body ? (document.body.innerText || '') : '';
-          const prompt = ${JSON.stringify(task.prompt.slice(0, 30))};
-          const idx = bodyText.lastIndexOf(prompt);
-          if (idx > -1) {
-            const lines = bodyText.slice(idx).split(/\r?\n/).slice(1);
-            const collected = [];
-            for (const line of lines) {
-              const trimmed = line.trim();
-              if (!trimmed) continue;
-              if (/^(今天|昨天|\d{1,2}:\d{2}|发消息|按住空格|换行)/i.test(trimmed)) {
-                if (collected.length > 0) break;
-                continue;
-              }
-              collected.push(trimmed);
-            }
-            const reply = collected.join('\n').trim();
-            if (reply) return reply;
-          }
-          return '';
-        } catch {
-          return '';
-        }
-      })()`);
-
-      if (typeof latestText === 'string' && latestText && latestText !== task.latestReply) {
-        this.update(task, { latestReply: latestText });
-        this.runtime.onTaskChanged();
-      }
-
-      if (typeof latestText === 'string' && /确认后.*(?:开始|生成)|请先确认.*参数|确认后我再开始|请确认最终参数|是否按此参数生成|确认以下参数/i.test(latestText)) {
-        this.update(task, { statusText: '已检测到参数确认提示，正在自动确认生成' });
-        if (!this.autoConfirmedTasks.has(task.id)) {
-          this.autoConfirmedTasks.add(task.id);
-          void (async () => {
-            try {
-              await new Promise((resolve) => setTimeout(resolve, 1000));
-              await this.confirmTask(task.id, '确认生成，直接开始');
-            } catch {}
-          })();
         }
       }
 
@@ -607,16 +600,6 @@ export class CanvasBridge {
         }
       }
       
-      await runInPage(view, `(() => {
-        const buttons = Array.from(document.querySelectorAll('button,[role=button],div[role=button],span[role=button]'))
-          .filter(n => n.getBoundingClientRect().width > 0 && !n.disabled && !n.closest('[aria-disabled=true]'));
-        const confirmBtn = buttons.find(n => /^(确认|确认生成|开始生成|立即生成|按此生成)$/.test((n.innerText || n.getAttribute('aria-label') || '').trim()));
-        if (confirmBtn) {
-          confirmBtn.click();
-          return true;
-        }
-        return false;
-      })()`).catch(() => false);
       if (/你的视频生成好了|视频生成好了|视频已生成|生成好了/.test(message)) {
         const opened = await runInPage(view, `(() => {
           const complete = Array.from(document.querySelectorAll('*')).filter((node) => (node.textContent || '').trim() === '你的视频生成好了。').at(-1);
@@ -659,7 +642,7 @@ export class CanvasBridge {
     if (terminal.has(task.status) && patch.status && patch.status !== task.status) return;
     Object.assign(task, patch, { updatedAt: new Date().toISOString() });
     this.persistTasks();
-    this.runtime.onTaskChanged();
+    this.runtime.onTaskChanged(task);
   }
 
 
@@ -674,12 +657,15 @@ export class CanvasBridge {
   private releaseStaleLocks() {
     for (const task of this.tasks.values()) {
       if (!task.accountId) continue;
-      if (!['assigned', 'submitting', 'generating', 'downloading'].includes(task.status)) continue;
+      if (!['assigned', 'submitting', 'awaiting_reply', 'awaiting_confirmation', 'generating', 'downloading'].includes(task.status)) continue;
       const last = this.lastPolledAt.get(task.id);
       const idleMs = Date.now() - (last ?? Date.parse(task.updatedAt || task.createdAt));
-      if (idleMs < 3 * 60 * 1000) continue;
+      // A task that waits on the user's own answer ("豆包参数确认中") is not stuck: the
+      // account stays reserved, but the task must survive however long the user takes.
+      const waitingOnUser = task.status === 'awaiting_reply' || task.status === 'awaiting_confirmation';
+      if (idleMs < (waitingOnUser ? 30 : 3) * 60 * 1000) continue;
       this.busyAccountIds.delete(task.accountId);
-      if (task.status === 'generating' || task.status === 'downloading') {
+      if (['awaiting_reply', 'awaiting_confirmation', 'generating', 'downloading'].includes(task.status)) {
         this.update(task, { status: 'needs_attention', statusText: '任务长时间无进展，已释放账号；请重新发送或到豆包确认结果', error: '任务轮询中断' });
       }
     }
@@ -704,7 +690,7 @@ export class CanvasBridge {
           this.tasks.set(task.id, task);
           continue;
         }
-        if (!task.accountId || !['generating', 'downloading'].includes(task.status)) continue;
+        if (!task.accountId || !['awaiting_reply', 'awaiting_confirmation', 'generating', 'downloading'].includes(task.status)) continue;
         // A task left 'generating' by a previous crash has no live polling loop behind it
         // anymore. tryDownloadCompletedVideo can still pick it up for a late download,
         // but it must NOT keep the account busy forever — a stuck task made every new
@@ -739,7 +725,7 @@ export class CanvasBridge {
     const prompt = body.prompt?.trim() ?? '';
     if (!prompt) throw new Error('缺少视频提示词');
     const id = `canvas-video-${randomUUID()}`;
-    const task: CanvasBridgeTask = { id, targetAccountId: body.targetAccountId, duration: body.duration, sourceAccountId: body.sourceAccountId, sourceUrl: body.sourceUrl, sourceDraftText: body.sourceDraftText, prompt, model: body.model, ratio: /^\d+:\d+$/.test(body.ratio || '') ? body.ratio! : '16:9', status: 'queued', statusText: '等待分配豆包账号', accountId: null, pageUrl: null, referencePaths: [], videoPath: null, error: null, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+    const task: CanvasBridgeTask = { id, gatewayThreadId: body.gatewayThreadId, gatewayReplyMessageId: body.gatewayReplyMessageId, conversationId: body.conversationId, targetAccountId: body.targetAccountId, duration: body.duration, sourceAccountId: body.sourceAccountId, sourceUrl: body.sourceUrl, sourceDraftText: body.sourceDraftText, prompt, model: body.model, ratio: /^\d+:\d+$/.test(body.ratio || '') ? body.ratio! : '16:9', status: 'queued', statusText: '等待分配豆包账号', accountId: null, pageUrl: null, referencePaths: [], videoPath: null, error: null, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
     task.referencePaths = [...(body.referencePaths ?? []), ...writeReferences(this.uploadRoot, id, body.referenceAssets ?? [])];
     this.tasks.set(id, task);
     this.persistTasks();
@@ -757,9 +743,17 @@ export class CanvasBridge {
     const account = task.targetAccountId
       ? doubaoAccounts.find(a => a.id === task.targetAccountId)
       : this.pool.pick(doubaoAccounts, this.busyAccountIds);
-    if (account && this.busyAccountIds.has(account.id)) { this.update(task, { status: 'queued', statusText: `等待 ${account.name} 完成前一个任务` }); return; }
+    if (account && this.busyAccountIds.has(account.id)) {
+      this.update(task, { status: 'queued', statusText: `等待 ${account.name} 完成前一个任务` });
+      this.dispatchingTasks.delete(task.id);
+      return;
+    }
     if (!account) {
-      if (task.targetAccountId) { this.update(task, { status: 'needs_attention', statusText: '执行账号不存在或不是豆包账号', error: '请选择可用的豆包执行账号' }); return; }
+      if (task.targetAccountId) {
+        this.update(task, { status: 'needs_attention', statusText: '执行账号不存在或不是豆包账号', error: '请选择可用的豆包执行账号' });
+        this.dispatchingTasks.delete(task.id);
+        return;
+      }
       const loggedIn = doubaoAccounts.filter(candidate => candidate.isLoggedIn);
       if (loggedIn.length) {
         const states = this.pool.snapshot(loggedIn, this.busyAccountIds).map(entry => `${entry.health}${entry.cooldownRemainingMs ? `(${Math.ceil(entry.cooldownRemainingMs / 1000)}s)` : ''}`);
@@ -773,15 +767,31 @@ export class CanvasBridge {
     }
     this.busyAccountIds.add(account.id);
     this.update(task, { status: 'assigned', statusText: `已分配账号：${account.name}`, accountId: account.id });
-      const view = this.runtime.viewForAccount(account.id) ?? this.runtime.openAccount(account.id);
-    if (!view) {
-      this.busyAccountIds.delete(account.id);
-      this.update(task, { status: 'needs_attention', statusText: '无法打开已登录的豆包工作台页面', error: '无法打开豆包页面' });
-      this.dispatchingTasks.delete(task.id);
-      return;
-    }
+    let view: BrowserView | null = null;
     try {
+      view = this.runtime.viewForAccount(account.id) ?? this.runtime.openAccount(account.id);
+      if (!view) {
+        this.busyAccountIds.delete(account.id);
+        this.update(task, { status: 'needs_attention', statusText: '无法打开已登录的豆包工作台页面', error: '无法打开豆包页面' });
+        return;
+      }
       this.update(task, { status: 'submitting', statusText: '正在向豆包工作台提交任务' });
+      if (task.conversationId) {
+        const targetUrl = `https://www.doubao.com/chat/${task.conversationId}`;
+        const currentUrl = view.webContents.getURL() || '';
+        if (normalizeTaskUrl(currentUrl) !== normalizeTaskUrl(targetUrl)) {
+          await view.webContents.loadURL(targetUrl);
+          await waitForComposer(view);
+        }
+      } else if (task.gatewayThreadId) {
+        const currentUrl = view.webContents.getURL() || '';
+        const isCleanNewChat = /^https?:\/\/(?:www\.)?doubao\.com\/chat\/?(?:[?#]|$)/i.test(currentUrl);
+        if (!isCleanNewChat) {
+          await view.webContents.loadURL('https://www.doubao.com/chat/');
+          await waitForComposer(view);
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+        }
+      }
       await new Promise((resolve) => setTimeout(resolve, 2500));
       if (task.targetAccountId && task.targetAccountId !== task.sourceAccountId) {
         const draft = await runInPage(view, `(() => { const input=[...document.querySelectorAll('[contenteditable=true],textarea')].find(n=>n.getBoundingClientRect().width>0); return input ? (input.value || input.innerText || '').trim() : ''; })()`);
@@ -801,13 +811,9 @@ export class CanvasBridge {
       this.videoBaselines.set(task.id, baseline);
       this.update(task, { videoBaseline: baseline });
 
-      const hasReferenceImages = Boolean(task.referencePaths && task.referencePaths.length > 0);
-      if (hasReferenceImages) {
-        this.update(task, { statusText: '正在上传参考图到豆包页面' });
-        await uploadTaskReferences(view, task.referencePaths);
-      }
-
-      // Model, duration and ratio are doubao ability parameters
+      // Model, duration and ratio are doubao ability parameters.
+      // Must be configured BEFORE uploading reference images, because dropdowns, settings popups
+      // or Escape keys can reset/clear the composer's draft attachments!
       const applied: string[] = [];
       try {
         await selectDoubaoVideoModel(view, task.model, task.duration);
@@ -822,10 +828,19 @@ export class CanvasBridge {
       } catch (error) {
         applied.push(`比例/时长未切换（${error instanceof Error ? error.message : '页面无比例/时长控件'}）`);
       }
+
+      const hasReferenceImages = Boolean(task.referencePaths && task.referencePaths.length > 0);
+      if (hasReferenceImages) {
+        this.update(task, { statusText: '正在上传参考图到豆包页面' });
+        await uploadTaskReferences(view, task.referencePaths);
+        this.update(task, { referenceUploaded: true });
+      }
       this.update(task, { statusText: `正在提交到豆包（${applied.join('，')}）` });
 
       const promptText = formatVideoPrompt(task.prompt, task.ratio, task.duration, task.model, hasReferenceImages);
       await prepareText(view, promptText);
+      const beforeSend = await runInPage(view, pageReplySnapshotScript) as PageReplySnapshot;
+      this.update(task, { sentPrompt: promptText, replyBaseline: createPageReplyBaseline(beforeSend, { prompt: promptText }) });
 
       view.webContents.send('account-send:bypass', true);
       try {
@@ -853,7 +868,8 @@ export class CanvasBridge {
       } finally {
         if (!view.webContents.isDestroyed()) view.webContents.send('account-send:bypass', false);
       }
-      this.update(task, { status: 'generating', statusText: '豆包正在生成视频', pageUrl: view.webContents.getURL() });
+      this.update(task, { status: 'awaiting_reply', statusText: '消息已提交，等待豆包回复', pageUrl: view.webContents.getURL() });
+      await this.syncTaskReply(task, view);
     } catch (error) {
       const detail = error instanceof Error ? error.message : '页面自动化失败';
       this.busyAccountIds.delete(account.id);
@@ -861,7 +877,7 @@ export class CanvasBridge {
       this.update(task, { status: 'needs_attention', statusText: `需要在豆包窗口处理：${detail}`, error: detail });
     } finally {
       this.dispatchingTasks.delete(task.id);
-      if (!view.webContents.isDestroyed()) view.webContents.send('account-send:bypass', false);
+      if (view && !view.webContents.isDestroyed()) view.webContents.send('account-send:bypass', false);
       this.dispatchNextQueuedTask();
     }
   }

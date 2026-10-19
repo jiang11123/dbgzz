@@ -1,6 +1,77 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { shouldRecoverTaskPage, normalizeTaskUrl, formatVideoPrompt } from './canvas-bridge';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import type { Account } from '../shared/types';
+import { CanvasBridge, shouldRecoverTaskPage, normalizeTaskUrl, formatVideoPrompt } from './canvas-bridge';
+
+const dispatchTestAccount: Account = {
+  id: 1, name: '测试账号', platform: 'doubao', note: '', sessionName: 'test-only', isLoggedIn: true,
+};
+
+function dispatchFixture(t: { after: (cleanup: () => void) => void }, accounts: Account[], viewError = false) {
+  const directory = mkdtempSync(path.join(tmpdir(), 'canvas-bridge-dispatch-'));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  const opened: number[] = [];
+  const bridge = new CanvasBridge({
+    accounts: () => accounts,
+    viewForAccount: () => { if (viewError) throw new Error('宿主创建失败'); return null; },
+    // Stop before page submission: no Electron view or real account is needed.
+    openAccount: accountId => { opened.push(accountId); return null; },
+    onTaskChanged: () => {},
+  }, directory);
+  const state = bridge as unknown as { busyAccountIds: Set<number>; dispatchingTasks: Set<string> };
+  return { bridge, state, opened };
+}
+
+test('busy target releases its dispatch guard and can be dispatched after the account is free', async t => {
+  const { bridge, state, opened } = dispatchFixture(t, [dispatchTestAccount]);
+  state.busyAccountIds.add(dispatchTestAccount.id);
+
+  const task = await bridge.create({ prompt: '回归测试', targetAccountId: dispatchTestAccount.id });
+  assert.equal(task.status, 'queued');
+  assert.equal(task.statusText, '等待 测试账号 完成前一个任务');
+  assert.equal(bridge.isBusy(dispatchTestAccount.id), true);
+  assert.equal(state.dispatchingTasks.has(task.id), false);
+  assert.deepEqual(opened, []);
+
+  state.busyAccountIds.delete(dispatchTestAccount.id);
+  // Public queue trigger calls the real dispatch again, not a mocked replacement.
+  bridge.clearAccountCooldown(dispatchTestAccount.id);
+  assert.deepEqual(opened, [dispatchTestAccount.id]);
+  assert.equal(task.accountId, dispatchTestAccount.id);
+  assert.equal(task.status, 'needs_attention');
+  assert.equal(task.error, '无法打开豆包页面');
+  assert.equal(bridge.isBusy(dispatchTestAccount.id), false);
+  assert.equal(state.dispatchingTasks.has(task.id), false);
+});
+
+test('host creation failure reports an error and releases both account and dispatch locks', async t => {
+  const { bridge, state } = dispatchFixture(t, [dispatchTestAccount], true);
+  const task = await bridge.create({ prompt: '回归测试', targetAccountId: dispatchTestAccount.id });
+  assert.equal(task.status, 'needs_attention');
+  assert.equal(task.error, '宿主创建失败');
+  assert.equal(bridge.isBusy(dispatchTestAccount.id), false);
+  assert.equal(state.dispatchingTasks.has(task.id), false);
+});
+
+for (const [label, accounts] of [
+  ['missing', []],
+  ['non-doubao', [{ ...dispatchTestAccount, platform: 'dola' }]],
+] as const) {
+  test(`invalid ${label} target releases its dispatch guard`, async t => {
+    const { bridge, state, opened } = dispatchFixture(t, [...accounts]);
+    const task = await bridge.create({ prompt: '回归测试', targetAccountId: dispatchTestAccount.id });
+    assert.equal(task.status, 'needs_attention');
+    assert.equal(task.statusText, '执行账号不存在或不是豆包账号');
+    assert.equal(task.error, '请选择可用的豆包执行账号');
+    assert.equal(task.accountId, null);
+    assert.equal(state.dispatchingTasks.has(task.id), false);
+    assert.equal(bridge.isBusy(dispatchTestAccount.id), false);
+    assert.deepEqual(opened, []);
+  });
+}
 
 test('recovers a drifted task page repeatedly, but not forever', () => {
   // A doubao video render takes minutes and the page drifts off its task URL while it

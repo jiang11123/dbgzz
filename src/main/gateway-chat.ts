@@ -16,7 +16,7 @@ export type GatewayChatRuntime = {
   /** Generates images for a prompt and returns them as locally stored attachments. */
   generateImages?: (prompt: string, options: { model?: string; ratio?: string; accountId?: number | null; attachments?: { path: string; name: string; mimeType: string }[] }) => Promise<GatewayAttachment[]>;
   /** Generates a video and resolves with a locally stored attachment once the file is on disk. */
-  generateVideos?: (prompt: string, options: { model?: string; ratio?: string; duration?: number; accountId?: number | null; replyMessageId?: number; referencePaths?: string[] }) => Promise<GatewayAttachment[]>;
+  generateVideos?: (prompt: string, options: { model?: string; ratio?: string; duration?: number; accountId?: number | null; replyMessageId?: number; threadId?: string; referencePaths?: string[] }) => Promise<GatewayAttachment[]>;
   /** Opens or reuses the account page used to issue the request. */
   viewForAccount: (accountId: number) => unknown | null;
   /** Picks a logged-in account when the thread has none bound yet. */
@@ -40,7 +40,7 @@ export type ThreadStore = {
   createGatewayThread(thread: { id: string; title?: string; model?: string; accountId?: number | null }): GatewayThread;
   updateGatewayThread(id: string, patch: Partial<Pick<GatewayThread, 'title' | 'doubaoConversationId' | 'accountId' | 'model'>>): GatewayThread;
   deleteGatewayThread(id: string): GatewayThread[];
-  appendGatewayMessage(message: { threadId: string; role: GatewayMessage['role']; content: string; attachments?: GatewayAttachment[]; status?: GatewayMessage['status']; error?: string }): number;
+  appendGatewayMessage(message: { threadId: string; role: GatewayMessage['role']; content: string; attachments?: GatewayAttachment[]; status?: GatewayMessage['status']; error?: string; accountId?: number | null }): number;
   updateGatewayMessage(id: number, patch: { content?: string; status?: GatewayMessage['status']; error?: string; attachments?: GatewayAttachment[]; accountId?: number | null }): void;
 };
 
@@ -123,24 +123,26 @@ export function createGatewayChat(store: ThreadStore, runtime: GatewayChatRuntim
     inFlight.set(thread.id, true);
     const userAttachments = (request.attachments ?? []).map(item => ({ id: 'staged-' + randomUUID(), kind: 'image' as const, url: item.url ?? ((item as any).path ? pathToFileURL((item as any).path).toString() : ''), name: item.name, path: (item as any).path }));
     const userMessage = store.appendGatewayMessage({ threadId: thread.id, role: 'user', content: prompt, attachments: userAttachments });
-    const replyId = store.appendGatewayMessage({ threadId: thread.id, role: 'assistant', content: '视频生成中，通常需要 1-5 分钟…', status: 'streaming' });
+    const replyId = store.appendGatewayMessage({ threadId: thread.id, role: 'assistant', content: '正在准备视频请求，等待豆包实际回复…', status: 'streaming' });
     try {
-      const attachments = await runtime.generateVideos(prompt, { model: request.model, ratio: request.ratio, duration: request.duration, accountId: request.accountId, replyMessageId: replyId, referencePaths: (request.attachments ?? []).flatMap(item => (item as any).path ? [(item as any).path] : []) });
+      const attachments = await runtime.generateVideos(prompt, { model: request.model, ratio: request.ratio, duration: request.duration, accountId: request.accountId, replyMessageId: replyId, threadId: thread.id, referencePaths: (request.attachments ?? []).flatMap(item => (item as any).path ? [(item as any).path] : []) });
       const videoAccount = runtime.lastVideoAccountId?.() ?? null;
       if (videoAccount != null) store.updateGatewayMessage(replyId, { accountId: videoAccount });
-      const currentMsg = store.gatewayMessages(thread.id).find(m => m.id === replyId);
-      const content = currentMsg?.content && currentMsg.content !== '视频生成中，通常需要 1-5 分钟…'
+      const targetReplyId = store.gatewayMessages(thread.id).filter(m => m.role === 'assistant' && m.id >= replyId).at(-1)?.id ?? replyId;
+      const currentMsg = store.gatewayMessages(thread.id).find(m => m.id === targetReplyId);
+      const content = currentMsg?.content && currentMsg.content !== '正在准备视频请求，等待豆包实际回复…'
         ? `${currentMsg.content}\n\n【视频生成完成】`
         : '已生成视频';
-      store.updateGatewayMessage(replyId, { content, status: 'done', attachments });
+      store.updateGatewayMessage(targetReplyId, { content, status: 'done', attachments });
       return {
         thread: store.gatewayThread(thread.id)!,
         userMessage: store.gatewayMessages(thread.id).find(m => m.id === userMessage)!,
-        assistantMessage: store.gatewayMessages(thread.id).find(m => m.id === replyId)!,
+        assistantMessage: store.gatewayMessages(thread.id).find(m => m.id === targetReplyId)!,
       };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      store.updateGatewayMessage(replyId, { status: 'failed', error: message });
+      const targetReplyId = store.gatewayMessages(thread.id).filter(m => m.role === 'assistant' && m.id >= replyId).at(-1)?.id ?? replyId;
+      store.updateGatewayMessage(targetReplyId, { status: 'failed', error: message });
       throw error;
     } finally {
       inFlight.delete(thread.id);
@@ -272,6 +274,7 @@ export function createGatewayChat(store: ThreadStore, runtime: GatewayChatRuntim
     generateVideos,
     isBusy: (threadId: string) => inFlight.has(threadId),
     updateMessage: (id: number, patch: Partial<GatewayMessage>) => store.updateGatewayMessage(id, patch),
+    appendMessage: (message: Parameters<ThreadStore['appendGatewayMessage']>[0]) => store.appendGatewayMessage(message),
     /** Attaches a finished video to a chat message that timed out waiting for it. */
     deliverLateVideo: (messageId: number, attachment: GatewayAttachment) => {
       store.updateGatewayMessage(messageId, {
