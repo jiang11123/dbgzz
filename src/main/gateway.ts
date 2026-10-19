@@ -174,36 +174,50 @@ export class DoubaoGateway {
    * without the account cookies, so callers that need to persist an image should fetch
    * it through the workspace (which is what the built-in UI does).
    */
-  private async images(request: IncomingMessage, response: ServerResponse) {
+    private async images(request: IncomingMessage, response: ServerResponse) {
     const body = await readBody(request);
     const prompt = String(body.prompt ?? '').trim();
     if (!prompt) return openAiError(response, 400, '缺少 prompt');
     const model = typeof body.model === 'string' && body.model ? body.model : DEFAULT_IMAGE_MODEL;
     const ratio = typeof body.size === 'string' && /^\d+:\d+$/.test(body.size) ? body.size : (typeof body.ratio === 'string' ? body.ratio : DEFAULT_IMAGE_RATIO);
 
-    const account = this.pickAccount();
-    if (!account) return openAiError(response, 503, '没有可调度的豆包账号，请检查账号池状态', 'service_unavailable');
-    const view = (this.runtime.viewForAccount(account.id) ?? this.runtime.openAccount(account.id)) as any;
-    if (!view?.webContents || view.webContents.isDestroyed()) {
-      this.pool.markFailure(account.id, 'logged_out', '无法打开账号页面');
-      return openAiError(response, 503, `账号 ${account.name} 页面不可用`, 'service_unavailable');
+    this.requests += 1;
+    let lastError: Error | null = null;
+    const maxAttempts = Math.min(3, Math.max(1, this.runtime.accounts().filter(a => a.platform === "doubao").length));
+
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+      const account = this.pickAccount();
+      if (!account) {
+        if (!lastError) return openAiError(response, 503, '没有可调度的豆包账号，请检查账号池状态', 'service_unavailable');
+        break;
+      }
+      const view = (this.runtime.viewForAccount(account.id) ?? this.runtime.openAccount(account.id)) as any;
+      if (!view?.webContents || view.webContents.isDestroyed()) {
+        this.pool.markFailure(account.id, 'logged_out', '无法打开账号页面');
+        lastError = new Error(`账号 ${account.name} 页面不可用`);
+        continue;
+      }
+
+      try {
+        const images = await this.withAccount(account.id, () => generateImages(view, prompt, { model, ratio }));
+        this.pool.markOk(account.id);
+        const created = Math.floor(Date.now() / 1000);
+        json(response, 200, {
+          created,
+          model,
+          data: images.map(image => ({ url: image.url, revised_prompt: prompt, width: image.width, height: image.height })),
+        });
+        return;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : '生图失败';
+        this.pool.markFailure(account.id, classify(message), message);
+        lastError = new Error(`账号 ${account.name} 生图失败：${message}`);
+        this.onLog(`账号 ${account.name} 失败，尝试故障转移下一个账号 (尝试 ${attempt + 1}/${maxAttempts})`);
+      }
     }
 
-    this.requests += 1;
-    try {
-      const images = await this.withAccount(account.id, () => generateImages(view, prompt, { model, ratio }));
-      this.pool.markOk(account.id);
-      const created = Math.floor(Date.now() / 1000);
-      json(response, 200, {
-        created,
-        model,
-        data: images.map(image => ({ url: image.url, revised_prompt: prompt, width: image.width, height: image.height })),
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : '生图失败';
-      this.pool.markFailure(account.id, classify(message), message);
-      openAiError(response, 502, `账号 ${account.name} 生图失败：${message}`, 'server_error');
-    }
+    const finalMessage = lastError?.message ?? '生图失败，无可用账号';
+    openAiError(response, 502, finalMessage, 'server_error');
   }
 
 
@@ -371,19 +385,42 @@ export class DoubaoGateway {
       return;
     }
 
-    try {
-      const { answer } = await this.withAccount(account.id, () => streamChat(view, prompt, { deepThink: MODEL_ALIASES[model]?.deepThink }));
-      this.pool.markOk(account.id);
-      json(response, 200, {
-        id, object: 'chat.completion', created, model,
-        choices: [{ index: 0, message: { role: 'assistant', content: answer }, finish_reason: 'stop' }],
-        usage: { prompt_tokens: prompt.length, completion_tokens: answer.length, total_tokens: prompt.length + answer.length },
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : '生成失败';
-      this.pool.markFailure(account.id, classify(message), message);
-      openAiError(response, 502, `账号 ${account.name} 生成失败：${message}`, 'server_error');
+    let lastChatError: Error | null = null;
+    const maxAttempts = Math.min(3, Math.max(1, this.runtime.accounts().filter(a => a.platform === "doubao").length));
+    let currentAccount = account;
+    let currentView = view;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+      if (attempt > 0) {
+        const next = this.pickAccount();
+        if (!next) break;
+        currentAccount = next;
+        currentView = (this.runtime.viewForAccount(currentAccount.id) ?? this.runtime.openAccount(currentAccount.id)) as any;
+        if (!currentView?.webContents || currentView.webContents.isDestroyed()) {
+          this.pool.markFailure(currentAccount.id, 'logged_out', '无法打开账号页面');
+          continue;
+        }
+      }
+
+      try {
+        const { answer } = await this.withAccount(currentAccount.id, () => streamChat(currentView, prompt, { deepThink: MODEL_ALIASES[model]?.deepThink }));
+        this.pool.markOk(currentAccount.id);
+        json(response, 200, {
+          id, object: 'chat.completion', created, model,
+          choices: [{ index: 0, message: { role: 'assistant', content: answer }, finish_reason: 'stop' }],
+          usage: { prompt_tokens: prompt.length, completion_tokens: answer.length, total_tokens: prompt.length + answer.length },
+        });
+        return;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : '生成失败';
+        this.pool.markFailure(currentAccount.id, classify(message), message);
+        lastChatError = new Error(`账号 ${currentAccount.name} 生成失败：${message}`);
+        this.onLog(`账号 ${currentAccount.name} 失败，故障转移至下一个账号 (尝试 ${attempt + 1}/${maxAttempts})`);
+      }
     }
+
+    const finalMessage = lastChatError?.message ?? '生成失败，无可用账号';
+    openAiError(response, 502, finalMessage, 'server_error');
   }
 }
 

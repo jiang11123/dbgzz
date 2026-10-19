@@ -58,3 +58,12 @@ test('advertises image models alongside chat models', () => {
   assert.ok(IMAGE_RATIOS.includes('1:1'));
   assert.equal(DEFAULT_IMAGE_MODEL, 'Seedream 4.5');
 });
+
+test('gateway failover classifies transient vs logged_out errors correctly', () => {
+  assert.equal(classify('网络连接中断'), 'transient');
+  assert.equal(classify('请求超时'), 'transient');
+  assert.equal(classify('未登录，请先登录'), 'logged_out');
+  assert.equal(classify('用户登录状态已失效'), 'logged_out');
+  assert.equal(classify('触发 710022004 人机验证'), 'captcha');
+  assert.equal(classify('今日额度已达上限'), 'quota');
+});
