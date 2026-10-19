@@ -2,7 +2,6 @@ node_modules/
 dist/
 release/
 exports/
-tools/
 *.log
 .env
 .env.*
@@ -17,3 +16,18 @@ canvas-bridge-references/
 canvas-bridge-tasks.json
 .DS_Store
 Thumbs.db
+# Local temporary probe & debug scripts
+*.cjs
+*.bat
+raw-events.json
+site-image-body.json
+tsconfig.md-verify.json
+.vid-e2e.cjs
+*.lnk
+Microsoft/
+
+# Docs screenshots & local recordings
+docs/*.png
+docs/*.jpg
+docs/*.jpeg
+docs/*.mp4
