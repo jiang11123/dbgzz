@@ -21,6 +21,8 @@ Thumbs.db
 *.bat
 raw-events.json
 site-image-body.json
+/conv-fiber.json
+/conv-msgs.json
 tsconfig.md-verify.json
 .vid-e2e.cjs
 *.lnk

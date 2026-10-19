@@ -125,46 +125,54 @@ export type ParsedEvent = {
 };
 
 /**
- * Recursively scans an event node for image and media URLs.
+ * Read only generated outputs from the assistant's creation blocks (2074).
+ * Never crawl arbitrary URLs: ACK icons, input attachment blocks (10052), and
+ * creations[].gen_detail.ref_images are not results. Paths observed on the site
+ * include message blocks and patch 50's JSON-encoded creation_full_content.
  */
-export function extractMediaUrlsFromNode(node: any, limit = 8): string[] {
-  const urls: string[] = [];
-  const check = (val: unknown) => {
-    if (typeof val === 'string' && val.startsWith('http') && /(byteimg|imagex|tos-cn|doubao|[.](png|jpe?g|webp|gif|mp4|webm|mov))/i.test(val)) {
-      const clean = val.replace(/\\u0026/g, '&').replace(/&amp;/g, '&');
-      if (!urls.includes(clean)) urls.push(clean);
-    }
+export function extractMediaUrlsFromNode(node: any): string[] {
+  const urls = new Map<string, string>();
+  const decode = (value: any): any => {
+    if (typeof value !== 'string') return value;
+    try { return JSON.parse(value); } catch { return null; }
   };
-
-  const walk = (item: any, depth = 0) => {
-    if (!item || depth > limit) return;
-    if (typeof item === 'string') {
-      if (item.startsWith('http')) check(item);
-      else if (item.startsWith('{') || item.startsWith('[')) {
-        try { walk(JSON.parse(item), depth + 1); } catch {}
-      }
-      return;
-    }
-    if (Array.isArray(item)) {
-      for (const el of item) walk(el, depth + 1);
-      return;
-    }
-    if (typeof item === 'object') {
-      if (item.image_ori?.url) check(item.image_ori.url);
-      if (item.image_raw?.url) check(item.image_raw.url);
-      if (item.image_thumb?.url) check(item.image_thumb.url);
-      if (typeof item.url === 'string') check(item.url);
-      if (item.attachment_block?.attachments) walk(item.attachment_block.attachments, depth + 1);
-      if (item.image) walk(item.image, depth + 1);
-      for (const k of Object.keys(item)) {
-        if (k === 'text_block' || k === 'local_message_id' || k === 'conversation_id' || k === 'client_meta') continue;
-        walk(item[k], depth + 1);
+  const readBlocks = (blocks: any) => {
+    if (!Array.isArray(blocks)) return;
+    for (const block of blocks) {
+      if (block?.block_type !== 2074) continue;
+      const creations = block.content?.creation_block?.creations;
+      if (!Array.isArray(creations)) continue;
+      for (const creation of creations) {
+        if (creation?.type !== 1) continue;
+        const image = creation.image;
+        const url = [image?.image_ori?.url, image?.image_ori_raw?.url, image?.image_raw?.url, image?.image_thumb?.url]
+          .find(value => typeof value === 'string' && /^https?:\/\//i.test(value));
+        if (typeof url !== 'string') continue;
+        const clean = url.replace(/\\u0026/g, '&').replace(/&amp;/g, '&');
+        // One output per creation even when later patches refresh its signature.
+        const identity = image.key || creation.id || clean;
+        urls.set(String(identity), clean);
       }
     }
   };
-
-  walk(node);
-  return urls;
+  const readContainer = (value: any) => {
+    const container = decode(value);
+    if (!container || typeof container !== 'object' || container.user_type === 1 || container.role === 'user') return;
+    readBlocks(container.content_block);
+    readBlocks(decode(container.content)?.content_block);
+    const packets = decode(container.ext?.creation_full_content);
+    if (Array.isArray(packets)) {
+      readBlocks(packets.map(packet => packet?.BlockInfo?.BlockContent));
+    }
+  };
+  readContainer(node);
+  readContainer(node?.message);
+  if (Array.isArray(node?.patch_op)) {
+    for (const op of node.patch_op) {
+      if (op?.patch_object === 1 || op?.patch_object === 50) readContainer(op.patch_value);
+    }
+  }
+  return [...urls.values()];
 }
 
 /**
@@ -402,7 +410,7 @@ export async function streamChat(view: BrowserView, text: string, options: Strea
   // on the deadline with a half-received reply would hand the caller a silently
   // truncated answer instead of a retry on another account.
   if (!finished) throw new Error('豆包响应超时');
-  if (!answer) throw new Error('豆包没有返回内容，请检查账号状态');
+  if (!answer && !collectedMediaUrls.size) throw new Error('豆包没有返回内容，请检查账号状态');
   return { answer, conversationId, messageId, mediaUrls: Array.from(collectedMediaUrls) };
 }
 

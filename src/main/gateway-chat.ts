@@ -222,10 +222,11 @@ export function createGatewayChat(store: ThreadStore, runtime: GatewayChatRuntim
       if (answeredBy != null) store.updateGatewayMessage(assistantId, { accountId: answeredBy });
       const attachments: GatewayAttachment[] = [];
       if (runtime.saveRemoteMedia) {
-        const candidateUrls = new Set<string>([
-          ...extractMediaUrls(result.answer),
-          ...(result.mediaUrls ?? []),
-        ]);
+        // Structured generation results are authoritative; text can mention input
+        // images too. Only fall back to textual links for ordinary link replies.
+        const candidateUrls = new Set<string>(result.mediaUrls?.length
+          ? result.mediaUrls
+          : extractMediaUrls(result.answer));
         for (const url of candidateUrls) {
           try {
             const saved = await runtime.saveRemoteMedia(url, /[.](mp4|mov|webm)/i.test(url) ? 'video' : 'image');

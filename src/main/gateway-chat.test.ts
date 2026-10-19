@@ -154,14 +154,15 @@ test('chat send captures mediaUrls returned by streamChat and attaches saved rem
           if (script.includes('__DSBUF')) return {
             events: [
               JSON.stringify({
-                text: '已换成蓝色背景，主体和紫色帽子保持不变。',
+                text: '已换成蓝色背景，主体和紫色帽子保持不变。参考图 https://cdn.example/original.png',
+                ack_client_meta: { conversation_info: { image: { image_ori: { url: 'https://cdn.example/bubble.png' } } } },
                 content: {
                   content_block: [
                     {
-                      block_type: 10052,
+                      block_type: 2074,
                       content: {
-                        attachment_block: {
-                          attachments: [
+                        creation_block: {
+                          creations: [
                             {
                               type: 1,
                               image: {

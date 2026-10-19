@@ -105,36 +105,45 @@ test('reads the bare text delta that carries most of the answer', () => {
   assert.equal(collectAnswer(events), '1、2、3、4、5、6、7、8、9、10');
 });
 
-test('extracts media URLs from content_block attachments in parseEvent', () => {
-  const event = {
-    content: {
-      content_block: [
-        { block_type: 10000, content: { text_block: { text: '好的' } } },
-        {
-          block_type: 10052,
-          content: {
-            attachment_block: {
-              attachments: [
-                {
-                  type: 1,
-                  image: {
-                    name: 'test.png',
-                    image_ori: {
-                      url: 'https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rabbit.png?rk3s=1',
-                      width: 1024,
-                      height: 1024,
-                    },
-                  },
-                },
-              ],
-            },
-          },
-        },
-      ],
-    },
-  };
-  const parsed = parseEvent(event);
-  assert.equal(parsed.delta, '好的');
-  assert.ok(parsed.mediaUrls?.length === 1);
-  assert.equal(parsed.mediaUrls[0], 'https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rabbit.png?rk3s=1');
+// Sanitized shape observed in the real green-background rabbit reply.
+const outputUrl = 'https://cdn.example/rc_gen_image/green.png';
+const creationBlock = {
+  block_type: 2074,
+  content: { creation_block: { creations: [{
+    type: 1, id: 'generated-task',
+    gen_detail: { ref_images: [{ url: 'https://cdn.example/original.png' }] },
+    image: { key: 'generated-key', image_ori: { url: outputUrl }, image_thumb: { url: 'https://cdn.example/thumb.png' } },
+  }] } },
+};
+
+test('extracts only the generated original from creation blocks, not references or icons', () => {
+  const parsed = parseEvent({
+    ack_client_meta: { conversation_info: { image: { image_ori: { url: 'https://cdn.example/bubble.png' } } } },
+    content: { content_block: [creationBlock, { block_type: 10052, content: { attachment_block: { attachments: [{ image: { image_ori: { url: 'https://cdn.example/input.png' } } }] } } }] },
+  });
+  assert.deepEqual(parsed.mediaUrls, [outputUrl]);
+});
+
+test('reads deep JSON creation_full_content inside patch 50 without a depth cutoff', () => {
+  const patch = { patch_object: 50, patch_value: { ext: { creation_full_content: JSON.stringify([
+    { BlockInfo: { BlockType: 2074, BlockContent: creationBlock } },
+  ]) } } };
+  assert.deepEqual(parseEvent({ patch_op: [patch] }).mediaUrls, [outputUrl]);
+});
+
+test('ignores metadata-only URLs, user messages and malformed creation packets', () => {
+  assert.equal(parseEvent({ ack_client_meta: { conversation_info: { image: { image_ori: { url: outputUrl } } } } }).mediaUrls, undefined);
+  assert.equal(parseEvent({ message: { user_type: 1, content_block: [creationBlock] } }).mediaUrls, undefined);
+  assert.equal(parseEvent({ patch_op: [{ patch_object: 50, patch_value: { ext: { creation_full_content: '{bad' } } }] }).mediaUrls, undefined);
+});
+
+test('falls back to image_ori_raw when the original is invalid', () => {
+  const block = { block_type: 2074, content: { creation_block: { creations: [
+    { type: 1, image: { image_ori: { url: 'javascript:bad' }, image_ori_raw: { url: outputUrl }, image_thumb: { url: 'https://cdn.example/thumb.png' } } },
+  ] } } };
+  assert.deepEqual(parseEvent({ content: { content_block: [block] } }).mediaUrls, [outputUrl]);
+});
+
+test('deduplicates full content and block patches for the same generated image', () => {
+  assert.deepEqual(parseEvent({ content: { content_block: [creationBlock] }, patch_op: [{ patch_object: 1, patch_value: { content_block: [creationBlock] } }] }).mediaUrls, [outputUrl]);
 });
