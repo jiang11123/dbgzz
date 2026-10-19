@@ -9,6 +9,7 @@ import type { ImageAssetStore } from './image-assets';
 import type { CanvasBridge } from './canvas-bridge';
 import { assertVisibleImage, browserPngScript, decodeImageData, imageDataDiagnostic, renderedPngScript } from './image-data';
 import { chatImagesScript, reimportOrderedImages } from './chat-images';
+import { resolveStagedAssetPaths } from './staged-attachments';
 import { assertEmptyDraft, clickComposerSend, ensureComposerMode, prepareText, waitForComposer } from './page-composer';
 
 type Runtime = {
@@ -81,10 +82,14 @@ export function setupAccountSend(runtime: Runtime) {
     if (sendingAccounts.has(targetId) || runtime.bridge()?.isBusy(targetId)) throw new Error('目标账号正在处理任务，请等待完成');
     sendingAccounts.add(targetId);
     try {
+      // Same attachment contract as chat/image/video IPC: resolve every staged id
+      // before touching the target page, so a stale asset fails loudly instead of
+      // silently sending a text-only message.
+      const importPaths=resolveStagedAssetPaths(captured.assetIds,id=>runtime.assets().resolve(id));
       const view=await targetView(targetId);
       await assertEmptyDraft(view);
       await ensureComposerMode(view,{mode:'chat'});
-      if (captured.assetIds.length) await reimportOrderedImages(view,captured.assetIds.map(id=>runtime.assets().resolve(id)));
+      if (importPaths.length) await reimportOrderedImages(view,importPaths);
       if (captured.prompt) await prepareText(view,captured.prompt);
       if (send) {
         await clickComposerSend(view,captured.prompt);
@@ -145,6 +150,10 @@ export function setupAccountSend(runtime: Runtime) {
             {label:'同步到此账号',enabled:!incomplete,click:()=>void sendToAccount(captured,account.id,false).catch(report)},
           ]};
         }),
+        // The full sync panel: it previews every draft image in order and lets the user
+        // pick, reorder and re-read them before anything is sent. Without this entry the
+        // panel (and its panel=messages window) was unreachable.
+        ...(accounts.length?[{label:'打开同步面板（预览并逐张导入）',click:()=>void openImageSync(captured,accounts[0].id).catch(report)}]:[]),
         ...(!accounts.length?[{label:'没有其他账号，请先在顶部添加账号',enabled:false}]:[]),
       ]);
     })().catch(report);
@@ -182,7 +191,7 @@ export function setupAccountSend(runtime: Runtime) {
     imageSyncDraft={...captured,id:randomUUID(),assetIds:ids.length?ids:captured.assetIds,targetId,kind,warning};
     if(imageSyncWindow && !imageSyncWindow.isDestroyed()){imageSyncWindow.show();imageSyncWindow.focus();imageSyncWindow.webContents.send('message-sync:changed');return;}
     imageSyncWindow=new BrowserWindow({parent:runtime.main() ?? undefined,width:960,height:740,title:'按顺序重新导入聊天图片',autoHideMenuBar:true,backgroundColor:'#f7f9fc',webPreferences:{preload:runtime.preload,contextIsolation:true,sandbox:true,nodeIntegration:false}});
-    const url=new URL(runtime.rendererUrl());url.searchParams.set('panel','message-sync');
+    const url=new URL(runtime.rendererUrl());url.searchParams.set('panel','messages');
     void imageSyncWindow.loadURL(url.toString());imageSyncWindow.on('closed',()=>{imageSyncWindow=null;});
   }
   ipcMain.on('account-send:failed', (event, message: string) => {

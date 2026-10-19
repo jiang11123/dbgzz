@@ -2,7 +2,7 @@ import Database from 'better-sqlite3';
 import { app } from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
-import type { Account, AccountPlatform, Asset, Dashboard, Project, TaskStatus, VideoLibraryItem, VideoTask } from '../shared/types';
+import type { Account, AccountPlatform, Asset, Dashboard, GatewayAttachment, GatewayMessage, GatewayThread, Project, TaskStatus, VideoLibraryItem, VideoTask } from '../shared/types';
 import { platformConfig } from './account-platform';
 
 type DbRow = Record<string, unknown>;
@@ -48,18 +48,31 @@ export class WorkspaceDatabase {
         FOREIGN KEY(account_id) REFERENCES accounts(id)
       );
       CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+      -- Gateway-mode chat threads. doubao_conversation_id is what makes multi-turn
+      -- work: passing it back to /chat/completion continues the same Doubao thread.
+      CREATE TABLE IF NOT EXISTS gateway_threads (
+        id TEXT PRIMARY KEY, title TEXT NOT NULL DEFAULT '新对话',
+        doubao_conversation_id TEXT NOT NULL DEFAULT '', account_id INTEGER,
+        model TEXT NOT NULL DEFAULT 'doubao',
+        created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS gateway_messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, thread_id TEXT NOT NULL,
+        role TEXT NOT NULL, content TEXT NOT NULL DEFAULT '',
+        attachments TEXT NOT NULL DEFAULT '[]', status TEXT NOT NULL DEFAULT 'done',
+        error TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL,
+        -- Which account produced this message, so the chat can label it 账号N 回复.
+        account_id INTEGER,
+        FOREIGN KEY(thread_id) REFERENCES gateway_threads(id) ON DELETE CASCADE
+      );
       CREATE TABLE IF NOT EXISTS share_downloads (
         id INTEGER PRIMARY KEY, file_name TEXT NOT NULL, file_path TEXT NOT NULL UNIQUE,
-        created_at TEXT NOT NULL
-      );
-      CREATE TABLE IF NOT EXISTS upscale_videos (
-        id INTEGER PRIMARY KEY, source_path TEXT NOT NULL, file_path TEXT NOT NULL UNIQUE,
         created_at TEXT NOT NULL
       );
     `);
     const retiredColumns: Record<string, string[]> = {
       accounts: ['daily_quota', 'used_quota', 'last_reset_date'],
-      tasks: ['duration'], share_downloads: ['duration'], upscale_videos: ['duration'],
+      tasks: ['duration'], share_downloads: ['duration'],
     };
     const changes = Object.entries(retiredColumns).flatMap(([table, names]) => {
       const columns = this.db.prepare(`PRAGMA table_info('${table}')`).all() as DbRow[];
@@ -69,12 +82,16 @@ export class WorkspaceDatabase {
       const backup = path.join(path.dirname(this.db.name), `workspace-before-duration-removal-${Date.now()}.db`);
       this.db.prepare('VACUUM INTO ?').run(backup);
       this.db.transaction(() => {
-        for (const table of ['quota_logs', 'quota_adjustments', 'generation_events']) this.db.exec(`DROP TABLE IF EXISTS ${table}`);
+        for (const table of ['quota_logs', 'quota_adjustments', 'generation_events', 'upscale_videos']) this.db.exec(`DROP TABLE IF EXISTS ${table}`);
         for (const { table, name } of changes) this.db.exec(`ALTER TABLE ${table} DROP COLUMN ${name}`);
       })();
     }
     const accountColumns = this.db.prepare("PRAGMA table_info('accounts')").all() as DbRow[];
     if (!accountColumns.some((column) => String(column.name) === 'platform')) this.db.exec("ALTER TABLE accounts ADD COLUMN platform TEXT NOT NULL DEFAULT 'doubao'");
+    const messageColumns = this.db.prepare("PRAGMA table_info('gateway_messages')").all() as DbRow[];
+    if (!messageColumns.some(column => column.name === 'account_id')) {
+      this.db.exec('ALTER TABLE gateway_messages ADD COLUMN account_id INTEGER');
+    }
     if (!accountColumns.some(column => column.name === 'sort_order')) {
       this.db.transaction(() => {
         this.db.exec('ALTER TABLE accounts ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0');
@@ -122,7 +139,10 @@ export class WorkspaceDatabase {
   }
   updateAccount(id: number, patch: Partial<Pick<Account, 'name' | 'note' | 'isLoggedIn'>>) {
     const current = this.accounts().find((a) => a.id === id); if (!current) throw new Error('账号不存在');
-    this.db.prepare('UPDATE accounts SET name=?,note=?,is_logged_in=? WHERE id=?').run(patch.name ?? current.name, patch.note ?? current.note, Number(patch.isLoggedIn ?? current.isLoggedIn), id);
+    // Names are trimmed and whitespace-only values are ignored, so a stray blur
+    // carrying spaces can never corrupt an account identity.
+    const nextName = patch.name != null && patch.name.trim() ? patch.name.trim() : current.name;
+    this.db.prepare('UPDATE accounts SET name=?,note=?,is_logged_in=? WHERE id=?').run(nextName, patch.note ?? current.note, Number(patch.isLoggedIn ?? current.isLoggedIn), id);
     return this.accounts().find((a) => a.id === id)!;
   }
   deleteAccount(id: number) {
@@ -189,25 +209,82 @@ export class WorkspaceDatabase {
       SELECT -m.id as taskId,0 as projectId,'手动下载' as projectName,'—' as sceneNumber,m.file_name as taskName,m.account_id as accountId,a.name as accountName,m.file_path as videoPath,m.created_at as completedAt FROM manual_downloads m LEFT JOIN accounts a ON a.id=m.account_id
         UNION ALL
         SELECT -1000000000-s.id as taskId,0 as projectId,'豆包分享下载' as projectName,'—' as sceneNumber,s.file_name as taskName,NULL as accountId,NULL as accountName,s.file_path as videoPath,s.created_at as completedAt FROM share_downloads s
-        UNION ALL
-        SELECT -2000000000-u.id as taskId,0 as projectId,'视频超分' as projectName,'—' as sceneNumber,u.file_path as taskName,NULL as accountId,NULL as accountName,u.file_path as videoPath,u.created_at as completedAt FROM upscale_videos u
-      ) ORDER BY completedAt DESC`).all().map(row => {
-        const item = row as VideoLibraryItem;
-        return item.projectName === '视频超分' ? { ...item, taskName: path.basename(item.videoPath) } : item;
-      });
+      ) ORDER BY completedAt DESC`).all() as VideoLibraryItem[];
   }
   recordShareDownload(filePath: string, fileName: string) {
     if (!fs.existsSync(filePath)) throw new Error('视频文件不存在，无法归档');
     this.db.prepare('INSERT OR IGNORE INTO share_downloads(file_name,file_path,created_at) VALUES(?,?,?)').run(fileName, filePath, stamp());
   }
-  recordUpscaleVideo(sourcePath: string, filePath: string) {
-    if (!fs.existsSync(filePath)) throw new Error('超分文件不存在，无法归档');
-    this.db.prepare('INSERT INTO upscale_videos(source_path,file_path,created_at) VALUES(?,?,?)').run(sourcePath, filePath, stamp());
-  }
   dashboard(): Dashboard {
     const stats: Record<TaskStatus, number> = { ready: 0, waiting: 0, generating: 0, completed: 0, failed: 0 };
     for (const row of this.db.prepare('SELECT status,COUNT(*) as count FROM tasks GROUP BY status').all() as DbRow[]) stats[row.status as TaskStatus] = Number(row.count);
     return { completedCount: stats.completed, statusCounts: stats, recentProjects: this.projects().slice(0, 4) };
+  }
+  // ── Gateway-mode chat threads ─────────────────────────────────────────────
+  gatewayThreads(): GatewayThread[] {
+    return (this.db.prepare(`SELECT t.*, (SELECT COUNT(*) FROM gateway_messages m WHERE m.thread_id=t.id) as message_count
+      FROM gateway_threads t ORDER BY t.updated_at DESC`).all() as DbRow[]).map(row => this.mapThread(row));
+  }
+  gatewayThread(id: string): GatewayThread | null {
+    const row = this.db.prepare('SELECT * FROM gateway_threads WHERE id=?').get(id) as DbRow | undefined;
+    return row ? this.mapThread(row) : null;
+  }
+  private mapThread(row: DbRow): GatewayThread {
+    return {
+      id: String(row.id), title: String(row.title),
+      doubaoConversationId: String(row.doubao_conversation_id ?? ''),
+      accountId: row.account_id === null || row.account_id === undefined ? null : Number(row.account_id),
+      model: String(row.model ?? 'doubao'),
+      createdAt: String(row.created_at), updatedAt: String(row.updated_at),
+      messageCount: row.message_count === undefined ? undefined : Number(row.message_count),
+    };
+  }
+  gatewayMessages(threadId: string): GatewayMessage[] {
+    return (this.db.prepare('SELECT * FROM gateway_messages WHERE thread_id=? ORDER BY id').all(threadId) as DbRow[]).map(row => ({
+      id: Number(row.id), threadId: String(row.thread_id),
+      role: row.role === 'assistant' ? 'assistant' : 'user',
+      content: String(row.content ?? ''),
+      attachments: (() => { try { const v = JSON.parse(String(row.attachments ?? '[]')); return Array.isArray(v) ? v : []; } catch { return []; } })(),
+      status: (['pending', 'streaming', 'done', 'failed'].includes(String(row.status)) ? String(row.status) : 'done') as GatewayMessage['status'],
+      error: String(row.error ?? ''), createdAt: String(row.created_at),
+      accountId: row.account_id === null || row.account_id === undefined ? null : Number(row.account_id),
+    }));
+  }
+  createGatewayThread(thread: { id: string; title?: string; model?: string; accountId?: number | null }) {
+    const now = stamp();
+    this.db.prepare('INSERT INTO gateway_threads(id,title,doubao_conversation_id,account_id,model,created_at,updated_at) VALUES(?,?,?,?,?,?,?)')
+      .run(thread.id, thread.title || '新对话', '', thread.accountId ?? null, thread.model || 'doubao', now, now);
+    return this.gatewayThread(thread.id)!;
+  }
+  updateGatewayThread(id: string, patch: Partial<Pick<GatewayThread, 'title' | 'doubaoConversationId' | 'accountId' | 'model'>>) {
+    const thread = this.gatewayThread(id); if (!thread) throw new Error('会话不存在');
+    const next = { ...thread, ...patch };
+    this.db.prepare('UPDATE gateway_threads SET title=?,doubao_conversation_id=?,account_id=?,model=?,updated_at=? WHERE id=?')
+      .run(next.title, next.doubaoConversationId, next.accountId, next.model, stamp(), id);
+    return this.gatewayThread(id)!;
+  }
+  deleteGatewayThread(id: string) {
+    const apply = this.db.transaction(() => {
+      this.db.prepare('DELETE FROM gateway_messages WHERE thread_id=?').run(id);
+      this.db.prepare('DELETE FROM gateway_threads WHERE id=?').run(id);
+    });
+    apply();
+    return this.gatewayThreads();
+  }
+  appendGatewayMessage(message: { threadId: string; role: GatewayMessage['role']; content: string; attachments?: GatewayAttachment[]; status?: GatewayMessage['status']; error?: string; accountId?: number | null }) {
+    const result = this.db.prepare('INSERT INTO gateway_messages(thread_id,role,content,attachments,status,error,created_at,account_id) VALUES(?,?,?,?,?,?,?,?)')
+      .run(message.threadId, message.role, message.content, JSON.stringify(message.attachments ?? []), message.status ?? 'done', message.error ?? '', stamp(), message.accountId ?? null);
+    this.db.prepare('UPDATE gateway_threads SET updated_at=? WHERE id=?').run(stamp(), message.threadId);
+    return Number(result.lastInsertRowid);
+  }
+  updateGatewayMessage(id: number, patch: { content?: string; status?: GatewayMessage['status']; error?: string; attachments?: GatewayAttachment[]; accountId?: number | null }) {
+    const row = this.db.prepare('SELECT * FROM gateway_messages WHERE id=?').get(id) as DbRow | undefined;
+    if (!row) return;
+    this.db.prepare('UPDATE gateway_messages SET content=?,status=?,error=?,attachments=?,account_id=? WHERE id=?').run(
+      patch.content ?? String(row.content ?? ''), patch.status ?? String(row.status ?? 'done'), patch.error ?? String(row.error ?? ''),
+      patch.attachments ? JSON.stringify(patch.attachments) : String(row.attachments ?? '[]'),
+      patch.accountId !== undefined ? patch.accountId : (row.account_id ?? null), id,
+    );
   }
   getSetting(key: string) { return (this.db.prepare('SELECT value FROM settings WHERE key=?').get(key) as DbRow | undefined)?.value as string | undefined; }
   setSetting(key: string, value: string) { this.db.prepare('INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value').run(key, value); }

@@ -1,5 +1,31 @@
 import { ipcRenderer } from 'electron';
 
+/**
+ * Streaming bridge for the Doubao HTTP API.
+ *
+ * The account page runs in a remote origin, so it cannot reach ipcRenderer on its
+ * own. This preload is our code running inside that page, so it can: the page writes
+ * SSE frames into window.__DSPUSH, and this bridge forwards each one to the main
+ * process immediately.
+ *
+ * This replaces the earlier approach of polling window.__DSBUF with
+ * executeJavaScript every 120ms, which added a full IPC round trip per tick and
+ * stalled whenever the page was busy.
+ */
+type PushChannel = { requestId: string; event?: string; error?: string; done?: boolean };
+
+const push = (payload: PushChannel) => { try { ipcRenderer.send('doubao:stream', payload); } catch { /* window closing */ } };
+
+// The page calls these. Keeping the surface tiny avoids exposing anything privileged.
+Object.defineProperty(window, '__DSPUSH', {
+  configurable: true,
+  value: {
+    event: (requestId: string, raw: string) => push({ requestId, event: raw }),
+    error: (requestId: string, message: string) => push({ requestId, error: message }),
+    done: (requestId: string) => push({ requestId, done: true }),
+  },
+});
+
 let automatedSend = false;
 let routing = false;
 let attachmentFiles: File[] = [];

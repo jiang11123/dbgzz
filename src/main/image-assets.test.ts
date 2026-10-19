@@ -33,3 +33,26 @@ test('selected assets retain requested order including repeated images',()=>{
     assert.deepEqual(imported.map(item=>item.name),['a.png','b.png','a.png']);
   }finally{fs.rmSync(root,{recursive:true,force:true});}
 });
+
+test('a file deleted between listing and stat is skipped, not fatal', () => {
+  // The asset panel calls list() on every refresh; a file removed by another window
+  // (or a half-finished copy) used to throw out of statSync and blank the panel.
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'asset-race-'));
+  try {
+    const source = path.join(root, 'x.png');
+    fs.writeFileSync(source, 'bytes');
+    const store = new ImageAssetStore(path.join(root, 'library'));
+    store.import([source]);
+    // Simulate the race: readdirSync sees the file, statSync finds it gone.
+    const realReaddir = fs.readdirSync;
+    (fs as any).readdirSync = (...args: any[]) => {
+      const names = realReaddir(args[0] as string, ...(args.slice(1) as []));
+      const id = names[0];
+      if (id) fs.unlinkSync(path.join(root, 'library', id));
+      return names;
+    };
+    try {
+      assert.deepEqual(store.list(), []);
+    } finally { (fs as any).readdirSync = realReaddir; }
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});

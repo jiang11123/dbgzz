@@ -2,6 +2,15 @@ export type TaskStatus = 'ready' | 'waiting' | 'generating' | 'completed' | 'fai
 export type AccountPlatform = 'doubao' | 'dola';
 export interface ImageAsset { id: string; name: string; url: string; size: number; }
 
+/** Renderer-safe attachment descriptor. Only the id is used to resolve the file in main. */
+export interface StagedAttachment {
+  id: string;
+  assetId: string;
+  name: string;
+  mimeType: string;
+  url?: string;
+}
+
 export interface Account {
   id: number;
   name: string;
@@ -83,14 +92,43 @@ export interface VideoLibraryItem {
   completedAt: string;
 }
 
-export type UpscaleTarget = '2k' | '4k';
-export interface UpscaleJob {
+export type GatewayRole = 'user' | 'assistant';
+
+export interface GatewayAttachment {
   id: string;
-  inputPath: string;
-  target: UpscaleTarget;
-  state: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled';
-  stage: string;
-  progress?: { percent: number; frame: number; total: number; fps: number; elapsed: string; remaining: string };
-  outputPath?: string;
-  error?: string;
+  kind: 'image' | 'video';
+  /** Local file URL, so the renderer can display it without a network round trip. */
+  url: string;
+  name: string;
+  path?: string;
+}
+
+export interface GatewayMessage {
+  id: number;
+  threadId: string;
+  role: GatewayRole;
+  content: string;
+  attachments: GatewayAttachment[];
+  status: 'pending' | 'streaming' | 'done' | 'failed';
+  error: string;
+  createdAt: string;
+  /** Account that produced this message, shown as 账号N 回复 in the chat. */
+  accountId: number | null;
+}
+
+export interface GatewayThread {
+  id: string;
+  title: string;
+  doubaoConversationId: string;
+  accountId: number | null;
+  model: string;
+  createdAt: string;
+  updatedAt: string;
+  messageCount?: number;
+}
+
+/** Result of one gateway chat turn, as reported to the renderer. */
+export interface GatewayTurnResult {
+  thread: GatewayThread;
+  message: GatewayMessage;
 }
