@@ -15,9 +15,11 @@ app.on('browser-window-created', (_event, win) => {
       check();
       await win.webContents.executeJavaScript(`window.workspace.openAccount(${accounts[1].id})`);
       check();
-      await win.webContents.executeJavaScript('window.workspace.setBrowserFullscreen(false)');
-      assert.ok(win.getBrowserViews()[0].getBounds().x > 0);
-      console.log('PASS: expand fills below account bar; account switch preserves expansion; restore returns split view');
+      // The split/sidebar layout was removed, so the native view is always full width.
+      // Hiding it is the only remaining shrink behaviour left to verify.
+      await win.webContents.executeJavaScript('window.workspace.hideBrowser()');
+      assert.equal(win.getBrowserViews().length, 0);
+      console.log('PASS: expanded view fills below the account bar; switching accounts preserves bounds; hiding removes the native view');
       app.quit();
     } catch (error) { console.error(error); app.exit(1); }
   });

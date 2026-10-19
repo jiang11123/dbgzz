@@ -1,4 +1,6 @@
 const {app,BrowserWindow}=require('electron');const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict');
+// These checks assert the account-mode shell, which is no longer the default.
+process.env.DOUBAO_APP_MODE = process.env.DOUBAO_APP_MODE || 'account';
 app.setPath('userData',fs.mkdtempSync(path.join(os.tmpdir(),'doubao-hotkeys-')));process.env.CANVAS_BRIDGE_PORT='0';
 app.on('web-contents-created',(_e,wc)=>{const load=wc.loadURL.bind(wc);wc.loadURL=(url,opts)=>/^https:\/\/(www\.)?(doubao|dola)\.com\/?$/.test(url)?load('data:text/html,<textarea id="draft"></textarea>',opts):load(url,opts);});
 const delay=ms=>new Promise(r=>setTimeout(r,ms));const wait=async(fn)=>{for(let i=0;i<100;i++){if(await fn())return;await delay(50);}throw new Error('timeout');};

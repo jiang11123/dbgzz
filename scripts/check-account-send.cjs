@@ -1,10 +1,13 @@
 const {app,BrowserWindow,Menu,dialog,nativeImage,net,ipcMain}=require('electron');
+// These checks assert the account-mode shell, which is no longer the default.
+process.env.DOUBAO_APP_MODE = process.env.DOUBAO_APP_MODE || 'account';
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict'),http=require('node:http');
 const profile=fs.mkdtempSync(path.join(os.tmpdir(),'doubao-right-send-'));
 app.setPath('userData',profile);process.env.CANVAS_BRIDGE_PORT='0';
 const sourceImage=path.join(profile,'原图.png');fs.writeFileSync(sourceImage,nativeImage.createFromBitmap(Buffer.from([80,160,240,255]),{width:1,height:1}).toPNG());
 dialog.showOpenDialog=async()=>({canceled:false,filePaths:[sourceImage]});
-const videoBytes=fs.readFileSync(path.join(__dirname,'../exports/collaboration-test-video.mp4'));
+// Generated inline: test fixtures must not depend on the gitignored exports/ directory.
+const videoBytes=Buffer.concat([Buffer.from([0,0,0,0x18]),Buffer.from('ftypmp42'),Buffer.alloc(1024,0x20)]);
 const server=http.createServer((req,res)=>{res.writeHead(200,{'content-type':'video/mp4','content-length':videoBytes.length,'content-disposition':'attachment; filename=generated.mp4'});res.end(videoBytes);});server.listen(0,'127.0.0.1');
 const menus=[];const build=Menu.buildFromTemplate;
 Menu.buildFromTemplate=function(items){const menu=build.call(Menu,items);menu.popup=()=>{menus.push(menu);};return menu;};

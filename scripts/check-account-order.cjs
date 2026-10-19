@@ -1,4 +1,6 @@
 const { app, BrowserWindow } = require('electron');
+// These checks assert the account-mode shell, which is no longer the default.
+process.env.DOUBAO_APP_MODE = process.env.DOUBAO_APP_MODE || 'account';
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
@@ -38,7 +40,7 @@ app.on('browser-window-created', (_event, main) => {
       await move(4, 0, true);
       const expected = [accounts[4], ...accounts.slice(0, 4)];
       await waitFor(async () => (await invoke('window.workspace.load()')).accounts[0].id === accounts[4].id);
-      await waitFor(async () => JSON.stringify(await ui('[...document.querySelectorAll(".account-setting input")].map(n=>n.value)')) === JSON.stringify(expected.map(a => a.name)));
+      await waitFor(async () => JSON.stringify(await ui('[...document.querySelectorAll(".account-setting")].map(row => row.querySelector("input").value)')) === JSON.stringify(expected.map(a => a.name)));
       assert.deepEqual(await invoke('[...document.querySelectorAll(".account-tabs .account")].map(n=>n.textContent)'), expected.map(a => a.name));
       assert.equal(main.getBrowserViews()[0].webContents.id, currentPage);
       assert.equal(await invoke('document.querySelector(".account-tabs .active").textContent'), accounts[1].name);

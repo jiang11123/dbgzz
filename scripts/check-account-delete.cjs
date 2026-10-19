@@ -1,4 +1,6 @@
 const { app, BrowserWindow, dialog } = require('electron');
+// These checks assert the account-mode shell, which is no longer the default.
+process.env.DOUBAO_APP_MODE = process.env.DOUBAO_APP_MODE || 'account';
 const assert = require('node:assert/strict'); const fs = require('node:fs'); const os = require('node:os'); const path = require('node:path');
 app.setPath('userData', fs.mkdtempSync(path.join(os.tmpdir(), 'doubao-delete-ui-')));
 process.env.CANVAS_BRIDGE_PORT='0';

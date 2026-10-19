@@ -1,4 +1,6 @@
 const { app, webContents } = require('electron');
+// These checks assert the account-mode shell, which is no longer the default.
+process.env.DOUBAO_APP_MODE = process.env.DOUBAO_APP_MODE || 'account';
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');

@@ -1,4 +1,6 @@
 const { app, BrowserWindow, dialog, nativeImage } = require('electron');
+// These checks assert the account-mode shell, which is no longer the default.
+process.env.DOUBAO_APP_MODE = process.env.DOUBAO_APP_MODE || 'account';
 const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');

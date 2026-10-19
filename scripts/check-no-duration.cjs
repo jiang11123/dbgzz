@@ -9,7 +9,8 @@ app.setPath('userData', profile);
 app.whenReady().then(async () => {
   try {
     const { WorkspaceDatabase } = require('../dist/main/main/database.js');
-    const { CanvasBridge, pickAvailableAccount } = require('../dist/main/main/canvas-bridge.js');
+    const { CanvasBridge } = require('../dist/main/main/canvas-bridge.js');
+    const { AccountPool } = require('../dist/main/main/account-pool.js');
     const original = new WorkspaceDatabase();
     original.setSetting('workspaceRoot', profile);
     const project = original.createProject('preserved project');
@@ -18,7 +19,6 @@ app.whenReady().then(async () => {
     fs.writeFileSync(video, 'video fixture');
     original.completeTask(task.id, video, 1);
     original.recordShareDownload(video, 'preserved.mp4');
-    original.recordUpscaleVideo(video, video);
     // Recreate an old installation with populated duration and quota columns.
     original.db.exec(`
       ALTER TABLE accounts ADD COLUMN daily_quota INTEGER NOT NULL DEFAULT 30;
@@ -26,7 +26,6 @@ app.whenReady().then(async () => {
       ALTER TABLE accounts ADD COLUMN last_reset_date TEXT NOT NULL DEFAULT '';
       ALTER TABLE tasks ADD COLUMN duration INTEGER NOT NULL DEFAULT 10;
       ALTER TABLE share_downloads ADD COLUMN duration REAL NOT NULL DEFAULT 0;
-      ALTER TABLE upscale_videos ADD COLUMN duration REAL NOT NULL DEFAULT 0;
       CREATE TABLE quota_logs(id INTEGER PRIMARY KEY,account_id INTEGER,seconds INTEGER);
       CREATE TABLE quota_adjustments(id INTEGER PRIMARY KEY,account_id INTEGER,seconds INTEGER,FOREIGN KEY(account_id) REFERENCES accounts(id));
       CREATE TABLE generation_events(id INTEGER PRIMARY KEY,account_id INTEGER,task_id INTEGER,duration INTEGER,FOREIGN KEY(account_id) REFERENCES accounts(id),FOREIGN KEY(task_id) REFERENCES tasks(id));
@@ -38,7 +37,7 @@ app.whenReady().then(async () => {
     `);
     original.db.close();
     const migrated = new WorkspaceDatabase();
-    for (const table of ['accounts', 'tasks', 'share_downloads', 'upscale_videos']) {
+    for (const table of ['accounts', 'tasks', 'share_downloads']) {
       const columns = migrated.db.prepare(`PRAGMA table_info('${table}')`).all().map(c => c.name);
       assert.equal(columns.some(name => ['duration', 'daily_quota', 'used_quota', 'last_reset_date'].includes(name)), false);
     }
@@ -47,7 +46,7 @@ app.whenReady().then(async () => {
     assert.equal(migrated.accounts().length, 5);
     assert.equal(migrated.task(task.id).videoPath, video);
     assert.equal(migrated.task(task.id).ratio, '9:16');
-    assert.equal(migrated.videoLibrary().length, 3);
+    assert.equal(migrated.videoLibrary().length, 2);
     assert.equal(migrated.videoLibrary().some(item => 'duration' in item), false);
     assert.equal('dailyQuota' in migrated.accounts()[0], false);
     const backupDir = path.join(profile, 'workspace-data');
@@ -58,8 +57,9 @@ app.whenReady().then(async () => {
     backup.close();
     const account = migrated.createAccount({ name: 'no quota required' });
     migrated.updateAccount(account.id, { isLoggedIn: true });
-    assert.equal(pickAvailableAccount(migrated.accounts(), new Set()).id, account.id);
-    assert.equal(pickAvailableAccount(migrated.accounts(), new Set([account.id])), null);
+    const pool = new AccountPool(null);
+    assert.equal(pool.pick(migrated.accounts(), new Set()).id, account.id);
+    assert.equal(pool.pick(migrated.accounts(), new Set([account.id])), null);
     migrated.db.close();
     const reopened = new WorkspaceDatabase();
     assert.equal(backups().length, 1);

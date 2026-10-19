@@ -1,4 +1,6 @@
 const {app,nativeImage}=require('electron');
+// These checks assert the account-mode shell, which is no longer the default.
+process.env.DOUBAO_APP_MODE = process.env.DOUBAO_APP_MODE || 'account';
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict');
 app.setPath('userData',fs.mkdtempSync(path.join(os.tmpdir(),'doubao-marquee-')));process.env.CANVAS_BRIDGE_PORT='0';
 app.on('web-contents-created',(_e,wc)=>{const load=wc.loadURL.bind(wc);wc.loadURL=(url,options)=>/^https:\/\/(www\.)?(doubao|dola)\.com\/?$/.test(url)?load('data:text/html,<textarea>fixture</textarea>',options):load(url,options);});
