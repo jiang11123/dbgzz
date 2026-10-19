@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Check, FolderOpen, GripVertical, Heart, MonitorPlay, Plus, Settings, Sparkles, Upload } from 'lucide-react';
+import { Check, FolderOpen, GripVertical, Heart, MonitorPlay, Plus, Server, Settings, Sparkles, Upload } from 'lucide-react';
 import type { Account, DownloadStatus } from '../shared/types';
 import './style.css';
-import { UpscaleNotice } from './upscale-notice';
 import { ImageAssetsPanel } from './image-assets-panel';
 import { BarResizer, useResizableBar } from './resizable-bar';
 import { ImageAssetsBar } from './image-assets-bar';
@@ -11,22 +10,34 @@ import { MessageSyncPanel } from './message-sync-panel';
 import { AccountShortcutInput, ResetAccountShortcuts } from './account-shortcut-settings';
 import { accountShortcut } from '../shared/account-shortcuts';
 import { DonationPanel } from './donation-panel';
+import { GatewayPanel } from './gateway-panel';
+import { GatewayChat, ModeSwitch } from './gateway-chat';
 
 type Workspace = { accounts: Account[]; downloadDirectory: string; accountShortcuts: Record<string,string> };
 const downloadNoticeTitle: Record<DownloadStatus['state'], string> = { started: '正在下载视频', completed: '视频已保存', duplicate: '已阻止重复下载', failed: '视频下载失败' };
 
 function App() {
+  // Secondary windows (设置 / API 网关 / 消息同步) render a single panel by query
+  // param. This MUST run before any hook: a settings window must not start the
+  // account-opening effects of the main workspace.
+  const panel = new URLSearchParams(window.location.search).get('panel');
+  if (panel === 'settings') return <div className="settings-page"><SettingsPage /></div>;
+  if (panel === 'gateway') return <GatewayPanel />;
+  if (panel === 'messages') return <MessageSyncPanel />;
+  if (panel === 'image-assets') return <ImageAssetsPanel />;
   const [data, setData] = useState<Workspace | null>(null);
   const [currentAccountId, setCurrentAccountId] = useState<number | null>(null);
   const [showNewAccount, setShowNewAccount] = useState(false);
   const [downloadNotice, setDownloadNotice] = useState<DownloadStatus | null>(null);
   const [toast, setToast] = useState('');
+  const [mode, setMode] = useState<'gateway' | 'account'>('gateway');
+  const [stagedImages, setStagedImages] = useState<import('../shared/types').StagedAttachment[]>([]);
+  const accountShortcuts = data?.accountShortcuts ?? {};
   const startupAccountOpened = useRef(false);
   const message = (text: string) => { setToast(text); window.setTimeout(() => setToast(''), 2400); };
   const accountBar = useResizableBar('account', message);
   const refresh = async () => {
     const next = await window.workspace.load(); setData(next);
-    setCurrentAccountId(old => next.accounts.some((a: Account) => a.id === old) ? old : null);
   };
   const openAccount = async (account?: Account) => {
     if (!account) return;
@@ -35,105 +46,170 @@ function App() {
   };
   useEffect(() => {
     void refresh();
-    const disposers = [window.workspace.onChanged(refresh), window.workspace.onAccountOpened(setCurrentAccountId),
+    void window.workspace.getAppMode().then(setMode).catch(() => undefined);
+    const disposers = [window.workspace.onChanged(refresh), window.workspace.onAppModeChanged(setMode), window.workspace.onAccountOpened(setCurrentAccountId),
       window.workspace.onBrowserError(message), window.workspace.onAccountSendStatus(message), window.workspace.onDownloadStatus(setDownloadNotice)];
     return () => disposers.forEach(dispose => dispose());
   }, []);
   useEffect(() => {
-    if (!data || startupAccountOpened.current || !data.accounts.length) return;
-    startupAccountOpened.current = true; void openAccount(data.accounts[0]);
+    if (!data) return;
+    // Clean the selection only when the chosen account really disappeared; never
+    // clobber a freshly opened account during a concurrent refresh.
+    setCurrentAccountId(old => (old != null && !data.accounts.some((a: Account) => a.id === old)) ? null : old);
   }, [data]);
+  useEffect(() => {
+    if (!data || mode !== 'account' || startupAccountOpened.current || !data.accounts.length) return;
+    // An explicit openAccount (a check script, a shortcut, a click) wins over the startup
+    // default: without this, a fast caller that opens its own account gets overridden
+    // when this effect re-fires on the next data refresh.
+    if (currentAccountId != null) { startupAccountOpened.current = true; return; }
+    startupAccountOpened.current = true; void openAccount(data.accounts[0]);
+  }, [data, mode]);
   useEffect(() => {
     if (!downloadNotice || downloadNotice.state === 'started' || downloadNotice.state === 'completed') return;
     const timer = window.setTimeout(() => setDownloadNotice(null), 4200); return () => window.clearTimeout(timer);
   }, [downloadNotice]);
   if (!data) return <div className="loading">正在打开 Doubao Video Workspace...</div>;
+  const changeMode = (next: 'gateway' | 'account') => { setMode(next); void window.workspace.setAppMode(next).catch(error => message(String(error))); };
+
+  if (mode === 'gateway') return <main className="app-shell gateway-shell">
+    <header className="gateway-topbar">
+      <span className="brand"><Sparkles size={16} />豆包工作台</span>
+      <ModeSwitch mode={mode} onModeChange={changeMode} />
+      <div className="topbar-actions">
+        <button className="browser-size-toggle watermark-shortcut donation-button" title="打赏作者" onClick={() => void window.workspace.openDonation()}><Heart size={15} />打赏作者</button>
+        <button className="browser-size-toggle" title="图片资产" onClick={() => void window.workspace.openImageAssets()}><Upload size={15} />图片资产</button>
+        <button className="browser-size-toggle" title="网关设置" onClick={() => void window.workspace.openGateway()}><Server size={15} />网关设置</button>
+        <button className="browser-size-toggle" title="设置" onClick={() => void window.workspace.openSettings()}><Settings size={15} />设置</button>
+      </div>
+    </header>
+    <ImageAssetsBar accountId={data?.accounts[0]?.id ?? null} message={message}
+      onStage={items => setStagedImages(current => [...current, ...items.filter(item => !current.some(x => x.id === item.id)).map(item => ({ id: item.id, assetId: item.id, name: item.name, mimeType: item.name.match(/\.(png|jpe?g|webp|gif)$/i)?.[0] ? 'image/' + item.name.split('.').pop()!.toLowerCase().replace('jpg', 'jpeg') : 'application/octet-stream', url: item.url }))])} />
+    <GatewayChat mode={mode} onModeChange={changeMode} stagedImages={stagedImages} onStagedChange={setStagedImages} />
+    {toast && <div className="toast"><Check size={16} />{toast}</div>}
+  </main>;
+
   return <main className="app-shell browser-fullscreen">
     <header className="topbar" style={{ height: accountBar.height, '--account-scale': Math.max(0.75, Math.min(2.5, accountBar.height / 58)) } as React.CSSProperties}><div className="brand"><Sparkles size={19} /><span>Doubao Video Workspace</span></div>
+      <ModeSwitch mode={mode} onModeChange={changeMode} />
       <div className="account-tabs">{data.accounts.map((account, index) => <button key={account.id} className={account.id === currentAccountId ? 'account active' : 'account'} onClick={() => void openAccount(account)} title={accountShortcut(index, data.accountShortcuts || {}) || undefined}><span className={account.isLoggedIn ? 'login-dot on' : 'login-dot'} />{account.name}</button>)}
         <button className="add-account" onClick={() => setShowNewAccount(true)} title="添加账号"><Plus size={15} />添加账号</button></div>
-      <div className="topbar-actions"><button className="watermark-shortcut donation-button" onClick={() => void window.workspace.openDonation()}><Heart size={15} />打赏作者</button><button className="watermark-shortcut" onClick={() => void window.workspace.openImageAssets()}><Upload size={15} />图片资产</button>
+      <div className="topbar-actions"><button className="watermark-shortcut donation-button" onClick={() => void window.workspace.openDonation()}><Heart size={15} />打赏作者</button><button className="browser-size-toggle" title="图片资产" onClick={() => void window.workspace.openImageAssets()}><Upload size={15} />图片资产</button>
+      <button className="browser-size-toggle" title="网关设置" onClick={() => void window.workspace.openGateway()}><Server size={15} />网关设置</button>
       <button className="browser-size-toggle" title="设置" onClick={() => void window.workspace.openSettings()}><Settings size={15} />设置</button></div>
       <BarResizer bar={accountBar} />
     </header>
     <ImageAssetsBar accountId={currentAccountId} message={message} />
     {showNewAccount && <NewAccount onClose={() => setShowNewAccount(false)} onCreated={async account => { const next = await window.workspace.createAccount(account); setShowNewAccount(false); await refresh(); await openAccount(next); }} />}
-    {downloadNotice && <div className={`download-notice ${downloadNotice.state}`} role="status"><div><b>{downloadNoticeTitle[downloadNotice.state]}</b><span>{downloadNotice.name}{downloadNotice.reason ? ` · ${downloadNotice.reason}` : ''}</span></div>
-      {downloadNotice.state === 'completed' && downloadNotice.path && <button className="download-location" onClick={() => void window.workspace.openFolder(downloadNotice.path!)}>打开下载位置</button>}
+    {downloadNotice && <div className={`download-notice ${downloadNotice.state}`} role="status"><div><b>{downloadNoticeTitle[downloadNotice.state]}</b><span>{downloadNotice.name}</span></div>
+      {downloadNotice.state === 'completed' && downloadNotice.path && <button className="download-location" onClick={() => void window.workspace.openFolder(downloadNotice.path as string)}><FolderOpen size={13} />打开下载位置</button>}
       <button className="download-dismiss" aria-label="关闭下载提示" onClick={() => setDownloadNotice(null)}>×</button></div>}
-    <UpscaleNotice />
     {toast && <div className="toast"><Check size={16} />{toast}</div>}
   </main>;
 }
 
-function AccountNameInput({ account, onSaved, message }: { account: Account; onSaved: () => Promise<void>; message: (text: string) => void }) {
-  const [draft, setDraft] = useState(account.name);
-  const [saving, setSaving] = useState(false);
-  const editing = useRef(false);
-  const composing = useRef(false);
-  const pending = useRef(false);
-  const value = useRef(account.name);
-  useEffect(() => {
-    if (!editing.current && !pending.current) { value.current = account.name; setDraft(account.name); }
-  }, [account.name]);
-  const save = async () => {
-    if (composing.current || pending.current) return;
-    const name = value.current.trim();
-    if (!name) { value.current = account.name; setDraft(account.name); message('账号名称不能为空'); return; }
-    if (name === account.name) { setDraft(name); return; }
-    pending.current = true; setSaving(true);
-    try { await window.workspace.updateAccount(account.id, { name }); value.current = name; setDraft(name); await onSaved(); }
-    catch (error) { message(`名称保存失败：${error instanceof Error ? error.message : String(error)}`); }
-    finally { pending.current = false; setSaving(false); }
+/** Settings window: account management, quotas, deletion and drag reordering. */
+/**
+ * IME-safe rename field: commits on blur/Enter, never commits mid-composition,
+ * and keeps focus + caret through unrelated data refreshes.
+ */
+function NameInput({ ariaLabel, initial, onCommit }: { ariaLabel: string; initial: string; onCommit: (value: string) => void }) {
+  const [value, setValue] = useState(initial);
+  const [composing, setComposing] = useState(false);
+  const field = useRef<HTMLInputElement | null>(null);
+  const committed = useRef(initial);
+  // A reorder changes this row's account: follow the new name unless the user is
+  // mid-edit, otherwise the field keeps showing the previous account's name.
+  const lastInitial = useRef(initial);
+  if (lastInitial.current !== initial) {
+    lastInitial.current = initial;
+    if (!composing) { committed.current = initial; setValue(initial); }
+  }
+  const commit = () => {
+    if (composing) return;
+    if (field.current !== document.activeElement && value === committed.current) return;
+    if (value.trim() && value !== committed.current) { committed.current = value; onCommit(value); }
   };
-  return <input aria-label={`${account.name}名称`} value={draft} disabled={saving}
-    onFocus={() => { editing.current = true; }}
-    onChange={event => { value.current = event.target.value; setDraft(event.target.value); }}
-    onCompositionStart={() => { composing.current = true; }}
-    onCompositionEnd={event => { composing.current = false; value.current = event.currentTarget.value; setDraft(event.currentTarget.value); if (!editing.current) void save(); }}
-    onBlur={() => { editing.current = false; void save(); }}
-    onKeyDown={event => { if (event.key === 'Enter' && !composing.current && !event.nativeEvent.isComposing && event.nativeEvent.keyCode !== 229) { event.preventDefault(); event.currentTarget.blur(); } }} />;
+  return <input ref={field} aria-label={ariaLabel} value={value}
+    onFocus={() => { committed.current = value; }}
+    onChange={event => setValue(event.target.value)}
+    onBlur={() => { const final = field.current ? field.current.value : value; setComposing(false); const trimmed = final.trim(); if (trimmed && trimmed !== committed.current) { committed.current = trimmed; onCommit(trimmed); setValue(trimmed); } else { setValue(committed.current); } }}
+    onKeyDown={event => {
+      if (event.nativeEvent.isComposing || composing) return;
+      if (event.key === 'Enter') { event.preventDefault(); (event.target as HTMLInputElement).blur(); }
+      if (event.key === 'Escape') { setValue(initial); (event.target as HTMLInputElement).blur(); }
+    }}
+    onCompositionStart={() => setComposing(true)}
+    onCompositionEnd={event => { setComposing(false); setValue(event.data); }} />;
 }
 
-function SettingsView({ data, refresh, message, onAddAccount, onOpenAccount }: { data: Workspace; refresh: () => Promise<void>; message: (s: string) => void; onAddAccount: () => void; onOpenAccount?: (account: Account) => void }) {
-  const dragged = useRef<number | null>(null);
-  const [dropTarget, setDropTarget] = useState<{ id: number; before: boolean } | null>(null);
-  const [sorting, setSorting] = useState(false);
-  const dropAccount = async (targetId: number, before: boolean) => {
-    const id = dragged.current; dragged.current = null; setDropTarget(null);
-    if (id === null || id === targetId || sorting) return;
-    setSorting(true);
-    try { await window.workspace.moveAccount(id, targetId, before); await refresh(); }
-    catch (error) { message(`排序失败：${error instanceof Error ? error.message : String(error)}`); }
-    finally { setSorting(false); }
-  };
-  const setDownloads = async () => { const folder = await window.workspace.selectDirectory(); if (folder) { await window.workspace.watchDownloads(folder); await refresh(); message('下载目录开始监听'); } }; const remove = async (account: Account) => { if (data.accounts.length <= 1) return message('至少保留一个账号'); try { const removed = await window.workspace.confirmDeleteAccount(account.id); if (!removed) return; await refresh(); message(`${account.name} 已删除`); } catch (error) { message(`删除失败：${error instanceof Error ? error.message : String(error)}`); } }; return <div className="settings-page"><div className="page-heading"><div><p className="eyebrow">本地设置</p><h1>账号与下载</h1></div><button className="primary" onClick={onAddAccount}><Plus size={16} />添加账号</button></div><section className="flat-panel settings-block"><div className="panel-head"><h2>下载监听目录</h2><button className="outline" onClick={() => void setDownloads()}><FolderOpen size={15} />选择目录</button></div><p>{data.downloadDirectory || '未设置。选择豆包视频下载保存的本地目录。'}</p></section><section className="flat-panel settings-block"><div className="panel-head"><h2>账号管理</h2><div className="account-management-actions"><span>拖动左侧手柄调整顺序</span><ResetAccountShortcuts refresh={refresh} message={message} /></div></div>{data.accounts.map((a, index) => <div className={`account-setting${dropTarget?.id === a.id ? dropTarget.before ? ' drop-before' : ' drop-after' : ''}`} key={a.id}
-      onDragOver={event => { if (dragged.current === null || dragged.current === a.id || sorting) return; event.preventDefault(); event.dataTransfer.dropEffect = 'move'; const rect = event.currentTarget.getBoundingClientRect(); setDropTarget({ id: a.id, before: event.clientY < rect.top + rect.height / 2 }); }}
-      onDragLeave={event => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDropTarget(null); }}
-      onDrop={event => { if (dragged.current === null) return; event.preventDefault(); const rect = event.currentTarget.getBoundingClientRect(); void dropAccount(a.id, event.clientY < rect.top + rect.height / 2); }}>
-      <button className="account-drag-handle" aria-label={`拖动排序 ${a.name}`} title="拖动调整账号顺序" draggable={!sorting}
-        onDragStart={event => { if (sorting) { event.preventDefault(); return; } dragged.current = a.id; event.dataTransfer.effectAllowed = 'move'; event.dataTransfer.setData('text/plain', String(a.id)); }}
-        onDragEnd={() => { dragged.current = null; setDropTarget(null); }}><GripVertical size={17} /></button><span><i className={a.isLoggedIn ? 'login-dot on' : 'login-dot'} />{a.name}</span><AccountNameInput account={a} onSaved={refresh} message={message} /><AccountShortcutInput index={index} custom={data.accountShortcuts || {}} refresh={refresh} message={message} /><button className="icon-button" title="打开账号" onClick={() => { if (onOpenAccount) onOpenAccount(a); else void window.workspace.openAccount(a.id); }}><MonitorPlay size={16} /></button><button className="delete-account" title="删除账号" onClick={() => void remove(a)}>删除</button></div>)}</section></div> }
-function NewAccount({ onClose, onCreated }: { onClose: () => void; onCreated: (account: { name: string; note: string; platform: 'doubao' | 'dola' }) => void }) { const [name, setName] = useState(''); const [note, setNote] = useState(''); const [platform, setPlatform] = useState<'doubao' | 'dola'>('doubao'); return <Modal title="添加账号" onClose={onClose}><p className="modal-hint">每个账号都会创建独立浏览器 Session。选择 Dola 后会打开国际版 dola.com，请手动完成该账号登录。</p><label>平台<select value={platform} onChange={(e) => setPlatform(e.target.value as 'doubao' | 'dola')}><option value="doubao">豆包（国内版）</option><option value="dola">Dola（国际版）</option></select></label><label>账号名称<input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder={platform === 'dola' ? '例如：Dola 视频号' : '例如：豆包视频号B'} /></label><label>备注<input value={note} onChange={(e) => setNote(e.target.value)} placeholder="例如：备用号" /></label><div className="modal-actions"><button className="outline" onClick={onClose}>取消</button><button className="primary" disabled={!name.trim()} onClick={() => onCreated({ name: name.trim(), note: note.trim(), platform })}>创建</button></div></Modal> }
-function Modal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) { return <div className="modal-backdrop" onMouseDown={onClose}><section className="modal" onMouseDown={(e) => e.stopPropagation()}><div className="modal-title"><h2>{title}</h2><button onClick={onClose}>×</button></div>{children}</section></div> }
-function SettingsApp() {
-  const [data, setData] = useState<Workspace | null>(null);
-  const [toast, setToast] = useState('');
+function SettingsPage() {
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [accountShortcuts, setAccountShortcuts] = useState<Record<string, string>>({});
+  const [message, setMessage] = useState('');
   const [showNewAccount, setShowNewAccount] = useState(false);
-  const message = (text: string) => { setToast(text); window.setTimeout(() => setToast(''), 2400); };
-  const refresh = async () => setData(await window.workspace.load());
-  useEffect(() => { void refresh(); return window.workspace.onChanged(() => { void refresh(); }); }, []);
-  const openAndClose = async (id: number) => { await window.workspace.openAccount(id); window.close(); };
-  if (!data) return <div className="loading">正在打开设置...</div>;
-  return <main className="settings-window">
-    <SettingsView data={data} refresh={refresh} message={message} onAddAccount={() => setShowNewAccount(true)} onOpenAccount={(account) => void openAndClose(account.id)} />
-    {showNewAccount && <NewAccount onClose={() => setShowNewAccount(false)} onCreated={async (account) => { const next = await window.workspace.createAccount(account); setShowNewAccount(false); await window.workspace.openAccount(next.id); window.close(); }} />}
-    {toast && <div className="toast"><Check size={16} />{toast}</div>}
-  </main>;
+  const refresh = async () => {
+    const next = await window.workspace.load();
+    setAccounts(next.accounts);
+    setAccountShortcuts(next.accountShortcuts ?? {});
+  };
+  useEffect(() => { void refresh().catch(error => setMessage(String(error))); }, []);
+  const rename = async (id: number, name: string) => {
+    try { await window.workspace.renameAccount(id, name); await refresh(); }
+    catch (error) { setMessage(error instanceof Error ? error.message : String(error)); }
+  };
+  const remove = async (account: Account) => {
+    try { await window.workspace.confirmDeleteAccount(account.id); await refresh(); }
+    catch (error) { setMessage(error instanceof Error ? error.message : String(error)); }
+  };
+  const move = async (sourceId: number, targetId: number, before: boolean) => {
+    try { await window.workspace.moveAccount(sourceId, targetId, before); await refresh(); }
+    catch (error) { setMessage(error instanceof Error ? error.message : String(error)); }
+  };
+  // AccountShortcutInput is index-based; the stored map is keyed by account id.
+  const indexKeyedShortcuts: Record<string, string> = {};
+  accounts.forEach((account, i) => { const s = accountShortcuts[String(account.id)]; if (s) indexKeyedShortcuts[String(i)] = s; });
+  return <div className="settings-window">
+    <h2>账号管理</h2>
+    {message && <div className="chat-alert">{message}</div>}
+    <button className="primary add-account-settings" onClick={() => setShowNewAccount(true)}><Plus size={15} />添加账号</button>
+    <div className="account-settings">
+      {accounts.map((account, index) => <div key={account.id} className="account-setting" data-account-id={account.id}
+          onDragOver={event => event.preventDefault()}
+          onDrop={event => { event.preventDefault(); const from = Number(event.dataTransfer.getData('text/plain')); if (from && from !== account.id) { const rect = event.currentTarget.getBoundingClientRect(); const before = event.clientY < rect.top + rect.height / 2; void move(from, account.id, before); } }}>
+        <span className="account-drag-handle" draggable
+          onDragStart={event => { event.dataTransfer.setData('text/plain', String(account.id)); }}
+          title="拖动调整顺序">⋮⋮</span>
+        <NameInput ariaLabel={`${account.name}名称`} initial={account.name} onCommit={value => { const v = value.trim(); if (v && v !== account.name) void rename(account.id, v); }} />
+        <AccountShortcutInput index={index} custom={indexKeyedShortcuts} refresh={refresh} message={setMessage} />
+        <button className="delete-account" onClick={() => void remove(account)} title="删除账号">删除</button>
+      </div>)}
+    </div>
+    <ResetAccountShortcuts refresh={refresh} message={setMessage} />
+    {showNewAccount && <NewAccount onClose={() => setShowNewAccount(false)} onCreated={async () => { setShowNewAccount(false); await refresh(); }} />}
+  </div>;
+}
+function NewAccount({ onClose, onCreated }: { onClose: () => void; onCreated: (account: Account) => Promise<void> }) {
+  const [name, setName] = useState('');
+  const [note, setNote] = useState('');
+  const [busy, setBusy] = useState(false);
+  return <div className="modal" role="dialog" aria-modal="true">
+    <form className="modal-card" onSubmit={async event => {
+      event.preventDefault();
+      if (busy) return;
+      setBusy(true);
+      try { const account = await window.workspace.createAccount({ name: name.trim(), note: note.trim(), sessionName: `persist:doubao_${Date.now().toString(36)}` }); await onCreated(account); }
+      finally { setBusy(false); }
+    }}>
+      <h2>添加豆包账号</h2>
+      <label>账号名称<input value={name} onChange={event => setName(event.target.value)} placeholder="例如：主号" required autoFocus /></label>
+      <label>备注<input value={note} onChange={event => setNote(event.target.value)} placeholder="可选" /></label>
+      <div className="modal-actions">
+        <button type="button" className="outline" onClick={onClose}>取消</button>
+        <button type="submit" className="primary" disabled={busy || !name.trim()}>{busy ? '创建中…' : '创建'}</button>
+      </div>
+    </form>
+  </div>;
 }
 
-const settingsPanel = new URLSearchParams(window.location.search).get('panel') === 'settings';
-createRoot(document.getElementById('root')!).render(new URLSearchParams(window.location.search).get('panel') === 'donation' ? <DonationPanel /> : new URLSearchParams(window.location.search).get('panel') === 'message-sync' ? <MessageSyncPanel /> : new URLSearchParams(window.location.search).get('panel') === 'image-assets' ? <ImageAssetsPanel /> : settingsPanel ? <SettingsApp /> : <App />);
-
-
-
+createRoot(document.getElementById('root')!).render(<App />);

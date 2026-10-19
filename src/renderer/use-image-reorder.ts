@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import type { ImageAsset } from '../shared/types';
 
 export function useImageReorder(items: ImageAsset[], selected: string[], busy: boolean,
-  commit: (ids: string[]) => void) {
-  const latest = useRef({items, selected, busy, commit});
-  latest.current = {items, selected, busy, commit};
+  commit: (ids: string[]) => void, options?: { nativeDrag?: boolean }) {
+  const latest = useRef({items, selected, busy, commit, nativeDrag: Boolean(options?.nativeDrag)});
+  latest.current = {items, selected, busy, commit, nativeDrag: Boolean(options?.nativeDrag)};
   const [moving, setMoving] = useState<string[]>([]);
   const [target, setTarget] = useState<{id: string; before: boolean} | null>(null);
   useEffect(() => {
@@ -34,6 +34,7 @@ export function useImageReorder(items: ImageAsset[], selected: string[], busy: b
       frame = requestAnimationFrame(scroll);
     };
     const down = (event: PointerEvent) => {
+      if (latest.current.nativeDrag) return;
       if (latest.current.busy || event.button !== 0 || !(event.target instanceof Element) || event.target.closest('input')) return;
       const card = event.target.closest<HTMLElement>('.asset-bar-thumb');
       const strip = card?.closest<HTMLElement>('.asset-bar-thumbnails');
