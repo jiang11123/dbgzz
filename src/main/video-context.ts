@@ -86,6 +86,49 @@ export function captureVideoAtPoint(point: { x: number; y: number }): SharedVide
   return null;
 }
 
+// Serialized into the page to extract the latest generated video's SharedVideo metadata for HD download
+export function captureLatestVideo(): SharedVideo | null {
+  const elements = Array.from(document.querySelectorAll<HTMLVideoElement | HTMLElement>('video, [data-message-id] video, .video-card, [class*="video"]'));
+  const videos = elements.reverse();
+  for (const media of videos) {
+    let scope: Element | null = media;
+    for (let level = 0; scope && level < 10; level++, scope = scope.parentElement) {
+      if (scope === document.body || scope === document.documentElement) break;
+      const candidates = new Map<string, SharedVideo>();
+      const seen = new WeakSet<object>(); let visited = 0;
+      const walk = (value: unknown, depth: number): void => {
+        if (++visited > 12000 || depth > 15 || !value) return;
+        if (typeof value === 'string') {
+          if (value.length < 2 * 1024 * 1024 && /^\s*[\[{]/.test(value)) { try { walk(JSON.parse(value), depth + 1); } catch { /* ignore */ } }
+          return;
+        }
+        if (typeof value !== 'object' || value instanceof Node || seen.has(value)) return;
+        seen.add(value);
+        const object = value as Record<string, any>;
+        const raw = object.video_model || object.videoModel;
+        if (raw) {
+          try {
+            const model = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            const vid = String(object.vid || model.video_id || '');
+            if (/^[\w-]{1,100}$/.test(vid) && typeof model.fallback_api === 'string') {
+              candidates.set(vid, { vid, model: { video_id: vid, fallback_api: model.fallback_api } });
+            }
+          } catch { /* malformed */ }
+        }
+        for (const [key, child] of Object.entries(object)) {
+          if (!['_owner', 'return', 'stateNode', 'video_model', 'videoModel'].includes(key)) walk(child, depth + 1);
+        }
+      };
+      for (const key of Object.keys(scope)) {
+        if (key.startsWith('__reactProps$')) walk((scope as any)[key], 0);
+        if (key.startsWith('__reactFiber$')) walk((scope as any)[key]?.memoizedProps, 0);
+      }
+      if (candidates.size > 0) return [...candidates.values()][candidates.size - 1];
+    }
+  }
+  return null;
+}
+
 export function attachVideoContextMenu(contents: WebContents, owner: () => BrowserWindow | null, download: (video: SharedVideo) => Promise<void>) {
   type ContextPoint = { x: number; y: number; mediaType: string; isEditable?: boolean; selectionText?: string; linkURL?: string };
   let requestNumber = 0;

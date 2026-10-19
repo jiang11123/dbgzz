@@ -11,6 +11,8 @@ import { ImageAssetStore } from './image-assets';
 import { setupAccountSend } from './account-send';
 import type { DownloadCandidate, GatewayAttachment } from '../shared/types';
 import { CanvasBridge } from './canvas-bridge';
+import { BackgroundPageHost } from './background-page-host';
+import { syncVideoTaskToChat, findVideoTaskForThread, recoverLegacyVideoLink, forwardVideoChatMessage } from './video-chat-sync';
 import { DoubaoGateway } from './gateway';
 import { createGatewayChat } from './gateway-chat';
 import { resolveStagedAttachments } from './staged-attachments';
@@ -18,7 +20,7 @@ import { generateImages } from './doubao-image';
 import { uploadImageToDoubao } from './doubao-upload';
 import { DownloadTracker } from './download-tracker';
 import { DoubaoShareService } from './doubao-share';
-import { attachVideoContextMenu } from './video-context';
+import { attachVideoContextMenu, captureLatestVideo } from './video-context';
 import { platformConfig } from './account-platform';
 import { accountShortcut, normalizeAccountShortcut, shortcutFromKey } from '../shared/account-shortcuts';
 import type { DownloadStatus } from '../shared/types';
@@ -53,6 +55,17 @@ let lastVideoAccountId: number | null = null;
 // task completes, the finished video is attached to the original chat message.
 const pendingChatVideos = new Map<string, number>();
 const accountViews = new Map<number, BrowserView>();
+const backgroundPages = new BackgroundPageHost(() => {
+  // show:false alone stalls Doubao's animation/resize-driven editor initialization.
+  // A transparent, non-focusable off-screen host renders without covering the chat.
+  const host = new BrowserWindow({
+    show: false, x: -10000, y: -10000, width: 1280, height: 900, useContentSize: true,
+    opacity: 0, focusable: false, skipTaskbar: true,
+    webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false, backgroundThrottling: false },
+  });
+  host.showInactive();
+  return host;
+});
 const downloadTracker = new DownloadTracker();
 const shareService = new DoubaoShareService();
 let shareParsing = false;
@@ -215,6 +228,7 @@ function openAccountBrowser(accountId: number, background = false, preloadOnly =
   if (preloadOnly) return view;
   // Attach the replacement before detaching the previous view: failed creation must
   // not leave the workspace without a visible account page.
+  backgroundPages.detach(view);
   if (background) {
     if (windowRef && !windowRef.getBrowserViews().includes(view)) windowRef.addBrowserView(view);
     view.setBounds(browserBounds());
@@ -241,14 +255,23 @@ function openAccountBrowser(accountId: number, background = false, preloadOnly =
  * Gateway requests must not yank the user out of the chat into an account page. An
  * unattached BrowserView still signs and fetches correctly (verified: frontierSign ok
  * and image generation ok on an unattached view), so there is no need to attach it. The
- * only operation that needs attachment is capturePage, guarded separately by the
- * bridge's isViewAttached check.
+ * DOM-driven video work is different: it needs a nonzero viewport and uses
+ * ensureVideoAccountView with a hidden native host. Visible screenshots remain
+ * guarded separately by the bridge's isViewAttached check.
  */
 function ensureAccountView(accountId: number): BrowserView | null {
   const existing = accountViews.get(accountId);
   if (existing?.webContents && !existing.webContents.isDestroyed()) return existing;
   // Warm the page in the background: preloadOnly keeps it out of the window.
   return openAccountBrowser(accountId, true, true) ?? null;
+}
+
+/** Keep DOM-driven video work rendered without covering the gateway chat. */
+function ensureVideoAccountView(accountId: number): BrowserView | null {
+  const view = ensureAccountView(accountId);
+  if (!view) return null;
+  if (windowRef?.getBrowserViews().includes(view)) return view;
+  return backgroundPages.attach(view);
 }
 
 /** Picks a usable Doubao account from the shared pool, or the first logged-in one. */
@@ -657,25 +680,59 @@ function setupIpc() {
     return gatewayChat.generateVideos({ threadId: request?.threadId, prompt: String(request?.prompt ?? ''), model: request?.model, ratio: request?.ratio, duration: request?.duration, accountId: request?.accountId, attachments: resolveStaged(request?.attachments) as any });
   });
   ipcMain.handle('chat:confirm', async (_event, request: { threadId?: string; text?: string }) => {
-    const text = String(request?.text || '确认生成，直接开始');
-    const threadId = request?.threadId;
     if (!canvasBridge) return false;
-    if (threadId && gatewayChat) {
-      const msgs = gatewayChat.messages(threadId);
-      for (const [taskId, replyMessageId] of pendingChatVideos) {
-        if (msgs.some(m => m.id === replyMessageId)) {
-          return canvasBridge.confirmTask(taskId, text);
-        }
+    return forwardVideoChatMessage(canvasBridge, db, request?.threadId || '', request?.text || '');
+  });
+  ipcMain.handle('chat:download-media', async (_event, attachment: { id?: string; kind?: 'image' | 'video'; name?: string; path?: string; url?: string }) => {
+    try {
+      const directory = watchedDirectory || db.getSetting('downloadDirectory') || path.join(app.getPath('downloads'), 'DoubaoWorkspace');
+      fs.mkdirSync(directory, { recursive: true });
+      const filename = path.basename(attachment?.name || '') || (attachment?.kind === 'video' ? `doubao-video-${Date.now()}.mp4` : `doubao-image-${Date.now()}.png`);
+      const target = path.join(directory, filename);
+
+      // Already inside the configured download folder: nothing to copy, just report it.
+      if (attachment?.path && fs.existsSync(attachment.path) && path.resolve(attachment.path) === path.resolve(target)) {
+        windowRef?.webContents.send('download:status', { state: 'completed', accountId: 0, name: filename, path: target });
+        return { path: target, alreadyInFolder: true };
       }
+
+      // Never overwrite an existing file: a second click would otherwise clobber the first copy.
+      let destination = target;
+      if (fs.existsSync(destination)) {
+        const parsed = path.parse(target);
+        destination = path.join(parsed.dir, `${parsed.name}-${Date.now().toString(36)}${parsed.ext}`);
+      }
+
+      if (attachment?.path && fs.existsSync(attachment.path)) {
+        fs.copyFileSync(attachment.path, destination);
+      } else if (attachment?.url && /^https?:\/\//.test(attachment.url)) {
+        const saved = await downloadRemoteMedia(attachment.url, attachment.kind === 'video' ? 'video' : 'image');
+        if (saved?.path && fs.existsSync(saved.path)) {
+          fs.copyFileSync(saved.path, destination);
+        } else {
+          throw new Error('下载文件失败，请检查网络');
+        }
+      } else {
+        throw new Error('未找到该媒体的本地文件');
+      }
+
+      pendingDownloads.add(destination);
+      if (attachment?.kind === 'video') db.recordShareDownload(destination, path.basename(destination));
+      windowRef?.webContents.send('workspace:changed');
+      windowRef?.webContents.send('download:status', { state: 'completed', accountId: 0, name: path.basename(destination), path: destination });
+      return { path: destination };
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : '下载失败，请重试';
+      windowRef?.webContents.send('download:status', { state: 'failed', accountId: 0, name: attachment?.name || '媒体文件', reason });
+      return { error: reason };
     }
-    const running = canvasBridge.list().find(t => t.status === 'generating' || t.status === 'submitting');
-    if (running) {
-      return canvasBridge.confirmTask(running.id, text);
-    }
-    return false;
   });
   ipcMain.handle('chat:threads', () => gatewayChat.threads());
-  ipcMain.handle('chat:messages', (_e, threadId: string) => gatewayChat.messages(String(threadId)));
+  ipcMain.handle('chat:messages', (event, threadId: string) => {
+    const task = canvasBridge?.list().find(t => t.gatewayThreadId === String(threadId) && !['completed','failed','cancelled','needs_attention'].includes(t.status));
+    if (task) setImmediate(() => { if (!event.sender.isDestroyed()) syncVideoTaskToChat(task, db, payload => event.sender.send('chat:delta', payload)); });
+    return gatewayChat.messages(String(threadId));
+  });
   ipcMain.handle('chat:create', (_e, model?: string) => gatewayChat.createThread(model));
   ipcMain.handle('chat:rename', (_e, id: string, title: string) => gatewayChat.renameThread(String(id), String(title)));
   ipcMain.handle('chat:delete', (_e, id: string) => gatewayChat.deleteThread(String(id)));
@@ -779,7 +836,7 @@ function createWindow() {
   windowRef.on('leave-html-full-screen', () => setBrowserFullscreen(false));
   windowRef.on('enter-full-screen', resizeBrowser);
   windowRef.on('leave-full-screen', resizeBrowser);
-  windowRef.on('closed', () => { windowRef = null; currentView = null; });
+  windowRef.on('closed', () => { windowRef = null; currentView = null; backgroundPages.destroy(); });
 }
 // A second launch must focus the running workspace instead of starting a rival
 // process that would fight for the canvas bridge port and pop an error dialog.
@@ -805,10 +862,32 @@ app.whenReady().then(() => {
   if (saved) watchDownloads(saved);
   canvasBridge = new CanvasBridge({
     accounts: () => db.accounts(),
-    openAccount: (accountId) => openAccountBrowser(accountId, true) ?? null,
-    viewForAccount: (accountId) => accountViews.get(accountId) ?? null,
+    openAccount: (accountId) => ensureVideoAccountView(accountId),
+    viewForAccount: (accountId) => ensureVideoAccountView(accountId),
     isViewAttached: (view) => Boolean(windowRef?.getBrowserViews().includes(view)),
-    onTaskChanged: () => { windowRef?.webContents.send('workspace:changed'); },
+    onTaskChanged: (task) => {
+      windowRef?.webContents.send('workspace:changed');
+      if (task) {
+        if (task.gatewayReplyMessageId != null) pendingChatVideos.set(task.id, task.gatewayReplyMessageId);
+        syncVideoTaskToChat(task, db, payload => windowRef?.webContents.send('chat:delta', payload));
+      }
+    },
+    downloadHDVideo: async (view, _task) => {
+      try {
+        const target = await view.webContents.executeJavaScript(`(${captureLatestVideo.toString()})()`);
+        if (target && target.vid && target.model?.fallback_api) {
+          const video = await shareService.resolveVideo(target);
+          const directory = watchedDirectory || path.join(app.getPath('downloads'), 'DoubaoWorkspace');
+          const saved = await shareService.save(video.id, directory);
+          pendingDownloads.add(saved.path);
+          db.recordShareDownload(saved.path, path.basename(saved.path));
+          windowRef?.webContents.send('workspace:changed');
+          windowRef?.webContents.send('download:status', { state: 'completed', accountId: 0, name: path.basename(saved.path), path: saved.path });
+          return saved.path;
+        }
+      } catch { /* fallback to normal download if page did not expose video model */ }
+      return null;
+    },
   }, app.getPath('userData'));
   setupAccountSend({ accounts: () => db.accounts(), views: accountViews, current: () => currentView,
     main: () => windowRef, rendererUrl, preload: path.join(__dirname, '../preload/preload.js'), bridge: () => canvasBridge,
@@ -887,7 +966,7 @@ app.whenReady().then(() => {
       }
       throw lastError ?? new Error('图片生成失败，请稍后重试');
     },
-    generateVideos: async (prompt, options: { model?: string; ratio?: string; duration?: number; accountId?: number | null; replyMessageId?: number; referencePaths?: string[] }) => {
+    generateVideos: async (prompt, options: { model?: string; ratio?: string; duration?: number; accountId?: number | null; replyMessageId?: number; threadId?: string; referencePaths?: string[] }) => {
       lastVideoAccountId = options.accountId ?? null;
       // The chat API cannot start a video job (the model answers "无法直接生成视频"),
       // so hand the prompt to the canvas bridge, which submits through the site's
@@ -896,9 +975,21 @@ app.whenReady().then(() => {
       let lastError = '视频生成未完成';
       // Not every account runs video jobs; the bridge cools down a rejecting account,
       // so each retry is dispatched to a different one until one accepts.
+      const thread = options.threadId ? db.gatewayThread(options.threadId) : null;
+      const effectiveTargetAccount = options.accountId ?? (thread?.doubaoConversationId ? (thread.accountId ?? undefined) : undefined);
       for (let attempt = 0; attempt < 6; attempt += 1) {
         // 指定账号也要传给桥：否则参考图上传会落到池里随便挑的账号上。
-        const task = await canvasBridge.create({ prompt, ratio: options.ratio, duration: options.duration, model: options.model, targetAccountId: options.accountId ?? undefined, referencePaths: options.referencePaths ?? [] });
+        const task = await canvasBridge.create({
+          gatewayThreadId: options.threadId,
+          gatewayReplyMessageId: options.replyMessageId,
+          conversationId: thread?.doubaoConversationId || undefined,
+          prompt,
+          ratio: options.ratio,
+          duration: options.duration,
+          model: options.model,
+          targetAccountId: effectiveTargetAccount,
+          referencePaths: options.referencePaths ?? []
+        });
         // If the chat request times out, the bridge task keeps rendering; deliver the
         // video to the original chat bubble whenever it finishes.
         if (options.replyMessageId != null) pendingChatVideos.set(task.id, options.replyMessageId);
@@ -907,24 +998,16 @@ app.whenReady().then(() => {
         // 30-minute cap so the chat never gives up before the bridge does.
         // DS_VIDEO_WAIT_MS shortens this for tests.
         const waitMs = Math.max(30_000, Number(process.env.DS_VIDEO_WAIT_MS) || 30 * 60 * 1000);
-        const deadline = Date.now() + waitMs;
+        let deadline = Date.now() + waitMs;
         let timedOut = false;
-        let lastLiveText = '';
+
         while (Date.now() < deadline) {
           await new Promise(resolve => setTimeout(resolve, 3000));
           const current = canvasBridge.task(task.id);
+          if (current?.status === 'awaiting_confirmation') deadline = Date.now() + waitMs;
           if (!current) { lastError = '视频任务丢失，请在任务面板查看'; break; }
           // Mirror the bridge's real state into the bubble. Waiting only for latestReply
           // left the bubble frozen on its placeholder while the task was still queued.
-          const live = current.latestReply || current.statusText || '';
-          if (options.replyMessageId != null && live && live !== lastLiveText && gatewayChat) {
-            lastLiveText = live;
-            gatewayChat.updateMessage(options.replyMessageId, { content: live });
-            const threadId = gatewayChat.threads().find(t => gatewayChat.messages(t.id).some(m => m.id === options.replyMessageId))?.id;
-            if (threadId && windowRef && !windowRef.isDestroyed()) {
-              windowRef.webContents.send('chat:delta', { threadId, full: live });
-            }
-          }
           if (current.status === 'completed' && current.videoPath) {
             if (!fs.existsSync(current.videoPath)) { lastError = '视频文件已生成但丢失，请重新生成'; break; }
             pendingChatVideos.delete(task.id);
@@ -945,6 +1028,13 @@ app.whenReady().then(() => {
     },
   });
 
+  for (const task of canvasBridge.list()) {
+    if (!task.gatewayThreadId && ['awaiting_reply','awaiting_confirmation','generating','downloading'].includes(task.status)) {
+      const link = recoverLegacyVideoLink(task, gatewayChat.threads(), id => gatewayChat.messages(id));
+      if (link) canvasBridge.linkChatTask(task.id, link.threadId, link.replyMessageId);
+    }
+    if (task.gatewayReplyMessageId != null && !['completed','failed','cancelled','needs_attention'].includes(task.status)) pendingChatVideos.set(task.id,task.gatewayReplyMessageId);
+  }
   canvasBridge.start(Number(process.env.CANVAS_BRIDGE_PORT || 3219));
   // Report a lost bridge port once the window exists, without blocking startup.
   setTimeout(() => {
@@ -966,7 +1056,7 @@ app.whenReady().then(() => {
         }
       }
     }
-  }, 3500);
+  }, 750);
   // A captcha block is terminal unless something re-tests the account, so the console
   // would show 需人机验证 forever even after the user verified in the Doubao window.
   // Probe blocked accounts on a slow timer; a successful load clears the block.

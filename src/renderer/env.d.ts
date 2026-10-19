@@ -50,10 +50,11 @@ declare global {
     chatRename: (id: string, title: string) => Promise<import('../shared/types').GatewayThread>;
     chatDelete: (id: string) => Promise<import('../shared/types').GatewayThread[]>;
     chatSend: (request: { threadId?: string; prompt: string; model?: string; deepThink?: boolean; accountId?: number | null; attachments?: import('../shared/types').StagedAttachment[]; imageAssetIds?: string[] }) => Promise<{ thread: import('../shared/types').GatewayThread; userMessage: import('../shared/types').GatewayMessage; assistantMessage: import('../shared/types').GatewayMessage }>;
-    onChatDelta: (listener: (payload: { threadId?: string; full: string }) => void) => () => void;
+    onChatDelta: (listener: (payload: { threadId?: string; full: string; messageId?: number; videoTaskId?: string; videoStatus?: string }) => void) => () => void;
     chatImages: (request: { threadId?: string; prompt: string; model?: string; ratio?: string; accountId?: number | null; attachments?: import('../shared/types').StagedAttachment[] }) => Promise<{ thread: import('../shared/types').GatewayThread; userMessage: import('../shared/types').GatewayMessage; assistantMessage: import('../shared/types').GatewayMessage }>;
     chatVideos: (request: { threadId?: string; prompt: string; model?: string; ratio?: string; duration?: number; accountId?: number | null; attachments?: import('../shared/types').StagedAttachment[] }) => Promise<{ thread: import('../shared/types').GatewayThread; userMessage: import('../shared/types').GatewayMessage; assistantMessage: import('../shared/types').GatewayMessage }>;
     chatConfirm: (request: { threadId?: string; text?: string }) => Promise<boolean>;
+    downloadMedia: (attachment: import('../shared/types').GatewayAttachment) => Promise<{ path?: string; error?: string; alreadyInFolder?: boolean }>;
   getAppMode: () => Promise<'gateway' | 'account'>;
     setAppMode: (mode: 'gateway' | 'account') => Promise<'gateway' | 'account'>;
     onAppModeChanged: (listener: (mode: 'gateway' | 'account') => void) => () => void;
