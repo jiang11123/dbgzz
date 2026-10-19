@@ -33,3 +33,8 @@ docs/*.png
 docs/*.jpg
 docs/*.jpeg
 docs/*.mp4
+# Local probe dumps & temp scripts
+temp_*.py
+docs/*.json
+docs/*.jsonl
+docs/*.err
