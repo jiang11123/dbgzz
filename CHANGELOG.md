@@ -2,6 +2,13 @@
 
 最新版本排在前面，原有 Git 提交和历史发布保留。[下载安装包](https://github.com/jiang11123/dbgzz/releases)。
 
+## [2.0.2] - 2026-10-22
+
+- 使用奶蛙老师人物图的头像版作为产品 Logo，更新工作站左上角、网页图标和 GitHub 首页展示。
+- 配置 Windows 应用、桌面/开始菜单快捷方式及安装/卸载程序图标，替换默认 Electron 图标。
+- 提供多尺寸 ICO、运行时 PNG 和可重新生成图标的脚本。
+- 保留原有功能、教程与全部历史发布。
+
 ## [2.0.1] - 2026-10-22
 
 - 将发送账号、图片比例和视频比例改为自定义向上展开菜单，与视频模型菜单保持一致，避免 Windows 原生下拉框向下遮挡输入区。
@@ -60,3 +67,5 @@
 [0.1.0]: https://github.com/jiang11123/dbgzz/releases/tag/v0.1.0
 
 [2.0.1]: https://github.com/jiang11123/dbgzz/compare/v2.0.0...v2.0.1
+
+[2.0.2]: https://github.com/jiang11123/dbgzz/compare/v2.0.1...v2.0.2

@@ -1546,3 +1546,5 @@ body:has(.settings-window){overflow:auto;background:var(--canvas)}
 .upward-select svg{flex-shrink:0}
 .chat-account-pick:focus-within{position:relative;z-index:13}
 .chat-composer .chat-account-pick .video-model-trigger{height:auto;min-height:20px;padding:0;background:transparent;box-shadow:none}
+
+.topbar .brand .product-logo{display:block;width:30px;height:30px;flex-shrink:0;object-fit:cover;border-radius:8px;background:#fff}

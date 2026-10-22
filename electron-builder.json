@@ -1,16 +1,42 @@
 {
   "appId": "com.dbgzz.doubao.workspace",
   "productName": "豆包工作站",
-  "directories": { "output": "release" },
-  "files": ["dist/**/*", "!dist/**/*.test.js", "package.json"],
+  "directories": {
+    "output": "release"
+  },
+  "files": [
+    "dist/**/*",
+    "!dist/**/*.test.js",
+    "package.json"
+  ],
   "asar": true,
-  "asarUnpack": ["**/*.node"],
-  "win": { "target": [{ "target": "nsis", "arch": ["x64"] }] },
+  "asarUnpack": [
+    "**/*.node"
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      }
+    ],
+    "icon": "build/icon.ico"
+  },
   "nsis": {
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "artifactName": "dbgzz-Setup-${version}-${arch}.${ext}"
-  }
+    "artifactName": "dbgzz-Setup-${version}-${arch}.${ext}",
+    "installerIcon": "build/icon.ico",
+    "uninstallerIcon": "build/icon.ico"
+  },
+  "extraResources": [
+    {
+      "from": "build/icon.png",
+      "to": "icon.png"
+    }
+  ]
 }

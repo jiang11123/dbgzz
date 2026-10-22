@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Check, FolderOpen, GripVertical, Heart, MonitorPlay, Music2, Plus, Server, Settings, Sparkles, Upload } from 'lucide-react';
+import { Check, FolderOpen, GripVertical, Heart, MonitorPlay, Music2, Plus, Server, Settings, Upload } from 'lucide-react';
 import type { Account, DownloadStatus } from '../shared/types';
 import './style.css';
 import './theme.css';
+import productLogo from './assets/logo.png';
 import { ThemeToggle } from './theme';
 import { ImageAssetsPanel } from './image-assets-panel';
 import { BarResizer, useResizableBar } from './resizable-bar';
@@ -88,7 +89,7 @@ function App() {
 
   const renderTopBar = () => (
     <header className="topbar" style={{ height: accountBar.height, '--account-scale': Math.max(0.75, Math.min(2.5, accountBar.height / 58)) } as React.CSSProperties}>
-      <div className="brand"><Sparkles size={19} /><span>豆包工作站</span></div>
+      <div className="brand"><img className="product-logo" src={productLogo} alt="奶蛙老师头像" /><span>豆包工作站</span></div>
       <ModeSwitch mode={mode} onModeChange={changeMode} />
       <div className="account-tabs">
         {data.accounts.map((account, index) => (

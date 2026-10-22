@@ -1,6 +1,6 @@
 {
   "name": "doubao-video-workspace",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "private": true,
   "description": "Local multi-account video workspace for Doubao",
   "author": "jiang11123",
@@ -14,7 +14,8 @@
     "rebuild": "electron-rebuild -f -w better-sqlite3",
     "package:win": "npm run build && electron-builder --win --x64",
     "typecheck": "tsc --noEmit -p tsconfig.main.json && tsc --noEmit -p tsconfig.renderer.json",
-    "test": "npm run build:main && npm run build:renderer-tests && node --test \"dist/main/main/**/*.test.js\" \"dist/main/renderer-tests/**/*.test.js\""
+    "test": "npm run build:main && npm run build:renderer-tests && node --test \"dist/main/main/**/*.test.js\" \"dist/main/renderer-tests/**/*.test.js\"",
+    "build:icons": "electron scripts/build-icons.cjs"
   },
   "dependencies": {
     "better-sqlite3": "^12.4.1",

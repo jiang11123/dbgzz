@@ -27,6 +27,10 @@ import { platformConfig } from './account-platform';
 import { accountShortcut, normalizeAccountShortcut, shortcutFromKey } from '../shared/account-shortcuts';
 import type { DownloadStatus } from '../shared/types';
 
+const workspaceIcon = app.isPackaged
+  ? path.join(process.resourcesPath, 'icon.png')
+  : path.join(app.getAppPath(), 'build/icon.png');
+
 let windowRef: BrowserWindow | null = null;
 let settingsWindow: BrowserWindow | null = null;
 let assetsWindow: BrowserWindow | null = null;
@@ -62,7 +66,7 @@ const accountViews = new Map<number, BrowserView>();
 const backgroundPages = new BackgroundPageHost(() => {
   // show:false alone stalls Doubao's animation/resize-driven editor initialization.
   // A transparent, non-focusable off-screen host renders without covering the chat.
-  const host = new BrowserWindow({
+  const host = new BrowserWindow({ icon: workspaceIcon,
     show: false, x: -10000, y: -10000, width: 1280, height: 900, useContentSize: true,
     opacity: 0, focusable: false, skipTaskbar: true,
     webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false, backgroundThrottling: false },
@@ -485,7 +489,7 @@ async function downloadRemoteMedia(url: string, kind: 'image' | 'video'): Promis
 function openGatewayWindow() {
   if (!windowRef) return;
   if (gatewayWindow && !gatewayWindow.isDestroyed()) { gatewayWindow.show(); gatewayWindow.focus(); return; }
-  gatewayWindow = new BrowserWindow({ parent: windowRef, width: 900, height: 760, minWidth: 720, minHeight: 520,
+  gatewayWindow = new BrowserWindow({ icon: workspaceIcon, parent: windowRef, width: 900, height: 760, minWidth: 720, minHeight: 520,
     title: 'API 网关', autoHideMenuBar: true, backgroundColor: '#f7f9fc',
     webPreferences: { preload: path.join(__dirname, '../preload/preload.js'), contextIsolation: true, sandbox: true, nodeIntegration: false } });
   const url = new URL(rendererUrl()); url.searchParams.set('panel', 'gateway');
@@ -496,7 +500,7 @@ function openGatewayWindow() {
 function openDonationWindow() {
   if (!windowRef) return;
   if (donationWindow && !donationWindow.isDestroyed()) { donationWindow.show(); donationWindow.focus(); return; }
-  const panel = new BrowserWindow({ parent: windowRef, modal: true, width: 420, height: 680,
+  const panel = new BrowserWindow({ icon: workspaceIcon, parent: windowRef, modal: true, width: 420, height: 680,
     resizable: false, title: '赞赏奶蛙老师', autoHideMenuBar: true, backgroundColor: '#ffffff', show: false,
     webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false } });
   donationWindow = panel;
@@ -514,7 +518,7 @@ function openSettingsWindow() {
     return;
   }
   const parent = windowRef;
-  settingsWindow = new BrowserWindow({
+  settingsWindow = new BrowserWindow({ icon: workspaceIcon,
     parent,
     width: 860,
     height: 700,
@@ -551,7 +555,7 @@ function openSettingsWindow() {
 function openImageAssets() {
   if (!windowRef) return;
   if (assetsWindow && !assetsWindow.isDestroyed()) { assetsWindow.show(); assetsWindow.focus(); return; }
-  assetsWindow = new BrowserWindow({ parent: windowRef, width: 900, height: 720, minWidth: 620, minHeight: 480,
+  assetsWindow = new BrowserWindow({ icon: workspaceIcon, parent: windowRef, width: 900, height: 720, minWidth: 620, minHeight: 480,
     title: '图片资产', autoHideMenuBar: true, backgroundColor: '#f7f9fc',
     webPreferences: { preload: path.join(__dirname, '../preload/preload.js'), contextIsolation: true, sandbox: true, nodeIntegration: false } });
   const url = new URL(rendererUrl()); url.searchParams.set('panel', 'image-assets');
@@ -1025,7 +1029,7 @@ function setupGateway() {
 }
 
 function createWindow() {
-  windowRef = new BrowserWindow({ width: 1480, height: 920, minWidth: 1100, minHeight: 700, backgroundColor: '#f7f9fc', title: '豆包工作站', webPreferences: { preload: path.join(__dirname, '../preload/preload.js'), contextIsolation: true, sandbox: true, nodeIntegration: false } });
+  windowRef = new BrowserWindow({ icon: workspaceIcon, width: 1480, height: 920, minWidth: 1100, minHeight: 700, backgroundColor: '#f7f9fc', title: '豆包工作站', webPreferences: { preload: path.join(__dirname, '../preload/preload.js'), contextIsolation: true, sandbox: true, nodeIntegration: false } });
   attachAccountShortcuts(windowRef.webContents);
   windowRef.loadURL(rendererUrl());
   windowRef.webContents.once('did-finish-load', () => {

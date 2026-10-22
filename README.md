@@ -1,5 +1,7 @@
 # 豆包工作站 2.0（dbgzz）
 
+<img src="build/icon.png" width="96" height="96" alt="奶蛙老师头像 Logo" />
+
 面向 Windows 的本地豆包多账号工作站，支持独立登录会话、统一文字聊天、图片/视频生成、素材管理，以及本地 OpenAI 兼容 API 网关。
 
 这是第三方桌面工具，非豆包官方产品。需要自行登录豆包，实际模型、额度和生成能力以登录账号的豆包页面为准。
@@ -21,7 +23,7 @@
 
 ## 下载与安装
 
-1. 从 [Releases](https://github.com/jiang11123/dbgzz/releases) 下载 `dbgzz-Setup-2.0.1-x64.exe`。
+1. 从 [Releases](https://github.com/jiang11123/dbgzz/releases) 下载 `dbgzz-Setup-2.0.2-x64.exe`。
 2. 运行安装程序，选择目录，再从桌面打开“豆包工作站”。普通用户不需要安装 Node.js。
 3. 点击账号标签完成豆包登录，或点击“添加账号”创建独立会话。
 4. 切回“网关模式”开始文字聊天；按需启用图片或视频模式。
@@ -75,6 +77,6 @@ npm run package:win  # 构建 release/ 下的 Windows x64 安装包
 ## 更新与反馈
 
 - [完整更新记录](CHANGELOG.md)：保留 0.1.x 历史和 2.0 更新。
-- [2.0.1 发布说明](docs/releases/2.0.1.md)：验证范围、已知限制及升级提醒。
+- [2.0.2 发布说明](docs/releases/2.0.2.md)：验证范围、已知限制及升级提醒。
 - [提交问题](https://github.com/jiang11123/dbgzz/issues)：提供版本、系统、步骤、错误文本和脱敏截图，请勿上传密码、Cookie、API Key 或完整数据目录。
 - [历史设计与执行记录](docs/2.0-execution-log.md)：供开发追溯，当前操作以使用教程为准。
