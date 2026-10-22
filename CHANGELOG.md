@@ -2,6 +2,12 @@
 
 最新版本排在前面，原有 Git 提交和历史发布保留。[下载安装包](https://github.com/jiang11123/dbgzz/releases)。
 
+## [2.0.1] - 2026-10-22
+
+- 将发送账号、图片比例和视频比例改为自定义向上展开菜单，与视频模型菜单保持一致，避免 Windows 原生下拉框向下遮挡输入区。
+- 保留原选项、自动调度及参数逻辑，支持方向键、Home/End、Escape、选项选中和点击外部关闭。
+- 同步更新安装包下载说明，保留 2.0.0 和更早版本记录。
+
 ## [2.0.0] - 2026-10-22
 
 汇总自 0.1.2 以来的 2.0 开发提交与本次界面、会话和视频改进。见 [发布说明](docs/releases/2.0.0.md) 和 [使用教程](docs/user-guide.md)。
@@ -52,3 +58,5 @@
 [0.1.2]: https://github.com/jiang11123/dbgzz/releases/tag/v0.1.2
 [0.1.1]: https://github.com/jiang11123/dbgzz/releases/tag/v0.1.1
 [0.1.0]: https://github.com/jiang11123/dbgzz/releases/tag/v0.1.0
+
+[2.0.1]: https://github.com/jiang11123/dbgzz/compare/v2.0.0...v2.0.1

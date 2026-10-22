@@ -1539,3 +1539,10 @@ body:has(.settings-window){overflow:auto;background:var(--canvas)}
 .video-model-menu{position:absolute;bottom:calc(100% + 8px);left:0;z-index:12;width:220px;max-height:min(260px,40vh);overflow-y:auto;padding:5px;border:0;border-radius:12px;background:var(--surface);box-shadow:0 8px 30px #0003}
 .chat-composer .video-model-menu button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;height:36px;padding:0 10px;border:0;border-radius:8px;background:transparent;color:var(--text);font-size:12px;text-align:left}
 .chat-composer .video-model-menu button:is(:hover,:focus-visible,[aria-checked=true]){background:var(--blue-subtle);color:var(--blue)}
+.upward-select{max-width:100%;min-width:0}
+.upward-select .video-model-menu{left:auto;right:0;width:max-content;min-width:100%;max-width:min(360px,calc(100vw - 32px));overscroll-behavior:contain}
+.upward-select .video-model-trigger span,.upward-select .video-model-menu button span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.upward-select .video-model-trigger{max-width:100%}
+.upward-select svg{flex-shrink:0}
+.chat-account-pick:focus-within{position:relative;z-index:13}
+.chat-composer .chat-account-pick .video-model-trigger{height:auto;min-height:20px;padding:0;background:transparent;box-shadow:none}

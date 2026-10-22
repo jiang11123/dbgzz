@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { ArrowLeft, Camera, Download, FolderOpen, Image as ImageIcon, Loader2, Plus, Send, Settings, Sparkles, Trash2, Video } from 'lucide-react';
 import type { GatewayAttachment, GatewayMessage, GatewayThread, StagedAttachment } from '../shared/types';
 import { renderMarkdown } from './markdown';
-import { VideoModelPicker } from './video-model-picker';
+import { UpwardSelect, VideoModelPicker } from './video-model-picker';
 
 type Mode = 'gateway' | 'account';
 
@@ -554,22 +554,20 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
             aria-label="视频时长（秒）" />
           <output>{videoDuration} 秒</output>
         </label>}
-        <label className="chat-account-pick" title="消息固定发送到此账号，或选择自动调度以多账号并发">
+        <div className="chat-account-pick" title="消息固定发送到此账号，或选择自动调度以多账号并发">
           <span>发送账号</span>
-          <select value={pinnedAccountId ?? ''} onChange={event => setPinnedAccountId(event.target.value ? Number(event.target.value) : null)}>
-            <option value="">自动调度（并发账号池）</option>
-            {accounts.map(account => <option key={account.id} value={account.id}>{account.name}</option>)}
-          </select>
-        </label>
+          <UpwardSelect label="发送账号" value={pinnedAccountId == null ? '' : String(pinnedAccountId)}
+            onChange={value => setPinnedAccountId(value ? Number(value) : null)}
+            options={[{ value: '', label: '自动调度（并发账号池）' }, ...accounts.map(account => ({ value: String(account.id), label: account.name }))]} />
+        </div>
         {composerMode === 'text'
           ? <label className="chat-toggle" title="开启后启用豆包深度思考">
               <input type="checkbox" checked={deepThink} onChange={event => setDeepThink(event.target.checked)} />深度思考
             </label>
-          : <select className="chat-ratio" value={composerMode === 'image' ? imageRatio : videoRatio}
-              onChange={event => (composerMode === 'image' ? setImageRatio : setVideoRatio)(event.target.value)}
-              title={composerMode === 'image' ? '图片比例' : '视频比例'}>
-              {(composerMode === 'image' ? ['1:1', '4:3', '3:4', '16:9', '9:16'] : ['16:9', '9:16', '1:1', '4:3', '3:4']).map(ratio => <option key={ratio} value={ratio}>{ratio}</option>)}
-            </select>}
+          : <UpwardSelect label={composerMode === 'image' ? '图片比例' : '视频比例'}
+              value={composerMode === 'image' ? imageRatio : videoRatio}
+              onChange={composerMode === 'image' ? setImageRatio : setVideoRatio}
+              options={(composerMode === 'image' ? ['1:1', '4:3', '3:4', '16:9', '9:16'] : ['16:9', '9:16', '1:1', '4:3', '3:4']).map(ratio => ({ value: ratio, label: ratio }))} />}
       </div>
           {stagedImages.length > 0 && <div className="chat-staged">
             {stagedImages.map(item => <figure key={item.id} title={item.name} className={/\.(png|jpg|jpeg|webp|gif)$/i.test(item.name) ? 'is-image' : 'is-file'}>
