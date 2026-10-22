@@ -79,3 +79,10 @@ test('reads nested reply text, including the JSON-string envelope', () => {
   assert.equal(extractEventText({}), '');
   assert.equal(extractEventText(null), '');
 });
+
+test('extracts conversationId from event ack or message', () => {
+  const event1 = { ack_client_meta: { conversation_id: '38447121957971202' } };
+  assert.equal(parseImageEvent(event1).conversationId, '38447121957971202');
+  const event2 = { event_data: JSON.stringify({ message: { conversation_id: '38447121957971203' } }) };
+  assert.equal(parseImageEvent(event2).conversationId, '38447121957971203');
+});

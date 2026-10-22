@@ -1,5 +1,9 @@
+import { randomUUID } from 'node:crypto';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import type { CanvasBridgeTask } from './canvas-bridge';
-import type { GatewayMessage, GatewayThread } from '../shared/types';
+import type { GatewayAttachment, GatewayMessage, GatewayThread } from '../shared/types';
 
 export type ChatStore = {
   gatewayThread(id: string): GatewayThread | null;
@@ -14,8 +18,18 @@ export function syncVideoTaskToChat(task: CanvasBridgeTask, store: ChatStore, em
   if (!message) return false;
   const full = task.latestReply || task.statusText;
   const failed = ['failed', 'needs_attention', 'cancelled'].includes(task.status);
+  const attachments: GatewayAttachment[] | undefined = (task.status === 'completed' && task.videoPath && existsSync(task.videoPath))
+    ? [{
+        id: randomUUID(),
+        kind: 'video',
+        url: pathToFileURL(task.videoPath).toString(),
+        name: path.basename(task.videoPath),
+        path: task.videoPath,
+      }]
+    : undefined;
   store.updateGatewayMessage(message.id, { content: full, accountId: task.accountId,
-    status: failed ? 'failed' : task.status === 'completed' ? 'done' : 'streaming', error: failed ? task.error || task.statusText : '' });
+    status: failed ? 'failed' : task.status === 'completed' ? 'done' : 'streaming', error: failed ? task.error || task.statusText : '',
+    ...(attachments ? { attachments } : {}) });
 
   if (task.pageUrl && store.updateGatewayThread) {
     const match = /\/chat\/([0-9a-zA-Z_-]+)/.exec(task.pageUrl);

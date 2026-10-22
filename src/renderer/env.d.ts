@@ -30,6 +30,7 @@ declare global {
     setBrowserFullscreen: (value: boolean) => Promise<boolean>;
     openSettings: () => Promise<boolean>;
     openDonation: () => Promise<boolean>;
+    openAuthorDouyin: () => Promise<void>;
     setAccountShortcut: (index: number, shortcut: string) => Promise<Record<string,string>>;
     resetAccountShortcuts: () => Promise<Record<string,string>>;
     onAccountOpened: (listener: (accountId: number) => void) => () => void;
@@ -54,7 +55,8 @@ declare global {
     chatImages: (request: { threadId?: string; prompt: string; model?: string; ratio?: string; accountId?: number | null; attachments?: import('../shared/types').StagedAttachment[] }) => Promise<{ thread: import('../shared/types').GatewayThread; userMessage: import('../shared/types').GatewayMessage; assistantMessage: import('../shared/types').GatewayMessage }>;
     chatVideos: (request: { threadId?: string; prompt: string; model?: string; ratio?: string; duration?: number; accountId?: number | null; attachments?: import('../shared/types').StagedAttachment[] }) => Promise<{ thread: import('../shared/types').GatewayThread; userMessage: import('../shared/types').GatewayMessage; assistantMessage: import('../shared/types').GatewayMessage }>;
     chatConfirm: (request: { threadId?: string; text?: string }) => Promise<boolean>;
-    downloadMedia: (attachment: import('../shared/types').GatewayAttachment) => Promise<{ path?: string; error?: string; alreadyInFolder?: boolean }>;
+    downloadMedia: (attachment: import('../shared/types').GatewayAttachment, context?: { accountId?: number | null; threadId?: string }) => Promise<{ path?: string; error?: string; alreadyInFolder?: boolean }>;
+    saveLastFrame: (payload: { dataUrl: string; name?: string }) => Promise<{ path?: string; error?: string }>;
   getAppMode: () => Promise<'gateway' | 'account'>;
     setAppMode: (mode: 'gateway' | 'account') => Promise<'gateway' | 'account'>;
     onAppModeChanged: (listener: (mode: 'gateway' | 'account') => void) => () => void;

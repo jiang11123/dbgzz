@@ -1,0 +1,88 @@
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas: #050608;
+  --surface: #0c1016;
+  --surface-subtle: #10151d;
+  --surface-hover: #182333;
+  --line: #293345;
+  --line-subtle: #1b2533;
+  --text: #e5ecf6;
+  --text-secondary: #b5c3d6;
+  --muted: #91a1b8;
+  --blue: #91baff;
+  --blue-hover: #b8d1ff;
+  --blue-subtle: #102345;
+  --blue-border: #2c4d7c;
+  --red: #ff939b;
+  --red-subtle: #35191f;
+  --red-border: #6e303b;
+  --green: #63dbb0;
+  --green-subtle: #102d25;
+  --green-border: #285749;
+  --amber: #f6c76d;
+  --amber-subtle: #302717;
+  --amber-border: #65502b;
+  --pink: #f4a0c8;
+  --pink-subtle: #302032;
+  --pink-border: #644064;
+}
+
+/* Override legacy light surfaces in both the workspace and secondary panels. */
+:root[data-theme="dark"] :is(body, .app-shell, .topbar, .gateway-topbar,
+  .gateway-chat, .chat-main, .chat-head, .chat-options, .chat-composer,
+  .chat-composer-stack, .image-assets-bar, .settings-page, .settings-window,
+  .gateway-window, .message-sync-panel, .image-assets-window, .donation-panel,
+  .modal, .download-settings-card, .account-settings) {
+  background: var(--canvas);
+  color: var(--text);
+  border-color: var(--line);
+}
+:root[data-theme="dark"] :is(.chat-threads, .chat-msg-md, .chat-msg-text,
+  .image-asset-card, .message-sync-preview, .chat-md-quote, .chat-md-table th,
+  .chat-code-inline, .download-notice, .toast, .gateway-card, .gateway-block,
+  .gateway-account, .gateway-card code, .gateway-answer, .gateway-log,
+  .drop-zone, .asset-bar-thumb, .image-bar-resizer, .account-bar-resizer) {
+  background: var(--surface-subtle);
+  color: var(--text);
+  border-color: var(--line);
+}
+:root[data-theme="dark"] .chat-msg.user :is(.chat-msg-md, .chat-msg-text) {
+  background: var(--blue-subtle);
+  border-color: var(--blue-border);
+}
+:root[data-theme="dark"] :is(input, textarea, select) {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--line) !important;
+  accent-color: #537fce;
+}
+:root[data-theme="dark"] ::placeholder { color: var(--muted); }
+:root[data-theme="dark"] :is(.chat-toggle, .chat-duration-control,
+  .chat-account-pick, .donation-intro, .donation-scan, .donation-thanks,
+  .download-settings-path, .chat-thread-open, .chat-thread-title) {
+  color: var(--text-secondary);
+}
+:root[data-theme="dark"] button {
+  background: #102f66 !important;
+  color: #e0ebff !important;
+  border-color: #284d85 !important;
+}
+:root[data-theme="dark"] button:hover:not(:disabled) {
+  background: #194585 !important;
+  border-color: #527ab6 !important;
+}
+:root[data-theme="dark"] button:is(.active, [aria-pressed="true"]) {
+  background: #214d8c !important;
+  border-color: #638fce !important;
+}
+:root[data-theme="dark"] :is(.chat-thread.active, .chat-thread:hover) {
+  background: #102345;
+}
+:root[data-theme="dark"] .chat-alert { background: var(--red-subtle); color: var(--red); border-color: var(--red-border); }
+:root[data-theme="dark"] .chat-alert.success { background: var(--green-subtle); color: var(--green); border-color: var(--green-border); }
+:root[data-theme="dark"] .donation-panel h1 { color: var(--text); }
+:root[data-theme="dark"] .donation-code { background: white; }
+:root[data-theme="dark"] .chat-options.chat-mode-floating{background:transparent;border:0}
+:root[data-theme="dark"] .chat-mode-floating :is(.chat-toggle,.chat-account-pick,.chat-duration-control,.chat-ratio){background:var(--surface-subtle);box-shadow:0 3px 12px #0004;border:0}
+:root[data-theme="dark"] .chat-mode-floating .chat-toggle:has(input:checked){background:var(--blue-subtle);color:var(--blue)}
+:root[data-theme="dark"] .chat-mode-floating .chat-account-pick select{background:transparent!important;border:0!important}

@@ -37,6 +37,8 @@ export type ImageGenerationOptions = {
   timeoutMs?: number;
   /** Reference images already uploaded to Doubao, as attachment objects. */
   attachments?: unknown[];
+  /** Continue an existing conversation instead of starting a new one. */
+  conversationId?: string;
 };
 
 function randomSuffix(): string {
@@ -82,6 +84,8 @@ export function buildImagePayload(prompt: string, options: ImageGenerationOption
     model,
   };
   if (ratio) contentData.ratio = ratio;
+  const conversationId = options.conversationId ?? '';
+  const needCreate = !conversationId;
   return {
     messages: [{
       content: JSON.stringify(contentData),
@@ -94,38 +98,53 @@ export function buildImagePayload(prompt: string, options: ImageGenerationOption
       },
     }],
     completion_option: {
-      is_regen: false, with_suggest: true, need_create_conversation: true, launch_stage: 1,
+      is_regen: false, with_suggest: true, need_create_conversation: needCreate, launch_stage: 1,
       is_replace: false, is_delete: false, is_ai_playground: false, memory_type: 2,
       message_from: 0, use_deep_think: false, use_auto_cot: false, resend_for_regen: false,
       enable_commerce_credit: false, action_bar_skill_id: IMAGE_SKILL_ID,
     },
     evaluate_option: { web_ab_params: '' },
-    local_conversation_id: 'local_' + randomSuffix(),
+    ...(conversationId ? { conversation_id: conversationId } : { local_conversation_id: 'local_' + randomSuffix() }),
     local_message_id: 'msg_' + randomSuffix(),
   };
 }
 
 export type GeneratedImage = { url: string; width: number; height: number; format: string };
 
+/** Extracts conversation id from any event shape (SSE acknowledgment, message, or nested event_data). */
+export function extractConversationId(event: any): string | undefined {
+  if (!event || typeof event !== 'object') return undefined;
+  if (typeof event.conversation_id === 'string' && event.conversation_id) return event.conversation_id;
+  if (typeof event.ack_client_meta?.conversation_id === 'string' && event.ack_client_meta.conversation_id) return event.ack_client_meta.conversation_id;
+  if (typeof event.message?.conversation_id === 'string' && event.message.conversation_id) return event.message.conversation_id;
+  let data = event.event_data ?? event;
+  if (typeof data === 'string') { try { data = JSON.parse(data); } catch { return undefined; } }
+  if (typeof data?.conversation_id === 'string' && data.conversation_id) return data.conversation_id;
+  if (typeof data?.ack_client_meta?.conversation_id === 'string' && data.ack_client_meta.conversation_id) return data.ack_client_meta.conversation_id;
+  if (typeof data?.message?.conversation_id === 'string' && data.message.conversation_id) return data.message.conversation_id;
+  return undefined;
+}
+
 /** Reads image URLs out of one SSE event (empty array when the event carries none). */
-export function parseImageEvent(event: any): { images: GeneratedImage[]; error?: { code: number; message: string; riskControl: boolean } } {
+export function parseImageEvent(event: any): { images: GeneratedImage[]; conversationId?: string; error?: { code: number; message: string; riskControl: boolean } } {
   const images: GeneratedImage[] = [];
   if (!event || typeof event !== 'object') return { images };
 
+  const conversationId = extractConversationId(event);
   const code = Number(event.error_code ?? event.code ?? 0);
   if (code) {
-    return { images, error: { code, message: String(event.error_msg ?? event.message ?? '未知错误'), riskControl: RISK_ERROR_CODES.includes(code) } };
+    return { images, conversationId, error: { code, message: String(event.error_msg ?? event.message ?? '未知错误'), riskControl: RISK_ERROR_CODES.includes(code) } };
   }
 
   // The site wraps payloads in event_data, sometimes itself a JSON string.
   let data = event.event_data ?? event;
-  if (typeof data === 'string') { try { data = JSON.parse(data); } catch { return { images }; } }
+  if (typeof data === 'string') { try { data = JSON.parse(data); } catch { return { images, conversationId }; } }
   let message = data?.message ?? data;
-  if (typeof message === 'string') { try { message = JSON.parse(message); } catch { return { images }; } }
-  if (!message || message.content_type !== IMAGE_RESPONSE_TYPE) return { images };
+  if (typeof message === 'string') { try { message = JSON.parse(message); } catch { return { images, conversationId }; } }
+  if (!message || message.content_type !== IMAGE_RESPONSE_TYPE) return { images, conversationId };
 
   let content = message.content;
-  if (typeof content === 'string') { try { content = JSON.parse(content); } catch { return { images }; } }
+  if (typeof content === 'string') { try { content = JSON.parse(content); } catch { return { images, conversationId }; } }
   const items = Array.isArray(content?.data) ? content.data : [];
   for (const item of items) {
     const url = item?.image_ori?.url || item?.image_raw?.url || item?.image_thumb?.url || item?.url;
@@ -137,7 +156,7 @@ export function parseImageEvent(event: any): { images: GeneratedImage[]; error?:
       format: String(item?.image_ori?.format ?? item?.format ?? 'png'),
     });
   }
-  return { images };
+  return { images, conversationId };
 }
 
 /** Pulls plain reply text out of an event, including the nested JSON-string shape. */
@@ -198,10 +217,13 @@ export async function generateImages(view: BrowserView, prompt: string, options:
   let textSeen = '';
 
   const rawSamples: string[] = [];
+  let conversationId = '';
   const consume = (raw: string) => {
     let event: any;
     try { event = JSON.parse(raw); } catch { return; }
     eventCount += 1;
+    const cid = extractConversationId(event);
+    if (cid && !cid.startsWith('local_')) conversationId = cid;
     // Keep the first few raw frames: when neither images nor text arrive, this is the
     // only evidence of what the server actually said.
     if (rawSamples.length < 10) rawSamples.push(raw.slice(0, 200));
@@ -274,6 +296,9 @@ export async function generateImages(view: BrowserView, prompt: string, options:
     // as a chat turn, which is a different problem from an empty response.
     const detail = textSeen ? '，文字：' + textSeen.slice(0, 60) : '，样本：' + rawSamples.join(' || ').slice(0, 420);
     throw new Error('豆包没有返回图片（收到 ' + eventCount + ' 个事件' + detail + '）');
+  }
+  if (conversationId) {
+    (images as any).conversationId = conversationId;
   }
   return images;
 }

@@ -1,7 +1,34 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
-import { composerSettingsScript } from './page-composer';
+import { composerSettingsScript, clickComposerSend } from './page-composer';
+
+for (const accepts of [true, false]) {
+  test(`send chooses the real button over a sidebar title; accepted=${accepts}`, async () => {
+    let draft = '让兔子站起来';
+    let sidebarClicks = 0, sendClicks = 0, nativeClicks = 0;
+    const rect = { left: 300, right: 1200, top: 700, bottom: 724, width: 900, height: 24 };
+    const editor = { disabled: false, get innerText() { return draft; }, value: undefined,
+      getAttribute: (key: string) => key === 'contenteditable' ? 'true' : null,
+      closest: () => null, getBoundingClientRect: () => rect };
+    const button = (title: string, testid: string, click: () => void) => ({ innerText: title, disabled: false,
+      className: '', closest: () => null, dispatchEvent: () => true, click,
+      getAttribute: (key: string) => key === 'data-testid' ? testid : null,
+      getBoundingClientRect: () => ({ left: 1164, right: 1200, top: 738, bottom: 774, width: 36, height: 36 }) });
+    const sidebar = button('生成视频：兔子站立', '', () => { sidebarClicks++; });
+    const send = button('', 'chat_input_send_button', () => { sendClicks++; if (accepts) draft = ''; });
+    const context = { document: { querySelectorAll: (selector: string) => selector.startsWith('button') ? [sidebar, send] : [editor] },
+      MouseEvent: class { constructor(..._args: unknown[]) {} } };
+    const view = { webContents: { executeJavaScript: async (script: string) => vm.runInNewContext(script, context),
+      send: () => {}, isDestroyed: () => false, sendInputEvent: () => { nativeClicks++; } } };
+    const result = clickComposerSend(view as any, draft);
+    if (accepts) await result;
+    else await assert.rejects(result, /未确认发送/);
+    assert.equal(sidebarClicks, 0);
+    assert.equal(sendClicks, 1);
+    assert.equal(nativeClicks, accepts ? 0 : 2);
+  });
+}
 
 type FakeButton = { text: string; bottom?: number };
 

@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Check, FolderOpen, GripVertical, Heart, MonitorPlay, Plus, Server, Settings, Sparkles, Upload } from 'lucide-react';
+import { Check, FolderOpen, GripVertical, Heart, MonitorPlay, Music2, Plus, Server, Settings, Sparkles, Upload } from 'lucide-react';
 import type { Account, DownloadStatus } from '../shared/types';
 import './style.css';
+import './theme.css';
+import { ThemeToggle } from './theme';
 import { ImageAssetsPanel } from './image-assets-panel';
 import { BarResizer, useResizableBar } from './resizable-bar';
 import { ImageAssetsBar } from './image-assets-bar';
@@ -32,6 +34,7 @@ function App() {
   if (panel === 'gateway') return <GatewayPanel />;
   if (panel === 'messages') return <MessageSyncPanel />;
   if (panel === 'image-assets') return <ImageAssetsPanel />;
+  if (panel === 'donation') return <DonationPanel />;
   const [data, setData] = useState<Workspace | null>(null);
   const [currentAccountId, setCurrentAccountId] = useState<number | null>(null);
   const [showNewAccount, setShowNewAccount] = useState(false);
@@ -48,7 +51,11 @@ function App() {
   };
   const openAccount = async (account?: Account) => {
     if (!account) return;
-    try { await window.workspace.openAccount(account.id); setCurrentAccountId(account.id); }
+    try {
+      await window.workspace.openAccount(account.id);
+      setCurrentAccountId(account.id);
+      if (mode !== 'account') changeMode('account');
+    }
     catch (error) { message(`打开账号失败：${error instanceof Error ? error.message : String(error)}`); }
   };
   useEffect(() => {
@@ -73,44 +80,49 @@ function App() {
     startupAccountOpened.current = true; void openAccount(data.accounts[0]);
   }, [data, mode]);
   useEffect(() => {
-    if (!downloadNotice || downloadNotice.state === 'started' || downloadNotice.state === 'completed') return;
-    const timer = window.setTimeout(() => setDownloadNotice(null), 4200); return () => window.clearTimeout(timer);
+    if (!downloadNotice || downloadNotice.state === 'started') return;
+    const timer = window.setTimeout(() => setDownloadNotice(null), 3000); return () => window.clearTimeout(timer);
   }, [downloadNotice]);
-  if (!data) return <div className="loading">正在打开 Doubao Video Workspace...</div>;
+  if (!data) return <div className="loading">正在打开豆包工作站...</div>;
   const changeMode = (next: 'gateway' | 'account') => { setMode(next); void window.workspace.setAppMode(next).catch(error => message(String(error))); };
 
-  if (mode === 'gateway') return <main className="app-shell gateway-shell">
-    <header className="gateway-topbar">
-      <span className="brand"><Sparkles size={16} />豆包工作台</span>
+  const renderTopBar = () => (
+    <header className="topbar" style={{ height: accountBar.height, '--account-scale': Math.max(0.75, Math.min(2.5, accountBar.height / 58)) } as React.CSSProperties}>
+      <div className="brand"><Sparkles size={19} /><span>豆包工作站</span></div>
       <ModeSwitch mode={mode} onModeChange={changeMode} />
+      <div className="account-tabs">
+        {data.accounts.map((account, index) => (
+          <button key={account.id} className={mode === 'account' && account.id === currentAccountId ? 'account active' : 'account'} onClick={() => void openAccount(account)} title={accountShortcut(index, data.accountShortcuts || {}) || undefined}>
+            <span className={account.isLoggedIn ? 'login-dot on' : 'login-dot'} />{account.name}
+          </button>
+        ))}
+        <button className="add-account" onClick={() => setShowNewAccount(true)} title="添加账号"><Plus size={15} />添加账号</button>
+      </div>
       <div className="topbar-actions">
-        <button className="browser-size-toggle watermark-shortcut donation-button" title="打赏作者" onClick={() => void window.workspace.openDonation()}><Heart size={15} />打赏作者</button>
+        <ThemeToggle />
+        <button className="browser-size-toggle" onClick={() => void window.workspace.openAuthorDouyin().catch(error => message(`打开抖音主页失败：${String(error)}`))} title="前往奶蛙老师的抖音主页"><Music2 size={15} />抖音奶蛙老师开源</button>
+        <button className="watermark-shortcut donation-button" onClick={() => void window.workspace.openDonation()} title="赞赏奶蛙老师"><Heart size={15} />赞赏奶蛙老师</button>
         <button className="browser-size-toggle" title="图片资产" onClick={() => void window.workspace.openImageAssets()}><Upload size={15} />图片资产</button>
         <button className="browser-size-toggle" title="网关设置" onClick={() => void window.workspace.openGateway()}><Server size={15} />网关设置</button>
         <button className="browser-size-toggle" title="设置" onClick={() => void window.workspace.openSettings()}><Settings size={15} />设置</button>
       </div>
+      <BarResizer bar={accountBar} />
     </header>
-    <ImageAssetsBar accountId={data?.accounts[0]?.id ?? null} message={message}
+  );
+
+  if (mode === 'gateway') return <main className="app-shell gateway-shell">
+    {renderTopBar()}
+    <ImageAssetsBar accountId={currentAccountId ?? data?.accounts[0]?.id ?? null} message={message}
       onStage={items => setStagedImages(current => [...current, ...items.filter(item => !current.some(x => x.id === item.id)).map(item => ({ id: item.id, assetId: item.id, name: item.name, mimeType: item.name.match(/\.(png|jpe?g|webp|gif)$/i)?.[0] ? 'image/' + item.name.split('.').pop()!.toLowerCase().replace('jpg', 'jpeg') : 'application/octet-stream', url: item.url }))])} />
     <GatewayChat mode={mode} onModeChange={changeMode} stagedImages={stagedImages} onStagedChange={setStagedImages} />
-    {downloadNotice && <div className={`download-notice ${downloadNotice.state}`} role="status"><div><b>{getDownloadNoticeTitle(downloadNotice)}</b><span>{downloadNotice.name}</span></div>
-      {downloadNotice.state === 'completed' && downloadNotice.path && <button className="download-location" onClick={() => void window.workspace.openFolder(downloadNotice.path as string)}><FolderOpen size={13} />打开下载位置</button>}
-      <button className="download-dismiss" aria-label="关闭下载提示" onClick={() => setDownloadNotice(null)}>×</button></div>}
+    {showNewAccount && <NewAccount onClose={() => setShowNewAccount(false)} onCreated={async account => { setShowNewAccount(false); await refresh(); await openAccount(account); }} />}
     {toast && <div className="toast"><Check size={16} />{toast}</div>}
   </main>;
 
   return <main className="app-shell browser-fullscreen">
-    <header className="topbar" style={{ height: accountBar.height, '--account-scale': Math.max(0.75, Math.min(2.5, accountBar.height / 58)) } as React.CSSProperties}><div className="brand"><Sparkles size={19} /><span>Doubao Video Workspace</span></div>
-      <ModeSwitch mode={mode} onModeChange={changeMode} />
-      <div className="account-tabs">{data.accounts.map((account, index) => <button key={account.id} className={account.id === currentAccountId ? 'account active' : 'account'} onClick={() => void openAccount(account)} title={accountShortcut(index, data.accountShortcuts || {}) || undefined}><span className={account.isLoggedIn ? 'login-dot on' : 'login-dot'} />{account.name}</button>)}
-        <button className="add-account" onClick={() => setShowNewAccount(true)} title="添加账号"><Plus size={15} />添加账号</button></div>
-      <div className="topbar-actions"><button className="watermark-shortcut donation-button" onClick={() => void window.workspace.openDonation()}><Heart size={15} />打赏作者</button><button className="browser-size-toggle" title="图片资产" onClick={() => void window.workspace.openImageAssets()}><Upload size={15} />图片资产</button>
-      <button className="browser-size-toggle" title="网关设置" onClick={() => void window.workspace.openGateway()}><Server size={15} />网关设置</button>
-      <button className="browser-size-toggle" title="设置" onClick={() => void window.workspace.openSettings()}><Settings size={15} />设置</button></div>
-      <BarResizer bar={accountBar} />
-    </header>
+    {renderTopBar()}
     <ImageAssetsBar accountId={currentAccountId} message={message} />
-    {showNewAccount && <NewAccount onClose={() => setShowNewAccount(false)} onCreated={async account => { const next = await window.workspace.createAccount(account); setShowNewAccount(false); await refresh(); await openAccount(next); }} />}
+    {showNewAccount && <NewAccount onClose={() => setShowNewAccount(false)} onCreated={async account => { setShowNewAccount(false); await refresh(); await openAccount(account); }} />}
     {downloadNotice && <div className={`download-notice ${downloadNotice.state}`} role="status"><div><b>{getDownloadNoticeTitle(downloadNotice)}</b><span>{downloadNotice.name}</span></div>
       {downloadNotice.state === 'completed' && downloadNotice.path && <button className="download-location" onClick={() => void window.workspace.openFolder(downloadNotice.path as string)}><FolderOpen size={13} />打开下载位置</button>}
       <button className="download-dismiss" aria-label="关闭下载提示" onClick={() => setDownloadNotice(null)}>×</button></div>}
@@ -231,23 +243,73 @@ function NewAccount({ onClose, onCreated }: { onClose: () => void; onCreated: (a
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
-  return <div className="modal" role="dialog" aria-modal="true">
-    <form className="modal-card" onSubmit={async event => {
-      event.preventDefault();
-      if (busy) return;
-      setBusy(true);
-      try { const account = await window.workspace.createAccount({ name: name.trim(), note: note.trim(), sessionName: `persist:doubao_${Date.now().toString(36)}` }); await onCreated(account); }
-      finally { setBusy(false); }
-    }}>
-      <h2>添加豆包账号</h2>
-      <label>账号名称<input value={name} onChange={event => setName(event.target.value)} placeholder="例如：主号" required autoFocus /></label>
-      <label>备注<input value={note} onChange={event => setNote(event.target.value)} placeholder="可选" /></label>
-      <div className="modal-actions">
-        <button type="button" className="outline" onClick={onClose}>取消</button>
-        <button type="submit" className="primary" disabled={busy || !name.trim()}>{busy ? '创建中…' : '创建'}</button>
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  return (
+    <div
+      className="modal-backdrop"
+      onClick={event => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <div className="modal" role="dialog" aria-modal="true">
+        <div className="modal-title">
+          <h2>添加豆包账号</h2>
+          <button type="button" className="modal-close" onClick={onClose} aria-label="关闭">×</button>
+        </div>
+        <form
+          className="modal-card"
+          onSubmit={async event => {
+            event.preventDefault();
+            if (busy) return;
+            setBusy(true);
+            try {
+              const account = await window.workspace.createAccount({
+                name: name.trim(),
+                note: note.trim(),
+                sessionName: `persist:doubao_${Date.now().toString(36)}`,
+              });
+              await onCreated(account);
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          <label>
+            账号名称
+            <input
+              value={name}
+              onChange={event => setName(event.target.value)}
+              placeholder="例如：主号"
+              required
+              autoFocus
+            />
+          </label>
+          <label>
+            备注
+            <input
+              value={note}
+              onChange={event => setNote(event.target.value)}
+              placeholder="可选"
+            />
+          </label>
+          <div className="modal-actions">
+            <button type="button" className="outline" onClick={onClose}>取消</button>
+            <button type="submit" className="primary" disabled={busy || !name.trim()}>
+              {busy ? '创建中…' : '创建'}
+            </button>
+          </div>
+        </form>
       </div>
-    </form>
-  </div>;
+    </div>
+  );
 }
 
 createRoot(document.getElementById('root')!).render(<App />);

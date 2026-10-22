@@ -37,7 +37,7 @@ export function captureVideoAtPoint(point: { x: number; y: number }): SharedVide
         if (value.length < 2 * 1024 * 1024 && /^\s*[\[{]/.test(value)) { try { walk(JSON.parse(value), depth + 1); } catch { /* plain text */ } }
         return;
       }
-      if (typeof value !== 'object' || value instanceof Node || seen.has(value)) return;
+      if (typeof value !== 'object' || (typeof Node !== 'undefined' && (typeof Node !== 'undefined' && value instanceof Node)) || seen.has(value)) return;
       seen.add(value);
       const object = value as Record<string, any>;
       const raw = object.video_model || object.videoModel;
@@ -88,7 +88,7 @@ export function captureVideoAtPoint(point: { x: number; y: number }): SharedVide
 
 // Serialized into the page to extract the latest generated video's SharedVideo metadata for HD download
 export function captureLatestVideo(): SharedVideo | null {
-  const elements = Array.from(document.querySelectorAll<HTMLVideoElement | HTMLElement>('video, [data-message-id] video, .video-card, [class*="video"]'));
+  const elements = Array.from(document.querySelectorAll<HTMLElement>('video, img, [data-message-id], [class*="message"], [class*="card"], .video-card, [class*="video"], [class*="player"], [data-testid*="video"]'));
   const videos = elements.reverse();
   for (const media of videos) {
     let scope: Element | null = media;
@@ -97,7 +97,7 @@ export function captureLatestVideo(): SharedVideo | null {
       const candidates = new Map<string, SharedVideo>();
       const seen = new WeakSet<object>(); let visited = 0;
       const walk = (value: unknown, depth: number): void => {
-        if (++visited > 12000 || depth > 15 || !value) return;
+        if (++visited > 20000 || depth > 20 || !value) return;
         if (typeof value === 'string') {
           if (value.length < 2 * 1024 * 1024 && /^\s*[\[{]/.test(value)) { try { walk(JSON.parse(value), depth + 1); } catch { /* ignore */ } }
           return;
@@ -109,11 +109,16 @@ export function captureLatestVideo(): SharedVideo | null {
         if (raw) {
           try {
             const model = typeof raw === 'string' ? JSON.parse(raw) : raw;
-            const vid = String(object.vid || model.video_id || '');
+            const vid = String(object.vid || model.video_id || model.vid || '');
             if (/^[\w-]{1,100}$/.test(vid) && typeof model.fallback_api === 'string') {
               candidates.set(vid, { vid, model: { video_id: vid, fallback_api: model.fallback_api } });
             }
           } catch { /* malformed */ }
+        } else if (typeof object.fallback_api === 'string' && (object.video_id || object.vid)) {
+          const vid = String(object.video_id || object.vid || '');
+          if (/^[\w-]{1,100}$/.test(vid)) {
+            candidates.set(vid, { vid, model: { video_id: vid, fallback_api: object.fallback_api } });
+          }
         }
         for (const [key, child] of Object.entries(object)) {
           if (!['_owner', 'return', 'stateNode', 'video_model', 'videoModel'].includes(key)) walk(child, depth + 1);
@@ -121,7 +126,12 @@ export function captureLatestVideo(): SharedVideo | null {
       };
       for (const key of Object.keys(scope)) {
         if (key.startsWith('__reactProps$')) walk((scope as any)[key], 0);
-        if (key.startsWith('__reactFiber$')) walk((scope as any)[key]?.memoizedProps, 0);
+        if (key.startsWith('__reactFiber$')) {
+          const fiber = (scope as any)[key];
+          walk(fiber?.memoizedProps, 0);
+          walk(fiber?.memoizedState, 0);
+          walk(fiber?.stateNode?.props, 0);
+        }
       }
       if (candidates.size > 0) return [...candidates.values()][candidates.size - 1];
     }

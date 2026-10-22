@@ -10,7 +10,7 @@ import { WorkspaceDatabase } from './database';
 import { ImageAssetStore } from './image-assets';
 import { setupAccountSend } from './account-send';
 import type { DownloadCandidate, GatewayAttachment } from '../shared/types';
-import { CanvasBridge } from './canvas-bridge';
+import { CanvasBridge, videoConversationForAccount } from './canvas-bridge';
 import { BackgroundPageHost } from './background-page-host';
 import { syncVideoTaskToChat, findVideoTaskForThread, recoverLegacyVideoLink, forwardVideoChatMessage } from './video-chat-sync';
 import { DoubaoGateway } from './gateway';
@@ -18,6 +18,8 @@ import { createGatewayChat } from './gateway-chat';
 import { resolveStagedAttachments } from './staged-attachments';
 import { generateImages } from './doubao-image';
 import { uploadImageToDoubao } from './doubao-upload';
+import { waitForPageReady } from './doubao-api';
+import { waitForComposer } from './page-composer';
 import { DownloadTracker } from './download-tracker';
 import { DoubaoShareService } from './doubao-share';
 import { attachVideoContextMenu, captureLatestVideo } from './video-context';
@@ -34,6 +36,7 @@ let assetUploading = false;
 const stagedImageAssets = new Map<number, string[]>();
 const stagedImageUrls = new Map<number, string>();
 let currentView: BrowserView | null = null;
+let activeAccountId: number | null = null;
 let browserFullscreen = true;
 let imageBarHeight = 76;
 let accountBarHeight = 58;
@@ -50,6 +53,7 @@ let canvasDownloadPoll: NodeJS.Timeout | null = null;
 let captchaProbePoll: NodeJS.Timeout | null = null;
 const probeInFlight = new Set<number>();
 let lastImageAccountId: number | null = null;
+let lastImageConversationId: string | null = null;
 let lastVideoAccountId: number | null = null;
 // Chat requests that timed out but whose bridge task is still rendering; when the
 // task completes, the finished video is attached to the original chat message.
@@ -239,11 +243,16 @@ function openAccountBrowser(accountId: number, background = false, preloadOnly =
   windowRef.addBrowserView(view);
   if (previousView?.webContents && previousView !== view && !previousView.webContents.isDestroyed()) windowRef.removeBrowserView(previousView);
   currentView = view;
+  activeAccountId = accountId;
   browserFullscreen = keepFullscreen;
   resizeBrowser();
   windowRef.setTopBrowserView(view);
   if (!view.webContents.isLoading() && !view.webContents.getURL()) {
     void view.webContents.loadURL(platformConfig(account.platform, account.id).homeUrl).catch((error) => windowRef?.webContents.send('browser:error', `${account.name} 网页加载失败：${error.message}`));
+  }
+  if (!background && !preloadOnly && currentAppMode() !== 'account') {
+    db.setSetting('appMode', 'account');
+    for (const win of BrowserWindow.getAllWindows()) if (!win.isDestroyed()) win.webContents.send('app:mode-changed', 'account');
   }
   windowRef.webContents.send('browser:fullscreen-changed', browserFullscreen);
   windowRef.webContents.send('account:opened', accountId);
@@ -266,12 +275,153 @@ function ensureAccountView(accountId: number): BrowserView | null {
   return openAccountBrowser(accountId, true, true) ?? null;
 }
 
+/**
+ * Ensures the account page is opened to a clean new chat session before initiating a new turn.
+ */
+async function prepareAccountNewConversation(accountId: number): Promise<void> {
+  const view = ensureAccountView(accountId);
+  if (!view?.webContents || view.webContents.isDestroyed()) {
+    throw new Error('账号页面不可用，请确认该账号已登录');
+  }
+  const currentUrl = view.webContents.getURL() || '';
+  const isCleanNewChat = /^https?:\/\/(?:www\.)?doubao\.com\/chat\/?(?:[?#]|$)/i.test(currentUrl);
+  if (!isCleanNewChat) {
+    await view.webContents.loadURL('https://www.doubao.com/chat/');
+  } else {
+    // If already on /chat/, try clicking "开启新对话" / "新对话" button if available, or reload /chat/
+    const clicked = await view.webContents.executeJavaScript(`(() => {
+      try {
+        const btns = [...document.querySelectorAll('button, [role="button"], a')].filter(el => {
+          const r = el.getBoundingClientRect();
+          return r.width > 0 && r.height > 0;
+        });
+        const btn = btns.find(el => {
+          const t = (el.innerText || el.getAttribute('aria-label') || el.getAttribute('title') || '').trim();
+          return /^(?:开启)?新对话$/i.test(t);
+        });
+        if (btn) { btn.click(); return true; }
+      } catch {}
+      return false;
+    })()`).catch(() => false);
+    if (!clicked) {
+      await view.webContents.loadURL('https://www.doubao.com/chat/').catch(() => undefined);
+    }
+  }
+  await waitForPageReady(view);
+  await waitForComposer(view).catch(() => undefined);
+}
+
+/**
+ * Synchronizes the background account view to the active conversation URL so that
+ * when switching to account mode, the user sees the newly created conversation.
+ */
+async function syncAccountConversationPage(accountId: number, conversationId: string): Promise<void> {
+  if (!conversationId || conversationId.startsWith('local_')) return;
+  const view = accountViews.get(accountId);
+  if (!view?.webContents || view.webContents.isDestroyed()) return;
+  const currentUrl = view.webContents.getURL() || '';
+  if (!currentUrl.includes(conversationId)) {
+    const targetUrl = `https://www.doubao.com/chat/${conversationId}`;
+    await view.webContents.loadURL(targetUrl).catch(() => undefined);
+  }
+}
+
 /** Keep DOM-driven video work rendered without covering the gateway chat. */
 function ensureVideoAccountView(accountId: number): BrowserView | null {
   const view = ensureAccountView(accountId);
   if (!view) return null;
   if (windowRef?.getBrowserViews().includes(view)) return view;
   return backgroundPages.attach(view);
+}
+
+/**
+ * Attempts to capture the latest unwatermarked HD video from a Doubao page view
+ * using the account's session state and DoubaoShareService.
+ */
+async function downloadHDVideoFromView(view: BrowserView): Promise<{ path: string; name: string } | null> {
+  try {
+    const target = await view.webContents.executeJavaScript(`(${captureLatestVideo.toString()})()`);
+    if (target && target.vid && target.model?.fallback_api) {
+      const video = await shareService.resolveVideo(target);
+      const directory = watchedDirectory || db.getSetting('downloadDirectory') || path.join(app.getPath('downloads'), 'DoubaoWorkspace');
+      const saved = await shareService.save(video.id, directory);
+      pendingDownloads.add(saved.path);
+      db.recordShareDownload(saved.path, path.basename(saved.path));
+      windowRef?.webContents.send('workspace:changed');
+      windowRef?.webContents.send('download:status', { state: 'completed', accountId: 0, name: path.basename(saved.path), path: saved.path });
+      return { path: saved.path, name: path.basename(saved.path) };
+    }
+  } catch (error) {
+    console.warn('[HD Video] resolution failed:', error instanceof Error ? error.message : error);
+  }
+  return null;
+}
+
+/**
+ * Searches candidates across active or associated account views to resolve the HD unwatermarked video.
+ */
+async function resolveHDVideo(accountId?: number | null, threadId?: string): Promise<{ path: string; name: string } | null> {
+  const candidateAccounts: number[] = [];
+  const addAccount = (id?: number | null) => {
+    if (id != null && !candidateAccounts.includes(id) && db.accounts().some(a => a.id === id && a.platform === 'doubao')) {
+      candidateAccounts.push(id);
+    }
+  };
+
+  let targetConversationId: string | null = null;
+  if (threadId) {
+    const thread = db.gatewayThread(threadId);
+    if (thread?.doubaoConversationId) targetConversationId = thread.doubaoConversationId;
+    addAccount(thread?.accountId);
+  }
+  addAccount(accountId);
+  addAccount(lastVideoAccountId);
+  addAccount(activeAccountId);
+  for (const a of db.accounts()) if (a.platform === 'doubao') addAccount(a.id);
+
+  const candidateViews: BrowserView[] = [];
+  for (const accId of candidateAccounts) {
+    const v = accountViews.get(accId) || ensureVideoAccountView(accId);
+    if (v && !candidateViews.includes(v)) candidateViews.push(v);
+  }
+  for (const [, v] of accountViews) {
+    if (!candidateViews.includes(v)) candidateViews.push(v);
+  }
+
+  for (const view of candidateViews) {
+    if (!view.webContents || view.webContents.isDestroyed()) continue;
+    if (targetConversationId && !targetConversationId.startsWith('local_')) {
+      const currentUrl = view.webContents.getURL() || '';
+      if (!currentUrl.includes(targetConversationId)) {
+        const targetUrl = `https://www.doubao.com/chat/${targetConversationId}`;
+        await view.webContents.loadURL(targetUrl).catch(() => undefined);
+        await waitForPageReady(view).catch(() => undefined);
+        await new Promise(resolve => setTimeout(resolve, 1500));
+      }
+    }
+    let result = await downloadHDVideoFromView(view);
+    if (result) return result;
+
+    try {
+      const clicked = await view.webContents.executeJavaScript(`(() => {
+        const nodes = Array.from(document.querySelectorAll('video, img, [role=button], button, [class*="card"]')).reverse();
+        for (const node of nodes) {
+          const rect = node.getBoundingClientRect();
+          if (rect.width > 80 && rect.height > 40) {
+            (node.closest('button,a,[role=button]') || node).click();
+            return true;
+          }
+        }
+        return false;
+      })()`);
+      if (clicked) {
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        result = await downloadHDVideoFromView(view);
+        if (result) return result;
+      }
+    } catch { /* ignore page evaluation error */ }
+  }
+  return null;
 }
 
 /** Picks a usable Doubao account from the shared pool, or the first logged-in one. */
@@ -347,7 +497,7 @@ function openDonationWindow() {
   if (!windowRef) return;
   if (donationWindow && !donationWindow.isDestroyed()) { donationWindow.show(); donationWindow.focus(); return; }
   const panel = new BrowserWindow({ parent: windowRef, modal: true, width: 420, height: 680,
-    resizable: false, title: '打赏作者', autoHideMenuBar: true, backgroundColor: '#ffffff', show: false,
+    resizable: false, title: '赞赏奶蛙老师', autoHideMenuBar: true, backgroundColor: '#ffffff', show: false,
     webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false } });
   donationWindow = panel;
   const url = new URL(rendererUrl()); url.searchParams.set('panel', 'donation');
@@ -586,6 +736,7 @@ function setupIpc() {
     accountViews.delete(id); stagedImageAssets.delete(id); stagedImageUrls.delete(id);
     canvasBridge?.forgetAccount(id);
     if (wasCurrent) { currentView = null; }
+    if (activeAccountId === id) { activeAccountId = null; }
     for (const win of BrowserWindow.getAllWindows()) if (!win.isDestroyed()) win.webContents.send('workspace:changed');
     if (view && !view.webContents.isDestroyed()) {
       if (windowRef && !windowRef.isDestroyed()) windowRef.removeBrowserView(view);
@@ -616,6 +767,7 @@ function setupIpc() {
   ipcMain.handle('accounts:create', (_e, data) => { const next = db.createAccount(data); windowRef?.webContents.send('workspace:changed'); return next; });
   ipcMain.handle('settings:open', () => { openSettingsWindow(); return true; });
   ipcMain.handle('donation:open', () => { openDonationWindow(); return true; });
+  ipcMain.handle('author:open-douyin', () => shell.openExternal('https://v.douyin.com/Mm0paOp_7fE/'));
   ipcMain.handle('accounts:open', (_e, id) => { if (!openAccountBrowser(id)) throw new Error('账号不存在或窗口尚未就绪'); return true; });
   ipcMain.handle('browser:hide', () => { hideBrowser(); return true; });
   ipcMain.handle('browser:set-fullscreen', (_e, value) => {
@@ -662,8 +814,13 @@ function setupIpc() {
     const next = mode === 'account' ? 'account' : 'gateway';
     db.setSetting('appMode', next);
     // Account mode needs the native page visible; gateway mode drives it off-screen.
-    if (next === 'account' && currentView) {
-      try { openAccountBrowser(db.accounts()[0]?.id ?? 0); } catch { /* handled by caller */ }
+    if (next === 'account') {
+      const targetId = (activeAccountId != null && db.accounts().some(a => a.id === activeAccountId))
+        ? activeAccountId
+        : ([...accountViews].find(([, view]) => view === currentView)?.[0] ?? db.accounts()[0]?.id ?? 0);
+      if (targetId) {
+        try { openAccountBrowser(targetId); } catch { /* handled by caller */ }
+      }
     } else {
       hideBrowser();
     }
@@ -683,8 +840,14 @@ function setupIpc() {
     if (!canvasBridge) return false;
     return forwardVideoChatMessage(canvasBridge, db, request?.threadId || '', request?.text || '');
   });
-  ipcMain.handle('chat:download-media', async (_event, attachment: { id?: string; kind?: 'image' | 'video'; name?: string; path?: string; url?: string }) => {
+  ipcMain.handle('chat:download-media', async (_event, attachment: { id?: string; kind?: 'image' | 'video'; name?: string; path?: string; url?: string }, context?: { accountId?: number | null; threadId?: string }) => {
     try {
+      if (attachment?.kind === 'video') {
+        const hd = await resolveHDVideo(context?.accountId, context?.threadId);
+        if (hd) {
+          return { path: hd.path };
+        }
+      }
       const directory = watchedDirectory || db.getSetting('downloadDirectory') || path.join(app.getPath('downloads'), 'DoubaoWorkspace');
       fs.mkdirSync(directory, { recursive: true });
       const filename = path.basename(attachment?.name || '') || (attachment?.kind === 'video' ? `doubao-video-${Date.now()}.mp4` : `doubao-image-${Date.now()}.png`);
@@ -727,6 +890,42 @@ function setupIpc() {
       return { error: reason };
     }
   });
+  ipcMain.handle('chat:save-last-frame', async (_event, payload: { dataUrl: string; name?: string }) => {
+    try {
+      if (!payload?.dataUrl || typeof payload.dataUrl !== 'string') {
+        throw new Error('未获取到有效的图像数据');
+      }
+      const base64Data = payload.dataUrl.replace(/^data:image\/[^;]+;base64,/, '');
+      const buffer = Buffer.from(base64Data, 'base64');
+      const directory = watchedDirectory || db.getSetting('downloadDirectory') || path.join(app.getPath('downloads'), 'DoubaoWorkspace');
+      fs.mkdirSync(directory, { recursive: true });
+
+      const rawName = (payload.name || '').trim();
+      let baseName = 'doubao-last-frame';
+      if (rawName) {
+        const parsed = path.parse(rawName);
+        baseName = parsed.name.replace(/\.[^.]+$/, '');
+      }
+      const filename = `${baseName}-last-frame-${Date.now()}.png`;
+      const target = path.join(directory, filename);
+
+      let destination = target;
+      if (fs.existsSync(destination)) {
+        const parsed = path.parse(target);
+        destination = path.join(parsed.dir, `${parsed.name}-${Date.now().toString(36)}${parsed.ext}`);
+      }
+
+      fs.writeFileSync(destination, buffer);
+      pendingDownloads.add(destination);
+      windowRef?.webContents.send('workspace:changed');
+      windowRef?.webContents.send('download:status', { state: 'completed', accountId: 0, name: path.basename(destination), path: destination });
+      return { path: destination };
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : '保存尾帧失败';
+      windowRef?.webContents.send('download:status', { state: 'failed', accountId: 0, name: payload?.name || '尾帧图片', reason });
+      return { error: reason };
+    }
+  });
   ipcMain.handle('chat:threads', () => gatewayChat.threads());
   ipcMain.handle('chat:messages', (event, threadId: string) => {
     const task = canvasBridge?.list().find(t => t.gatewayThreadId === String(threadId) && !['completed','failed','cancelled','needs_attention'].includes(t.status));
@@ -761,6 +960,17 @@ function currentAppMode(): 'gateway' | 'account' {
   return db.getSetting('appMode') === 'account' ? 'account' : 'gateway';
 }
 
+/** Ensures an API key exists by generating a default sk-xxx key if unset. */
+function ensureGatewayApiKey(): string {
+  if (process.env.DOUBAO_GATEWAY_KEY) return process.env.DOUBAO_GATEWAY_KEY;
+  let key = db.getSetting('gatewayKey');
+  if (!key) {
+    key = `sk-${randomUUID().replace(/-/g, '')}`;
+    db.setSetting('gatewayKey', key);
+  }
+  return key;
+}
+
 /** Snapshot used by both the main window and the API gateway panel. */
 function gatewayStatus() {
   const doubaoIds = new Set(db.accounts().filter(a => a.platform === 'doubao').map(a => a.id));
@@ -770,7 +980,7 @@ function gatewayStatus() {
     enabled: db.getSetting('gatewayEnabled') !== 'false',
     running: Boolean(gateway),
     port: Number(process.env.DOUBAO_GATEWAY_PORT || db.getSetting('gatewayPort') || 8788),
-    apiKey: db.getSetting('gatewayKey') || '',
+    apiKey: ensureGatewayApiKey(),
     error: gateway?.error ?? null,
     requests: gateway?.requestCount ?? 0,
     model: gateway?.defaultModel ?? 'doubao',
@@ -793,7 +1003,7 @@ function setupGateway() {
   // opt-out, so a fresh install can be driven by any OpenAI-compatible client.
   if (enabled === 'false') return;
   const port = Number(process.env.DOUBAO_GATEWAY_PORT || db.getSetting('gatewayPort') || 8788);
-  const apiKey = process.env.DOUBAO_GATEWAY_KEY || db.getSetting('gatewayKey') || '';
+  const apiKey = ensureGatewayApiKey();
   gateway = new DoubaoGateway({
     accounts: () => db.accounts(),
     viewForAccount: (accountId) => ensureAccountView(accountId),
@@ -815,7 +1025,7 @@ function setupGateway() {
 }
 
 function createWindow() {
-  windowRef = new BrowserWindow({ width: 1480, height: 920, minWidth: 1100, minHeight: 700, backgroundColor: '#f7f9fc', title: 'Doubao Video Workspace', webPreferences: { preload: path.join(__dirname, '../preload/preload.js'), contextIsolation: true, sandbox: true, nodeIntegration: false } });
+  windowRef = new BrowserWindow({ width: 1480, height: 920, minWidth: 1100, minHeight: 700, backgroundColor: '#f7f9fc', title: '豆包工作站', webPreferences: { preload: path.join(__dirname, '../preload/preload.js'), contextIsolation: true, sandbox: true, nodeIntegration: false } });
   attachAccountShortcuts(windowRef.webContents);
   windowRef.loadURL(rendererUrl());
   windowRef.webContents.once('did-finish-load', () => {
@@ -868,25 +1078,19 @@ app.whenReady().then(() => {
     onTaskChanged: (task) => {
       windowRef?.webContents.send('workspace:changed');
       if (task) {
-        if (task.gatewayReplyMessageId != null) pendingChatVideos.set(task.id, task.gatewayReplyMessageId);
+        if (task.gatewayReplyMessageId != null) {
+          if (['completed', 'failed', 'cancelled'].includes(task.status)) {
+            pendingChatVideos.delete(task.id);
+          } else {
+            pendingChatVideos.set(task.id, task.gatewayReplyMessageId);
+          }
+        }
         syncVideoTaskToChat(task, db, payload => windowRef?.webContents.send('chat:delta', payload));
       }
     },
     downloadHDVideo: async (view, _task) => {
-      try {
-        const target = await view.webContents.executeJavaScript(`(${captureLatestVideo.toString()})()`);
-        if (target && target.vid && target.model?.fallback_api) {
-          const video = await shareService.resolveVideo(target);
-          const directory = watchedDirectory || path.join(app.getPath('downloads'), 'DoubaoWorkspace');
-          const saved = await shareService.save(video.id, directory);
-          pendingDownloads.add(saved.path);
-          db.recordShareDownload(saved.path, path.basename(saved.path));
-          windowRef?.webContents.send('workspace:changed');
-          windowRef?.webContents.send('download:status', { state: 'completed', accountId: 0, name: path.basename(saved.path), path: saved.path });
-          return saved.path;
-        }
-      } catch { /* fallback to normal download if page did not expose video model */ }
-      return null;
+      const result = await downloadHDVideoFromView(view);
+      return result?.path ?? null;
     },
   }, app.getPath('userData'));
   setupAccountSend({ accounts: () => db.accounts(), views: accountViews, current: () => currentView,
@@ -895,6 +1099,12 @@ app.whenReady().then(() => {
     openAccount: (id, background) => openAccountBrowser(id, background) ?? null });
   gatewayChat = createGatewayChat(db as any, {
     viewForAccount: (accountId) => ensureAccountView(accountId),
+    prepareNewConversation: async (accountId) => {
+      await prepareAccountNewConversation(accountId);
+    },
+    syncConversationPage: async (accountId, conversationId) => {
+      await syncAccountConversationPage(accountId, conversationId);
+    },
     pickAccount: () => {
       const pool = canvasBridge?.poolRef;
       const accounts = db.accounts().filter(account => account.platform === 'doubao');
@@ -903,6 +1113,7 @@ app.whenReady().then(() => {
     },
     // Which account produced the last image/video, so the reply can be labelled.
     lastImageAccountId: () => lastImageAccountId,
+    lastImageConversationId: () => lastImageConversationId,
     uploadImages: async (accountId, paths, names) => {
       // Upload through the account's own page: the site does the prepare_upload + TOS
       // signing, and we read back the object key the completion payload needs.
@@ -928,10 +1139,11 @@ app.whenReady().then(() => {
         return saved;
       } catch { return null; }
     },
-    generateImages: async (prompt, options: { model?: string; ratio?: string; accountId?: number | null; attachments?: { path: string; name: string; mimeType: string }[] }) => {
+    generateImages: async (prompt, options: { model?: string; ratio?: string; accountId?: number | null; threadId?: string; conversationId?: string; attachments?: { path: string; name: string; mimeType: string }[] }) => {
       const accounts = db.accounts().filter(account => account.platform === 'doubao');
       if (!accounts.length) throw new Error('没有可用的豆包账号，请先在设置里添加并登录账号');
       lastImageAccountId = null;
+      lastImageConversationId = null;
       // Doubao answers a burst of image requests with 710020202 'common invalid param'
       // or a plain "访问频繁" note. Neither is a payload bug, so retry on another account
       // instead of surfacing the raw server message.
@@ -946,8 +1158,11 @@ app.whenReady().then(() => {
         const view = ensureAccountView(account.id);
         if (!view?.webContents || view.webContents.isDestroyed()) { lastError = new Error('账号页面不可用，请确认该账号已登录'); continue; }
         try {
+          if (!options.conversationId) {
+            await prepareAccountNewConversation(account.id);
+          }
           const uploaded = options.attachments?.length ? await Promise.all(options.attachments.map(item => uploadImageToDoubao(view, item.path, item.name))) : [];
-          const images = await generateImages(view, prompt, { model: options.model, ratio: options.ratio, attachments: uploaded });
+          const images = await generateImages(view, prompt, { model: options.model, ratio: options.ratio, conversationId: options.conversationId, attachments: uploaded });
           const attachments: GatewayAttachment[] = [];
           for (const image of images) {
             // CDN links expire and are cookie-bound; persist the bytes locally.
@@ -982,7 +1197,7 @@ app.whenReady().then(() => {
         const task = await canvasBridge.create({
           gatewayThreadId: options.threadId,
           gatewayReplyMessageId: options.replyMessageId,
-          conversationId: thread?.doubaoConversationId || undefined,
+          conversationId: videoConversationForAccount(thread, effectiveTargetAccount),
           prompt,
           ratio: options.ratio,
           duration: options.duration,
@@ -1051,8 +1266,17 @@ app.whenReady().then(() => {
         if (!task) { pendingChatVideos.delete(taskId); continue; }
         if (task.status === 'completed' && task.videoPath && fs.existsSync(task.videoPath)) {
           pendingChatVideos.delete(taskId);
-          gatewayChat.deliverLateVideo(messageId, { id: randomUUID(), kind: 'video', url: pathToFileURL(task.videoPath).toString(), name: path.basename(task.videoPath), path: task.videoPath });
+          const threadId = gatewayChat.deliverLateVideo(messageId, { id: randomUUID(), kind: 'video', url: pathToFileURL(task.videoPath).toString(), name: path.basename(task.videoPath), path: task.videoPath }) ?? task.gatewayThreadId;
           windowRef?.webContents.send('workspace:changed');
+          if (threadId) {
+            windowRef?.webContents.send('chat:delta', {
+              threadId,
+              messageId,
+              full: '视频已生成（后台完成）',
+              videoTaskId: task.id,
+              videoStatus: 'completed',
+            });
+          }
         }
       }
     }

@@ -4,7 +4,15 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import type { Account } from '../shared/types';
-import { CanvasBridge, shouldRecoverTaskPage, normalizeTaskUrl, formatVideoPrompt } from './canvas-bridge';
+import { CanvasBridge, videoConversationForAccount, shouldRecoverTaskPage, normalizeTaskUrl, formatVideoPrompt, VIDEO_COMPLETION_PATTERN } from './canvas-bridge';
+
+test('video switches start a new conversation while the same account continues its own conversation', () => {
+  const thread = { accountId: 1, doubaoConversationId: 'account-one-conversation' };
+  assert.equal(videoConversationForAccount(thread, 1), 'account-one-conversation');
+  assert.equal(videoConversationForAccount(thread, 2), undefined);
+  assert.equal(videoConversationForAccount(thread, null), undefined);
+  assert.equal(videoConversationForAccount(null, 2), undefined);
+});
 
 const dispatchTestAccount: Account = {
   id: 1, name: '测试账号', platform: 'doubao', note: '', sessionName: 'test-only', isLoggedIn: true,
@@ -135,4 +143,14 @@ test('formatVideoPrompt preserves Seedance 2.5 when duration is >= 10s', () => {
   const result = formatVideoPrompt('兔子跳起来', '16:9', 10, 'Seedance 2.5', true);
   assert.match(result, /使用 Seedance 2\.5 模型/);
   assert.match(result, /时长 10 秒/);
+});
+
+test('VIDEO_COMPLETION_PATTERN recognizes Doubao video completion messages', () => {
+  assert.equal(VIDEO_COMPLETION_PATTERN.test('【视频生成完成】'), true);
+  assert.equal(VIDEO_COMPLETION_PATTERN.test('视频生成完成'), true);
+  assert.equal(VIDEO_COMPLETION_PATTERN.test('你的视频生成好了'), true);
+  assert.equal(VIDEO_COMPLETION_PATTERN.test('视频已生成'), true);
+  assert.equal(VIDEO_COMPLETION_PATTERN.test('已为你生成视频'), true);
+  assert.equal(VIDEO_COMPLETION_PATTERN.test('正在生成视频中，请稍候'), false);
+  assert.equal(VIDEO_COMPLETION_PATTERN.test('请确认参数后开始生成'), false);
 });

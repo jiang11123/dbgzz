@@ -21,46 +21,75 @@ async function clickPoint(view: BrowserView, point: unknown) {
 }
 
 export const composerSettingsScript = `(() => {
-  const visible = n => { const r = n.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
-  const norm = s => (s || '').replace(/\\s+/g, ' ').trim();
-  const input = [...document.querySelectorAll('[contenteditable=true],textarea')].find(n => visible(n) && !n.disabled);
-  if (!input) return {mode:'chat'};
-  // The active skill renders as an exit chip in the composer toolbar: <div data-testid=skill_input_exit_button>视频生成</div>.
-  const chip = [...document.querySelectorAll('[data-testid=skill_input_exit_button]')].find(visible);
-  const chipText = chip ? norm(chip.innerText) : '';
-  const modeBtn = [...document.querySelectorAll('#chat_input_action_mode,[data-testid=chat_input_action_mode]')].find(visible);
-  const modeBtnText = modeBtn ? norm(modeBtn.innerText) : '';
-  const placeholder = input.getAttribute('placeholder') || input.getAttribute('data-placeholder') || '';
-  const rect = input.getBoundingClientRect();
-  // Model / duration chips live in the same toolbar row as the skill chip, never in the sidebar.
-  // Without an active skill there are no model/duration chips: a stray model label elsewhere
-  // must never make a plain chat composer look like a video composer.
-  const near = chip
-    ? [...document.querySelectorAll('button,[role=button]')].filter(n => visible(n) && Math.abs(n.getBoundingClientRect().bottom - chip.getBoundingClientRect().bottom) < 24)
-    : [];
-  const nearTexts = near.map(n => norm(n.innerText)).filter(Boolean);
-  const modelRaw = nearTexts.find(s => /^模型\\s*\\S/.test(s)) || '';
-  const model = modelRaw ? modelRaw.replace(/^模型\\s*/, '').trim() : undefined;
-  const ratio = nearTexts.map(s => s.replace(/\\s+/g, '').replace('：', ':')).find(s => /^\\d+:\\d+$/.test(s));
-  // 'auto · 10s' carries the duration the page will actually use.
-  const durationRaw = nearTexts.find(s => /^(?:自动|auto)\\s*[·.]?\\s*\\d+\\s*s?$/i.test(s)) || '';
-  const duration = (() => { const m = /(\\d+)\\s*s?$/i.exec(durationRaw); return m ? Number(m[1]) : undefined; })();
-  const video = /视频生成|生成视频|video/i.test(chipText) || /视频生成|生成视频/i.test(modeBtnText) || (!chipText && /描述你想要的视频|视频/.test(placeholder));
-  const image = !video && (/图像生成|图片生成|生成图片|画图|image/i.test(chipText) || /图像生成|图片生成/i.test(modeBtnText));
-  const modeLabel = chipText || modeBtnText || undefined;
-  const mode = video ? 'video' : image ? 'image' : chipText ? 'other' : 'chat';
-  return {mode, modeLabel, model, ratio, duration: duration && duration > 0 ? duration : undefined};
+  try {
+    const visible = n => {
+      try {
+        const r = n && typeof n.getBoundingClientRect === 'function' ? n.getBoundingClientRect() : null;
+        return Boolean(r && r.width > 0 && r.height > 0);
+      } catch { return false; }
+    };
+    const norm = s => (s || '').replace(/\\s+/g, ' ').trim();
+    const getAttr = (n, attr) => {
+      try { return (n && typeof n.getAttribute === 'function' ? n.getAttribute(attr) : '') || ''; }
+      catch { return ''; }
+    };
+    const getText = n => {
+      try { return norm(n ? (n.innerText || n.textContent || '') : ''); }
+      catch { return ''; }
+    };
+    const input = [...document.querySelectorAll('[contenteditable=true],textarea')].find(n => visible(n) && !n.disabled);
+    if (!input) return {mode:'chat'};
+    // The active skill renders as an exit chip in the composer toolbar: <div data-testid=skill_input_exit_button>视频生成</div>.
+    const chip = [...document.querySelectorAll('[data-testid=skill_input_exit_button]')].find(visible);
+    const chipText = chip ? getText(chip) : '';
+    const modeBtn = [...document.querySelectorAll('#chat_input_action_mode,[data-testid=chat_input_action_mode]')].find(visible);
+    const modeBtnText = modeBtn ? getText(modeBtn) : '';
+    const placeholder = getAttr(input, 'placeholder') || getAttr(input, 'data-placeholder');
+    const chipRect = chip ? chip.getBoundingClientRect() : null;
+    const near = chipRect
+      ? [...document.querySelectorAll('button,[role=button]')].filter(n => visible(n) && Math.abs(n.getBoundingClientRect().bottom - chipRect.bottom) < 24)
+      : [];
+    const nearTexts = near.map(n => getText(n)).filter(Boolean);
+    const modelRaw = nearTexts.find(s => /^模型\\s*\\S/.test(s)) || '';
+    const model = modelRaw ? modelRaw.replace(/^模型\\s*/, '').trim() : undefined;
+    const ratio = nearTexts.map(s => s.replace(/\\s+/g, '').replace('：', ':')).find(s => /^\\d+:\\d+$/.test(s));
+    // 'auto · 10s' carries the duration the page will actually use.
+    const durationRaw = nearTexts.find(s => /^(?:自动|auto)\\s*[·.]?\\s*\\d+\\s*s?$/i.test(s)) || '';
+    const duration = (() => { const m = /(\\d+)\\s*s?$/i.exec(durationRaw); return m ? Number(m[1]) : undefined; })();
+    const video = /视频生成|生成视频|video/i.test(chipText) || /视频生成|生成视频/i.test(modeBtnText) || (!chipText && /描述你想要的视频|视频/.test(placeholder));
+    const image = !video && (/图像生成|图片生成|生成图片|画图|image/i.test(chipText) || /图像生成|图片生成/i.test(modeBtnText));
+    const modeLabel = chipText || modeBtnText || undefined;
+    const mode = video ? 'video' : image ? 'image' : chipText ? 'other' : 'chat';
+    return {mode, modeLabel, model, ratio, duration: duration && duration > 0 ? duration : undefined};
+  } catch (err) {
+    return {mode:'chat'};
+  }
 })()`;
 
 export async function readComposerSettings(view: BrowserView): Promise<ComposerSettings> {
   if (view.webContents.isDestroyed()) throw new Error('账号窗口已关闭');
-  return view.webContents.executeJavaScript(composerSettingsScript);
+  try {
+    return await view.webContents.executeJavaScript(composerSettingsScript, true);
+  } catch {
+    return { mode: 'chat' };
+  }
 }
 
 export async function waitForComposer(view: BrowserView) {
   for (let attempt = 0; attempt < 80; attempt++) {
     if (view.webContents.isDestroyed()) throw new Error('账号窗口已关闭');
-    if (!view.webContents.isLoading() && await view.webContents.executeJavaScript(`Boolean([...document.querySelectorAll('[contenteditable=true],textarea')].find(n=>n.getBoundingClientRect().width>0 && !n.disabled))`)) return;
+    try {
+      if (!view.webContents.isLoading()) {
+        const hasInput = await view.webContents.executeJavaScript(`(() => {
+          try {
+            return Boolean([...document.querySelectorAll('[contenteditable=true],textarea')].find(n => {
+              try { return n.getBoundingClientRect().width > 0 && !n.disabled; } catch { return false; }
+            }));
+          } catch { return false; }
+        })()`, true);
+        if (hasInput) return;
+      }
+    } catch {}
     await pause(250);
   }
   throw new Error('目标账号未出现输入框，请打开执行账号检查页面加载状态');
@@ -68,63 +97,90 @@ export async function waitForComposer(view: BrowserView) {
 
 /** Centre point of the first visible element matching the given skill label inside the composer toolbar. */
 const skillButtonPointScript = (label: string) => `(() => {
-  const visible = n => { const r = n.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
-  const want = ${JSON.stringify(label)};
-  const norm = s => (s || '').replace(/\\s+/g, ' ').trim();
-  const isMatch = s => {
-    const text = norm(s);
-    if (!text) return false;
-    if (text === want) return true;
-    if (want === '视频生成' || want === '生成视频') {
-      return /^(?:AI\\s*)?(?:视频生成|生成视频)/i.test(text) || text.includes('视频生成');
-    }
-    if (want === '图像生成' || want === '图片生成') {
-      return /^(?:AI\\s*)?(?:图像生成|图片生成|生成图片)/i.test(text) || text.includes('图像生成') || text.includes('图片生成');
-    }
-    return text.includes(want);
-  };
-  const input = [...document.querySelectorAll('[contenteditable=true],textarea')].find(n => visible(n));
-  const rect = input?.getBoundingClientRect();
-  const nodes = [...document.querySelectorAll('[data-testid^=skill_bar_button_],button,[role=button],[role=menuitem],[role=option]')]
-    .filter(n => visible(n) && isMatch(n.innerText || n.getAttribute('aria-label') || n.getAttribute('title') || ''))
-    .filter(n => !rect || n.getBoundingClientRect().bottom > rect.top - 200);
-  if (!nodes.length) return null;
-  const target = nodes[nodes.length - 1];
-  const r = target.getBoundingClientRect();
-  const pt = { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
-  const opts = { bubbles: true, cancelable: true, clientX: pt.x, clientY: pt.y };
   try {
-    target.dispatchEvent(new PointerEvent('pointerdown', opts));
-    target.dispatchEvent(new MouseEvent('mousedown', opts));
-    target.dispatchEvent(new PointerEvent('pointerup', opts));
-    target.dispatchEvent(new MouseEvent('mouseup', opts));
-    target.dispatchEvent(new MouseEvent('click', opts));
-    if (typeof target.click === 'function') target.click();
-  } catch (_) {}
-  return pt;
+    const visible = n => {
+      try {
+        const r = n && typeof n.getBoundingClientRect === 'function' ? n.getBoundingClientRect() : null;
+        return Boolean(r && r.width > 0 && r.height > 0);
+      } catch { return false; }
+    };
+    const want = ${JSON.stringify(label)};
+    const norm = s => (s || '').replace(/\\s+/g, ' ').trim();
+    const getAttr = (n, attr) => {
+      try { return (n && typeof n.getAttribute === 'function' ? n.getAttribute(attr) : '') || ''; }
+      catch { return ''; }
+    };
+    const getText = n => {
+      try { return norm(n ? (n.innerText || n.textContent || '') : ''); }
+      catch { return ''; }
+    };
+    const isMatch = s => {
+      const text = norm(s);
+      if (!text) return false;
+      if (text === want) return true;
+      if (want === '视频生成' || want === '生成视频') {
+        return /^(?:AI\\s*)?(?:视频生成|生成视频)/i.test(text) || text.includes('视频生成');
+      }
+      if (want === '图像生成' || want === '图片生成') {
+        return /^(?:AI\\s*)?(?:图像生成|图片生成|生成图片)/i.test(text) || text.includes('图像生成') || text.includes('图片生成');
+      }
+      return text.includes(want);
+    };
+    const input = [...document.querySelectorAll('[contenteditable=true],textarea')].find(n => visible(n));
+    const rect = input ? input.getBoundingClientRect() : null;
+    const nodes = [...document.querySelectorAll('[data-testid^=skill_bar_button_],button,[role=button],[role=menuitem],[role=option]')]
+      .filter(n => visible(n) && isMatch(getText(n) || getAttr(n, 'aria-label') || getAttr(n, 'title')))
+      .filter(n => !rect || n.getBoundingClientRect().bottom > rect.top - 200);
+    if (!nodes.length) return null;
+    const target = nodes[nodes.length - 1];
+    const r = target.getBoundingClientRect();
+    if (!r || r.width <= 0 || r.height <= 0) return null;
+    const pt = { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
+    const opts = { bubbles: true, cancelable: true, clientX: pt.x, clientY: pt.y };
+    try {
+      target.dispatchEvent(new PointerEvent('pointerdown', opts));
+      target.dispatchEvent(new MouseEvent('mousedown', opts));
+      target.dispatchEvent(new PointerEvent('pointerup', opts));
+      target.dispatchEvent(new MouseEvent('mouseup', opts));
+      target.dispatchEvent(new MouseEvent('click', opts));
+      if (typeof target.click === 'function') target.click();
+    } catch (_) {}
+    return pt;
+  } catch (err) {
+    return null;
+  }
 })()`;
 
 /** Makes the composer's skill bar visible: it only renders once the editor has been focused/expanded. */
 async function expandSkillBar(view: BrowserView) {
   const count = () => view.webContents.executeJavaScript(
-    `document.querySelectorAll('[data-testid^=skill_bar_button_]').length`).catch(() => 0);
+    `(() => { try { return document.querySelectorAll('[data-testid^=skill_bar_button_]').length; } catch { return 0; } })()`, true).catch(() => 0);
   if (await count() > 0) return true;
   if (!view.webContents.isDestroyed()) view.webContents.focus();
   const clickCoords = await view.webContents.executeJavaScript(`(() => {
-    const all = [...document.querySelectorAll('[contenteditable=true],textarea')].filter(n => n.getBoundingClientRect().width > 0 && !n.disabled);
-    const ed = all.find(n => n.getAttribute('contenteditable') === 'true') || all[all.length - 1];
-    if (!ed) return null;
-    ed.focus();
-    const rect = ed.getBoundingClientRect();
-    const pt = { x: Math.round(rect.left + Math.min(50, rect.width / 2)), y: Math.round(rect.top + rect.height / 2) };
-    const opts = { bubbles: true, cancelable: true, clientX: pt.x, clientY: pt.y };
-    ed.dispatchEvent(new PointerEvent('pointerdown', opts));
-    ed.dispatchEvent(new MouseEvent('mousedown', opts));
-    ed.dispatchEvent(new PointerEvent('pointerup', opts));
-    ed.dispatchEvent(new MouseEvent('mouseup', opts));
-    ed.dispatchEvent(new MouseEvent('click', opts));
-    return pt;
-  })()`).catch(() => null);
+    try {
+      const all = [...document.querySelectorAll('[contenteditable=true],textarea')].filter(n => {
+        try {
+          const r = n.getBoundingClientRect();
+          return r.width > 0 && !n.disabled;
+        } catch { return false; }
+      });
+      const ed = all.find(n => n.getAttribute('contenteditable') === 'true') || all[all.length - 1];
+      if (!ed) return null;
+      ed.focus();
+      const rect = ed.getBoundingClientRect();
+      const pt = { x: Math.round(rect.left + Math.min(50, rect.width / 2)), y: Math.round(rect.top + rect.height / 2) };
+      const opts = { bubbles: true, cancelable: true, clientX: pt.x, clientY: pt.y };
+      try {
+        ed.dispatchEvent(new PointerEvent('pointerdown', opts));
+        ed.dispatchEvent(new MouseEvent('mousedown', opts));
+        ed.dispatchEvent(new PointerEvent('pointerup', opts));
+        ed.dispatchEvent(new MouseEvent('mouseup', opts));
+        ed.dispatchEvent(new MouseEvent('click', opts));
+      } catch (_) {}
+      return pt;
+    } catch { return null; }
+  })()`, true).catch(() => null);
   if (clickCoords) {
     await clickPoint(view, clickCoords);
   }
@@ -147,37 +203,53 @@ export async function ensureComposerMode(view: BrowserView, settings: ComposerSe
   for (let attempt = 0; attempt < 4; attempt++) {
     await expandSkillBar(view);
     // 1. The skill bar exposes the mode directly as a chip button (视频生成 / PPT 生成 / 图像生成 ...).
-    let point = await view.webContents.executeJavaScript(skillButtonPointScript(label));
+    let point = await view.webContents.executeJavaScript(skillButtonPointScript(label), true).catch(() => null);
     if (!point) {
       // 2. Otherwise open the composer menu through the mode button or the '+' tool button.
       const opener = await view.webContents.executeJavaScript(`(() => {
-        const visible = n => { const r = n.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
-        const norm = s => (s || '').replace(/\\s+/g, ' ').trim();
-        const input = [...document.querySelectorAll('[contenteditable=true],textarea')].find(n => visible(n));
-        const rect = input?.getBoundingClientRect();
-        const candidates = [...document.querySelectorAll('button,[role=button]')].filter(n => visible(n));
-        const target = candidates.find(n => n.id === 'chat_input_action_mode' || n.getAttribute('data-testid') === 'chat_input_action_mode')
-          || candidates.find(n => /^(?:更多|More|Tools)$/i.test(norm(n.innerText)))
-          || candidates.find(n => n.getAttribute('data-testid') === 'upload_file_button')
-          || candidates.find(n => /^[+＋]$/.test(norm(n.innerText)) && (!rect || Math.abs(n.getBoundingClientRect().bottom - rect.bottom) < 120));
-        if (!target) return null;
-        const r = target.getBoundingClientRect();
-        const pt = { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
-        const opts = { bubbles: true, cancelable: true, clientX: pt.x, clientY: pt.y };
         try {
-          target.dispatchEvent(new PointerEvent('pointerdown', opts));
-          target.dispatchEvent(new MouseEvent('mousedown', opts));
-          target.dispatchEvent(new PointerEvent('pointerup', opts));
-          target.dispatchEvent(new MouseEvent('mouseup', opts));
-          target.dispatchEvent(new MouseEvent('click', opts));
-          if (typeof (target as any).click === 'function') (target as any).click();
-        } catch (_) {}
-        return pt;
-      })()`);
+          const visible = n => {
+            try {
+              const r = n && typeof n.getBoundingClientRect === 'function' ? n.getBoundingClientRect() : null;
+              return Boolean(r && r.width > 0 && r.height > 0);
+            } catch { return false; }
+          };
+          const norm = s => (s || '').replace(/\\s+/g, ' ').trim();
+          const getAttr = (n, attr) => {
+            try { return (n && typeof n.getAttribute === 'function' ? n.getAttribute(attr) : '') || ''; }
+            catch { return ''; }
+          };
+          const getText = n => {
+            try { return norm(n ? (n.innerText || n.textContent || '') : ''); }
+            catch { return ''; }
+          };
+          const input = [...document.querySelectorAll('[contenteditable=true],textarea')].find(n => visible(n));
+          const rect = input ? input.getBoundingClientRect() : null;
+          const candidates = [...document.querySelectorAll('button,[role=button]')].filter(n => visible(n));
+          const target = candidates.find(n => n.id === 'chat_input_action_mode' || getAttr(n, 'data-testid') === 'chat_input_action_mode')
+            || candidates.find(n => /^(?:更多|More|Tools)$/i.test(getText(n)))
+            || candidates.find(n => getAttr(n, 'data-testid') === 'upload_file_button')
+            || candidates.find(n => /^[+＋]$/.test(getText(n)) && (!rect || Math.abs(n.getBoundingClientRect().bottom - rect.bottom) < 120));
+          if (!target) return null;
+          const r = target.getBoundingClientRect();
+          if (!r || r.width <= 0 || r.height <= 0) return null;
+          const pt = { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
+          const opts = { bubbles: true, cancelable: true, clientX: pt.x, clientY: pt.y };
+          try {
+            target.dispatchEvent(new PointerEvent('pointerdown', opts));
+            target.dispatchEvent(new MouseEvent('mousedown', opts));
+            target.dispatchEvent(new PointerEvent('pointerup', opts));
+            target.dispatchEvent(new MouseEvent('mouseup', opts));
+            target.dispatchEvent(new MouseEvent('click', opts));
+            if (typeof (target as any).click === 'function') (target as any).click();
+          } catch (_) {}
+          return pt;
+        } catch { return null; }
+      })()`, true).catch(() => null);
       if (opener) {
         await clickPoint(view, opener);
         await pause(700);
-        point = await view.webContents.executeJavaScript(skillButtonPointScript(label));
+        point = await view.webContents.executeJavaScript(skillButtonPointScript(label), true).catch(() => null);
       }
     }
     if (point) {
@@ -456,12 +528,15 @@ export async function clickComposerSend(view: BrowserView, prompt: string) {
     const inputs = [...document.querySelectorAll('[contenteditable=true],textarea,[role=textbox]')].filter(n => !n.disabled && !n.closest('[hidden],[aria-hidden=true],template'));
     const input = inputs.find(n => n.getBoundingClientRect().width > 0 || n.offsetWidth > 0) || inputs[0];
     const rect = input ? input.getBoundingClientRect() : null;
-    const nodes = [...document.querySelectorAll('button,[role=button],div[role=button],span[role=button]')].filter(n => !n.disabled && n.getAttribute('aria-disabled') !== 'true');
+    const nodes = [...document.querySelectorAll('button,[role=button],div[role=button],span[role=button]')].filter(n => !n.disabled && n.getAttribute('aria-disabled') !== 'true' && !n.closest('[hidden],[aria-hidden=true],template') && n.getBoundingClientRect().width > 0 && n.getBoundingClientRect().height > 0);
     const named = nodes.find(n => /发送|send|submit|开始生成|立即生成|生成视频/i.test([n.innerText, n.getAttribute('aria-label'), n.getAttribute('title'), n.getAttribute('data-testid')].join(' ')));
     const nearby = (rect && rect.width > 0)
       ? nodes.filter(n => { const r = n.getBoundingClientRect(); return r.left >= rect.right - 140 && r.top >= rect.top - 80 && r.bottom <= rect.bottom + 120; }).sort((a,b) => b.getBoundingClientRect().right - a.getBoundingClientRect().right)[0]
       : null;
-    const target = named || nearby || nodes.filter(n => /send|submit/i.test(n.className || '')).pop();
+    // Sidebar conversation titles can contain "生成视频" too. The site's exact
+    // send control must win over any label or geometric fallback.
+    const explicit = nodes.find(n => n.getAttribute('data-testid') === 'chat_input_send_button');
+    const target = explicit || nearby || named || nodes.filter(n => /send|submit/i.test(n.className || '')).pop();
     if (!target) return { ok: false, reason: '未找到发送按钮' };
 
     target.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }));
@@ -475,7 +550,12 @@ export async function clickComposerSend(view: BrowserView, prompt: string) {
 
   if (!outcome?.ok) throw new Error('目标账号发送按钮不可用，请检查登录、附件上传和生成参数');
 
-  if (outcome.point) {
+  await pause(250);
+  const stillPending = prompt.trim() ? await view.webContents.executeJavaScript(`(() => {
+    const n = ${COMPOSER_PICK_SCRIPT};
+    return n ? (n.value ?? n.innerText ?? '').trim() === ${JSON.stringify(prompt.trim())} : false;
+  })()`) : (await view.webContents.executeJavaScript(draftImageStateScript)).count > 0;
+  if (outcome.point && stillPending) {
     view.webContents.send('account-send:bypass', true);
     try {
       view.webContents.sendInputEvent({ type: 'mouseDown', button: 'left', clickCount: 1, ...outcome.point });

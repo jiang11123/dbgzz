@@ -58,6 +58,10 @@ type Runtime = {
   downloadHDVideo?: (view: BrowserView, task: CanvasBridgeTask) => Promise<string | null>;
 };
 
+export function videoConversationForAccount(thread: { accountId: number | null; doubaoConversationId: string } | null, accountId?: number | null): string | undefined {
+  return thread && accountId != null && thread.accountId === accountId ? thread.doubaoConversationId || undefined : undefined;
+}
+
 export function videoReplyState(text: string): Pick<CanvasBridgeTask, 'status' | 'statusText'> {
   if (/请[^。！？]*确认|[^。！？]*确认[^。！？]*(?:后|再)[^。！？]*(?:生成|开始)|是否[^。！？]*(?:生成|上传|开始)|请[^。！？]*(?:上传|提供|补充)[^。！？]*(?:图片|参考图)/.test(text))
     return { status: 'awaiting_confirmation', statusText: '豆包等待你的回复，请直接在此发送补充消息' };
@@ -72,6 +76,7 @@ const contentType = (filePath: string) => /\.webm$/i.test(filePath) ? 'video/web
 const QUOTA_PATTERN = /免费次数用完|额度不足|创作额度.*不足|暂时无法使用|额度已用尽|今日.*上限/;
 const CAPTCHA_PATTERN = /710022004|人机验证|安全验证|滑块/;
 const SESSION_PATTERN = /未登录|登录已过期|请先登录|会话失效/;
+export const VIDEO_COMPLETION_PATTERN = /视频[^。！？]*(?:已生成|生成好了|生成完成|已完成|制作完成)|(?:已生成|已完成|已制作|生成好了|制作好了)[^。！？]*视频|你的视频生成好了|【视频生成完成】|视频生成完成|视频已生成|生成好了|生成完成|已为你生成视频/;
 
 /** Maps a page-level failure message onto the account pool's failure taxonomy. */
 export function classifyDispatchFailure(message: string): FailureKind {
@@ -231,80 +236,6 @@ async function selectDoubaoVideoAspectRatio(view: BrowserView, ratio: string) {
   await selectPageSetting(view, 'ratio', ratio);
 }
 
-
-async function submitToDoubao(view: BrowserView, task: CanvasBridgeTask) {
-  const fillOutcome = await runInPage(view, `(() => {
-    try {
-      const text = ${JSON.stringify(task.prompt)};
-      const candidates = Array.from(document.querySelectorAll('[role=textbox][contenteditable=true],[role=textbox],[contenteditable=true],textarea'))
-        .filter((node) => node instanceof HTMLElement && !node.closest('[aria-hidden=true]') && !(node instanceof HTMLTextAreaElement && node.disabled));
-      const input = candidates[0];
-      const labels = Array.from(document.querySelectorAll('button')).map((node) => (node.textContent || node.getAttribute('aria-label') || '').replace(/\\s+/g, '')).filter(Boolean).slice(0, 30);
-      if (!input) return { ok: false, reason: '未找到提示词输入框（页面可能未登录、尚未打开视频创作页，或正在显示验证）', labels };
-      if (input instanceof HTMLTextAreaElement || input instanceof HTMLInputElement) {
-        const prototype = input instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
-        Object.getOwnPropertyDescriptor(prototype, 'value')?.set?.call(input, '');
-      } else {
-        input.focus();
-        document.execCommand('selectAll', false);
-        document.execCommand('delete', false);
-      }
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-      return { ok: true, labels };
-    } catch (error) {
-      return { ok: false, reason: error instanceof Error ? error.message : String(error) };
-    }
-  })()`) as { ok?: boolean; reason?: string; labels?: string[] };
-  if (!fillOutcome.ok) return fillOutcome;
-  await view.webContents.insertText(task.prompt);
-  await new Promise((resolve) => setTimeout(resolve, 650));
-  const target = await runInPage(view, `(() => {
-    const buttons = Array.from(document.querySelectorAll('button')).filter((node) =>
-      !node.hasAttribute('disabled') && node.getBoundingClientRect().width > 0 && node.getBoundingClientRect().height > 0
-    );
-    const input = Array.from(document.querySelectorAll('[role=textbox][contenteditable=true],[role=textbox],[contenteditable=true],textarea'))
-      .find((node) => node instanceof HTMLElement && !node.closest('[aria-hidden=true]'));
-    const inputRect = input instanceof HTMLElement ? input.getBoundingClientRect() : null;
-    const composerSubmit = inputRect
-      ? buttons
-          .filter((node) => {
-            const rect = node.getBoundingClientRect();
-            return rect.left >= inputRect.right - 140 && rect.top >= inputRect.top - 120 && rect.bottom <= inputRect.bottom + 120;
-          })
-          .sort((left, right) => {
-            const leftRect = left.getBoundingClientRect();
-            const rightRect = right.getBoundingClientRect();
-            return rightRect.right - leftRect.right || rightRect.bottom - leftRect.bottom;
-          })[0]
-      : null;
-    const labelled = buttons.find((node) => /生成视频|立即生成|开始生成/.test((node.textContent || node.getAttribute('aria-label') || '').replace(/\\s+/g, '')));
-    const primary = composerSubmit || labelled || buttons.filter((node) => /bg-dbx-text-highlight/.test(String(node.className))).pop();
-    if (!(primary instanceof HTMLElement)) {
-      return { ok: false, reason: '未找到提交按钮', labels: buttons.map((node) => (node.textContent || node.getAttribute('aria-label') || '').replace(/\\s+/g, '')).filter(Boolean).slice(-12) };
-    }
-    const rect = primary.getBoundingClientRect();
-    return { ok: true, x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.top + rect.height / 2) };
-  })()`);
-  if (!(target as { ok?: boolean }).ok) return target;
-  const point = target as { x: number; y: number };
-  view.webContents.sendInputEvent({ type: 'mouseDown', x: point.x, y: point.y, button: 'left', clickCount: 1 });
-  view.webContents.sendInputEvent({ type: 'mouseUp', x: point.x, y: point.y, button: 'left', clickCount: 1 });
-  await new Promise((resolve) => setTimeout(resolve, 1200));
-  return runInPage(view, `(() => {
-    const prompt = ${JSON.stringify(task.prompt)};
-    const draft = Array.from(document.querySelectorAll('[role=textbox][contenteditable=true],[role=textbox],[contenteditable=true],textarea,input')).some((node) => {
-      const value = node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement ? node.value : node.textContent || '';
-      return value.trim() === prompt.trim();
-    });
-    const posted = Array.from(document.querySelectorAll('body *')).some((node) => {
-      if (node.closest('[contenteditable=true],textarea,input')) return false;
-      return (node.textContent || '').includes(prompt);
-    });
-    if (draft) return { ok: false, reason: '豆包未确认发送，提示词仍停留在输入框' };
-    return posted ? { ok: true } : { ok: false, reason: '豆包未确认提交，聊天记录中没有出现本次提示词' };
-  })()`);
-}
 
 export class CanvasBridge {
   private server = createServer((request, response) => void this.handle(request, response));
@@ -541,12 +472,12 @@ export class CanvasBridge {
         this.dispatchNextQueuedTask();
         return false;
       }
-      if (['awaiting_reply', 'awaiting_confirmation'].includes(task.status) && !/视频[^。！？]*(?:已生成|生成好了)|你的视频生成好了/.test(message)) return false;
+      if (['awaiting_reply', 'awaiting_confirmation'].includes(task.status) && !VIDEO_COMPLETION_PATTERN.test(message)) return false;
 
       // Prefer the user's HD unwatermarked method (shareService) over the site's own
-      // watermarked download button. The player data can lag the "生成好了" message, so
+      // watermarked download button. The player data can lag the completion message, so
       // retry a bounded number of polls before falling back to the regular download.
-      if (/你的视频生成好了|视频生成好了|视频已生成|生成好了/.test(message) && this.runtime.downloadHDVideo) {
+      if (VIDEO_COMPLETION_PATTERN.test(message) && this.runtime.downloadHDVideo) {
         const attempts = this.hdAttempts.get(task.id) ?? 0;
         if (attempts < 8) {
           this.hdAttempts.set(task.id, attempts + 1);
@@ -581,6 +512,17 @@ export class CanvasBridge {
         return link && isNew(link) ? link : '';
       })()`);
       if (typeof videoSource === 'string' && videoSource) {
+        // Before falling back to web player download, try HD download once more since the video is confirmed present
+        if (this.runtime.downloadHDVideo) {
+          const hdPath = await this.runtime.downloadHDVideo(view, task).catch(() => null);
+          if (hdPath && existsSync(hdPath)) {
+            this.hdAttempts.delete(task.id);
+            this.update(task, { status: 'completed', statusText: task.sourceAccountId ? '视频已返回共享工作区' : '视频已高清下载（无水印）', videoPath: hdPath, error: null });
+            this.busyAccountIds.delete(accountId);
+            this.dispatchNextQueuedTask();
+            return true;
+          }
+        }
         this.downloadSources.set(task.id, videoSource);
         this.update(task, { status: 'downloading', statusText: '正在下载豆包生成的视频' });
         if (videoSource.startsWith('blob:')) {
@@ -600,7 +542,7 @@ export class CanvasBridge {
         }
       }
       
-      if (/你的视频生成好了|视频生成好了|视频已生成|生成好了/.test(message)) {
+      if (VIDEO_COMPLETION_PATTERN.test(message)) {
         const opened = await runInPage(view, `(() => {
           const complete = Array.from(document.querySelectorAll('*')).filter((node) => (node.textContent || '').trim() === '你的视频生成好了。').at(-1);
           if (!complete) return false;
@@ -794,20 +736,46 @@ export class CanvasBridge {
       }
       await new Promise((resolve) => setTimeout(resolve, 2500));
       if (task.targetAccountId && task.targetAccountId !== task.sourceAccountId) {
-        const draft = await runInPage(view, `(() => { const input=[...document.querySelectorAll('[contenteditable=true],textarea')].find(n=>n.getBoundingClientRect().width>0); return input ? (input.value || input.innerText || '').trim() : ''; })()`);
+        const draft = await runInPage(view, `(() => {
+          try {
+            const input=[...document.querySelectorAll('[contenteditable=true],textarea')].find(n => {
+              try { return n.getBoundingClientRect().width > 0; } catch { return false; }
+            });
+            return input ? (input.value || input.innerText || '').trim() : '';
+          } catch { return ''; }
+        })()`).catch(() => '');
         if (draft) throw new Error('执行账号已有未发送草稿，请先处理该草稿再重试');
       }
       await waitForComposer(view);
       try {
         await ensureComposerMode(view, { mode: 'video' });
       } catch (modeError) {
-        throw new Error(`无法进入豆包视频生成模式：${modeError instanceof Error ? modeError.message : String(modeError)}`);
+        // 当前页面（如历史对话页面）可能没有视频模式切换入口，自动回退到干净新对话页面重试进入视频模式
+        try {
+          await view.webContents.loadURL('https://www.doubao.com/chat/');
+          await waitForComposer(view);
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+          await ensureComposerMode(view, { mode: 'video' });
+        } catch (retryError) {
+          throw new Error(`无法进入豆包视频生成模式：${retryError instanceof Error ? retryError.message : String(retryError)}`);
+        }
       }
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      const existingDownloads = await runInPage(view, `(() => [...document.querySelectorAll('button,a')].filter((node) => /下载(视频)?|保存视频/.test((node.textContent || node.getAttribute('aria-label') || '').replace(/\\s+/g, ''))).length)()`);
+      const existingDownloads = await runInPage(view, `(() => {
+        try {
+          return [...document.querySelectorAll('button,a')].filter((node) => {
+            try { return /下载(视频)?|保存视频/.test((node.textContent || node.getAttribute('aria-label') || '').replace(/\\s+/g, '')); }
+            catch { return false; }
+          }).length;
+        } catch { return 0; }
+      })()`).catch(() => 0);
       this.downloadBaselines.set(task.id, Number(existingDownloads) || 0);
-      const baseline = await runInPage(view, `Array.from(document.querySelectorAll('video')).map(v => v.currentSrc || v.src)`);
+      const baseline = await runInPage(view, `(() => {
+        try {
+          return Array.from(document.querySelectorAll('video')).map(v => v.currentSrc || v.src);
+        } catch { return []; }
+      })()`).catch(() => [] as string[]);
       this.videoBaselines.set(task.id, baseline);
       this.update(task, { videoBaseline: baseline });
 
@@ -845,29 +813,23 @@ export class CanvasBridge {
       view.webContents.send('account-send:bypass', true);
       try {
         await clickComposerSend(view, promptText);
-      } catch (sendError) {
-        const clicked = await runInPage(view, `(() => {
-          const input = [...document.querySelectorAll('[contenteditable=true],textarea')].find(n => n.getBoundingClientRect().width > 0);
-          const rect = input?.getBoundingClientRect();
-          const buttons = [...document.querySelectorAll('button,[role=button]')].filter(n => !n.disabled && n.getBoundingClientRect().width > 0);
-          const target = buttons.find(n => /发送|send|submit|生成视频|立即生成/i.test((n.innerText || n.getAttribute('aria-label') || '').trim()))
-            || (rect ? buttons.filter(n => { const r = n.getBoundingClientRect(); return r.left >= rect.right - 140 && r.top >= rect.top - 80 && r.bottom <= rect.bottom + 120; }).pop() : null);
-          if (target) {
-            target.click();
-            return true;
-          }
-          return false;
-        })()`);
-        if (!clicked) {
-          const outcome = await submitToDoubao(view, { ...task, prompt: promptText }) as unknown as { ok?: boolean; reason?: string; labels?: string[] };
-          if (!outcome?.ok) {
-            const labels = Array.isArray(outcome?.labels) ? `（当前可见按钮：${outcome.labels.slice(0, 8).join('、')}）` : '';
-            throw new Error(`${outcome?.reason || (sendError instanceof Error ? sendError.message : '页面提交未完成')}${labels}`);
-          }
-        }
       } finally {
         if (!view.webContents.isDestroyed()) view.webContents.send('account-send:bypass', false);
       }
+      // Only a fresh user turn proves submission; clicking alone is insufficient.
+      let posted = false;
+      for (let attempt = 0; attempt < 16; attempt++) {
+        const snapshot = await runInPage(view, pageReplySnapshotScript) as PageReplySnapshot;
+        const next = collectPageReplies(task.replyBaseline!, snapshot);
+        if (next.baseline.anchorId) {
+          // Keep emitted replies untouched so syncTaskReply can deliver them.
+          this.update(task, { replyBaseline: { ...task.replyBaseline!, anchorId: next.baseline.anchorId } });
+          posted = true;
+          break;
+        }
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      if (!posted) throw new Error('豆包未确认提交：聊天记录中没有本次消息，请检查账号窗口；不会自动重复发送');
       this.update(task, { status: 'awaiting_reply', statusText: '消息已提交，等待豆包回复', pageUrl: view.webContents.getURL() });
       await this.syncTaskReply(task, view);
     } catch (error) {

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Check, Copy, Play, RefreshCw, Server, X } from 'lucide-react';
+import { Check, Copy, Play, RefreshCw, Server, Sparkles, X } from 'lucide-react';
 
 type GatewayAccount = {
   accountId: number;
@@ -41,6 +41,13 @@ const healthClass: Record<string, string> = {
 };
 
 const countdown = (ms: number) => (ms <= 0 ? '' : ms >= 60_000 ? `${Math.ceil(ms / 60_000)} 分钟` : `${Math.ceil(ms / 1000)} 秒`);
+
+export function generateRandomApiKey(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return `sk-${crypto.randomUUID().replace(/-/g, '')}`;
+  }
+  return `sk-${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`;
+}
 
 export function GatewayPanel() {
   const [status, setStatus] = useState<GatewayStatus | null>(null);
@@ -191,7 +198,13 @@ export function GatewayPanel() {
       <h2>设置</h2>
       <div className="gateway-form">
         <label>端口<input value={port} onChange={event => setPort(event.target.value.replace(/[^0-9]/g, ''))} placeholder="8788" /></label>
-        <label>API Key（留空表示不校验）<input value={apiKey} onChange={event => setApiKey(event.target.value)} placeholder="sk-..." /></label>
+        <label>
+          API Key（留空表示不校验）
+          <div className="gateway-input-group">
+            <input value={apiKey} onChange={event => setApiKey(event.target.value)} placeholder="sk-..." />
+            <button type="button" className="outline" onClick={() => setApiKey(generateRandomApiKey())} title="生成一个随机的 sk-xxx 密钥"><Sparkles size={13} />自动生成</button>
+          </div>
+        </label>
         <div className="gateway-actions">
           <button className="primary" disabled={busy} onClick={() => void run(async () => {
             const parsed = Number(port);

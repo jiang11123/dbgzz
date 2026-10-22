@@ -14,11 +14,15 @@ import { streamChat } from './doubao-api';
 
 export type GatewayChatRuntime = {
   /** Generates images for a prompt and returns them as locally stored attachments. */
-  generateImages?: (prompt: string, options: { model?: string; ratio?: string; accountId?: number | null; attachments?: { path: string; name: string; mimeType: string }[] }) => Promise<GatewayAttachment[]>;
+  generateImages?: (prompt: string, options: { model?: string; ratio?: string; accountId?: number | null; threadId?: string; conversationId?: string; attachments?: { path: string; name: string; mimeType: string }[] }) => Promise<GatewayAttachment[]>;
   /** Generates a video and resolves with a locally stored attachment once the file is on disk. */
   generateVideos?: (prompt: string, options: { model?: string; ratio?: string; duration?: number; accountId?: number | null; replyMessageId?: number; threadId?: string; referencePaths?: string[] }) => Promise<GatewayAttachment[]>;
   /** Opens or reuses the account page used to issue the request. */
   viewForAccount: (accountId: number) => unknown | null;
+  /** Ensures the account view opens/resets to a clean new conversation before sending. */
+  prepareNewConversation?: (accountId: number) => Promise<void>;
+  /** Syncs the account page to the newly created conversation URL. */
+  syncConversationPage?: (accountId: number, conversationId: string) => Promise<void>;
   /** Picks a logged-in account when the thread has none bound yet. */
   pickAccount: () => { id: number } | null;
   markAccountOk: (accountId: number) => void;
@@ -27,6 +31,8 @@ export type GatewayChatRuntime = {
   uploadImages?: (accountId: number, paths: string[], names: string[]) => Promise<unknown[]>;
   /** Account that produced the most recent image, for labelling the reply. */
   lastImageAccountId?: () => number | null;
+  /** Conversation id returned by the most recent image turn. */
+  lastImageConversationId?: () => string | null;
   /** Account that produced the most recent video, for labelling the reply. */
   lastVideoAccountId?: () => number | null;
   /** Resolves a generated media URL into a stored asset, returning its file URL. */
@@ -85,9 +91,19 @@ export function createGatewayChat(store: ThreadStore, runtime: GatewayChatRuntim
     const image = store.appendGatewayMessage({ threadId: thread.id, role: 'user', content: prompt, attachments: userAttachments });
     const replyId = store.appendGatewayMessage({ threadId: thread.id, role: 'assistant', content: '', status: 'streaming' });
     try {
-      const attachments = await runtime.generateImages(prompt, { model: request.model, ratio: request.ratio, accountId: request.accountId, attachments: (request.attachments ?? []).flatMap(item => (item as any).path ? [{ path: (item as any).path, name: item.name, mimeType: item.mimeType }] : []) });
+      const attachments = await runtime.generateImages(prompt, {
+        threadId: thread.id,
+        conversationId: thread.doubaoConversationId || undefined,
+        model: request.model,
+        ratio: request.ratio,
+        accountId: request.accountId ?? thread.accountId ?? null,
+        attachments: (request.attachments ?? []).flatMap(item => (item as any).path ? [{ path: (item as any).path, name: item.name, mimeType: item.mimeType }] : [])
+      });
       const imageAccount = runtime.lastImageAccountId?.() ?? null;
-      if (imageAccount != null) store.updateGatewayMessage(replyId, { accountId: imageAccount });
+      if (imageAccount != null) {
+        store.updateGatewayMessage(replyId, { accountId: imageAccount });
+        thread = store.updateGatewayThread(thread.id, { accountId: imageAccount });
+      }
       store.updateGatewayMessage(replyId, { content: '已生成图片', status: 'done', attachments });
       return {
         thread: store.gatewayThread(thread.id)!,
@@ -186,6 +202,9 @@ export function createGatewayChat(store: ThreadStore, runtime: GatewayChatRuntim
         const view = runtime.viewForAccount(accountId) as any;
         if (!view?.webContents || view.webContents.isDestroyed()) throw new Error('账号页面不可用，请在设置里打开该账号确认已登录');
         try {
+          if (!thread.doubaoConversationId && runtime.prepareNewConversation) {
+            await runtime.prepareNewConversation(accountId);
+          }
           // Images must be uploaded on THIS account's page before the turn is sent.
           const attachments = request.imageAssets?.length && runtime.uploadImages
             ? await runtime.uploadImages(accountId, request.imageAssets.map(a => a.path), request.imageAssets.map(a => a.name))
@@ -244,6 +263,9 @@ export function createGatewayChat(store: ThreadStore, runtime: GatewayChatRuntim
         : store.updateGatewayThread(thread.id, { doubaoConversationId: result.conversationId, accountId: answeredBy ?? undefined });
       // Remember which account owns this conversation so later turns stay with it.
       if (answeredBy != null) thread = store.updateGatewayThread(thread.id, { accountId: answeredBy });
+      if (answeredBy != null && result.conversationId) {
+        void runtime.syncConversationPage?.(answeredBy, result.conversationId).catch(() => undefined);
+      }
 
       return {
         thread: store.gatewayThread(thread.id)!,
@@ -277,12 +299,20 @@ export function createGatewayChat(store: ThreadStore, runtime: GatewayChatRuntim
     appendMessage: (message: Parameters<ThreadStore['appendGatewayMessage']>[0]) => store.appendGatewayMessage(message),
     /** Attaches a finished video to a chat message that timed out waiting for it. */
     deliverLateVideo: (messageId: number, attachment: GatewayAttachment) => {
+      let targetThreadId: string | undefined;
+      for (const t of store.gatewayThreads()) {
+        if (store.gatewayMessages(t.id).some(m => m.id === messageId)) {
+          targetThreadId = t.id;
+          break;
+        }
+      }
       store.updateGatewayMessage(messageId, {
         status: 'done',
         error: undefined,
         content: '视频已生成（后台完成）',
         attachments: [attachment],
       });
+      return targetThreadId;
     },
   };
 }

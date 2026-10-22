@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Download, FolderOpen, Image as ImageIcon, Loader2, Plus, Send, Settings, Sparkles, Trash2, Video } from 'lucide-react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, Camera, Download, FolderOpen, Image as ImageIcon, Loader2, Plus, Send, Settings, Sparkles, Trash2, Video } from 'lucide-react';
 import type { GatewayAttachment, GatewayMessage, GatewayThread, StagedAttachment } from '../shared/types';
 import { renderMarkdown } from './markdown';
+import { VideoModelPicker } from './video-model-picker';
 
 type Mode = 'gateway' | 'account';
 
@@ -25,6 +26,76 @@ function mimeTypeForName(name: string): string {
 /** Converts a persisted generated image back into the renderer attachment contract. */
 export function toStagedGeneratedImage(item: GatewayAttachment, asset: { id: string; name: string; url: string }): StagedAttachment {
   return { id: item.id, assetId: asset.id, name: asset.name, mimeType: mimeTypeForName(asset.name), url: asset.url };
+}
+
+/** Computes the target seek time for extracting the last frame without landing on black/EOF. */
+export function calculateLastFrameTime(duration: number, offset = 0.05): number {
+  if (!Number.isFinite(duration) || duration <= 0) return 0;
+  return Math.max(0, duration - offset);
+}
+
+/** Extracts the final video frame as a high quality PNG data URL via off-screen HTML5 video and canvas. */
+export async function extractVideoLastFrame(videoUrl: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video');
+    video.crossOrigin = 'anonymous';
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = 'auto';
+
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(new Error('截取视频最后一帧超时，请重试'));
+    }, 20000);
+
+    const cleanup = () => {
+      clearTimeout(timer);
+      video.onloadedmetadata = null;
+      video.onseeked = null;
+      video.onerror = null;
+      video.src = '';
+      video.load();
+    };
+
+    video.onloadedmetadata = () => {
+      const targetTime = calculateLastFrameTime(video.duration);
+      video.currentTime = targetTime;
+    };
+
+    video.onseeked = () => {
+      if (settled) return;
+      settled = true;
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth || 1280;
+        canvas.height = video.videoHeight || 720;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          cleanup();
+          return reject(new Error('无法创建画布进行截帧'));
+        }
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/png', 1.0);
+        cleanup();
+        resolve(dataUrl);
+      } catch (err) {
+        cleanup();
+        reject(err instanceof Error ? err : new Error(String(err)));
+      }
+    };
+
+    video.onerror = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(new Error('视频加载失败，无法提取尾帧'));
+    };
+
+    video.src = videoUrl;
+  });
 }
 
 /** Unscoped deltas must never leak into whichever thread happens to be open. */
@@ -77,6 +148,28 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<GatewayMessage[]>([]);
   const [draft, setDraft] = useState('');
+  const composerInput = useRef<HTMLTextAreaElement | null>(null);
+  useLayoutEffect(() => {
+    const input = composerInput.current;
+    if (!input) return;
+    const resize = () => {
+      const styles = getComputedStyle(input);
+      const minimum = parseFloat(styles.minHeight) || 36;
+      const maximum = Math.max(minimum, parseFloat(styles.maxHeight) || 240);
+      input.style.height = '0px';
+      const contentHeight = input.value ? input.scrollHeight + 2 : minimum;
+      input.style.height = `${Math.max(minimum, Math.min(maximum, contentHeight))}px`;
+      input.style.overflowY = contentHeight > maximum ? 'auto' : 'hidden';
+    };
+    resize();
+    let width = input.getBoundingClientRect().width;
+    const observer = new ResizeObserver(() => {
+      const nextWidth = input.getBoundingClientRect().width;
+      if (nextWidth !== width) { width = nextWidth; resize(); }
+    });
+    observer.observe(input);
+    return () => observer.disconnect();
+  }, [draft]);
   const [streaming, setStreaming] = useState('');
   // Busy is tracked per thread so one long video turn cannot lock the whole window.
   const [busyThreads, setBusyThreads] = useState<string[]>([]);
@@ -87,6 +180,14 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
     else if (typeof val === 'string') setNoticeState({ text: val, kind: val.startsWith('正在') ? 'info' : 'error' });
     else setNoticeState(val);
   }, []);
+
+  useEffect(() => {
+    if (!notice || notice.kind !== 'success') return;
+    const timer = setTimeout(() => {
+      setNoticeState(null);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [notice]);
   const activeIdRef = useRef<string | null>(null);
   const busyRef = useRef(new Set<string>());
   const markBusy = useCallback((threadId: string, on: boolean) => {
@@ -163,7 +264,15 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
     if (payload.threadId && payload.videoTaskId) {
       const running = !['completed','failed','cancelled','needs_attention'].includes(payload.videoStatus || '');
       markBusy(payload.threadId, running);
-      if (!running && activeIdRef.current === payload.threadId) void loadMessages(payload.threadId);
+      if (!running) {
+        delete streams.current[payload.threadId];
+        if (activeIdRef.current === payload.threadId) {
+          setStreaming('');
+          setNotice('');
+          void loadMessages(payload.threadId);
+        }
+        return;
+      }
     }
     if (payload.threadId) {
       streams.current[payload.threadId] = payload.full;
@@ -332,12 +441,14 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
 
   /** Downloads a generated image/video to the configured download folder. */
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
-  const downloadMedia = async (item: GatewayAttachment) => {
+  const [extractingLastFrameId, setExtractingLastFrameId] = useState<string | null>(null);
+
+  const downloadMedia = async (item: GatewayAttachment, accountId?: number | null, threadId?: string) => {
     if (downloadingId) return;
     setDownloadingId(item.id);
     try {
       setNotice(item.kind === 'video' ? '正在按高清下载保存无水印视频...' : '正在保存图片到下载目录...');
-      const result = await window.workspace.downloadMedia(item);
+      const result = await window.workspace.downloadMedia(item, { accountId, threadId: threadId || activeId || undefined });
       if (result?.error) throw new Error(result.error);
       setNotice({ text: result?.path ? `已保存到：${result.path}` : '已保存到下载目录', path: result?.path, kind: 'success' });
     } catch (error) {
@@ -346,14 +457,23 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
       setDownloadingId(null);
     }
   };
-  // The newest finished image/video in this thread, for the toolbar shortcut.
-  const latestMedia = useMemo(() => {
-    for (let i = messages.length - 1; i >= 0; i -= 1) {
-      const found = messages[i].attachments.find(item => item.kind === 'video' || item.kind === 'image');
-      if (found) return found;
+
+  const downloadLastFrame = async (item: GatewayAttachment) => {
+    if (extractingLastFrameId || !item.url) return;
+    setExtractingLastFrameId(item.id);
+    try {
+      setNotice('正在截取视频最后一帧...');
+      const dataUrl = await extractVideoLastFrame(item.url);
+      setNotice('正在保存尾帧图片到下载目录...');
+      const result = await window.workspace.saveLastFrame({ dataUrl, name: item.name });
+      if (result?.error) throw new Error(result.error);
+      setNotice({ text: result?.path ? `尾帧已保存到：${result.path}` : '尾帧已保存到下载目录', path: result?.path, kind: 'success' });
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : String(error));
+    } finally {
+      setExtractingLastFrameId(null);
     }
-    return null;
-  }, [messages]);
+  };
 
   return <main className="gateway-chat">
     <aside className="chat-threads">
@@ -397,32 +517,26 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
           <h2>通过网关和豆包对话</h2>
           <p>消息由已登录的账号池发出，支持文字、图片与视频结果。</p>
         </div>}
-        {messages.filter(message => !(streaming && message.role === 'assistant' && (message.status === 'pending' || message.status === 'streaming'))).map(message => <MessageBubble key={message.id} message={message} accountName={accountNames[message.accountId ?? -1]} streamed="" onDownload={item => void downloadMedia(item)} downloadingId={downloadingId} onConfirm={!streaming && busy && !forwarding && message.id === messages[messages.length - 1]?.id ? handleConfirm : undefined} />)}
-        {streaming && <MessageBubble message={{ id: 0, threadId: activeId ?? '', role: 'assistant', content: streaming, attachments: [], status: 'streaming', error: '', createdAt: '', accountId: active?.accountId ?? null }} streamed="" onDownload={item => void downloadMedia(item)} downloadingId={downloadingId} onConfirm={busy && !forwarding ? handleConfirm : undefined} />}
+        {messages.filter(message => !(streaming && message.role === 'assistant' && (message.status === 'pending' || message.status === 'streaming'))).map(message => <MessageBubble key={message.id} message={message} accountName={accountNames[message.accountId ?? -1]} streamed="" onDownload={item => void downloadMedia(item, message.accountId, message.threadId)} downloadingId={downloadingId} onDownloadLastFrame={item => void downloadLastFrame(item)} extractingLastFrameId={extractingLastFrameId} onConfirm={!streaming && busy && !forwarding && message.id === messages[messages.length - 1]?.id ? handleConfirm : undefined} />)}
+        {streaming && <MessageBubble message={{ id: 0, threadId: activeId ?? '', role: 'assistant', content: streaming, attachments: [], status: 'streaming', error: '', createdAt: '', accountId: active?.accountId ?? null }} streamed="" onDownload={item => void downloadMedia(item, active?.accountId, activeId ?? undefined)} downloadingId={downloadingId} onDownloadLastFrame={item => void downloadLastFrame(item)} extractingLastFrameId={extractingLastFrameId} onConfirm={busy && !forwarding ? handleConfirm : undefined} />}
       </div>
 
-      <div className="chat-options">
-        <button type="button" className="chat-download-latest" disabled={!latestMedia || Boolean(downloadingId)}
-          onClick={() => { if (latestMedia) void downloadMedia(latestMedia); }}
-          title={latestMedia ? (latestMedia.kind === 'video' ? '下载本会话最新生成的高清无水印视频' : '下载本会话最新生成的图片') : '本会话还没有可下载的生成结果'}>
-          {downloadingId ? <Loader2 size={13} className="spin" /> : <Download size={13} />}下载{latestMedia ? (latestMedia.kind === 'video' ? '视频' : '图片') : ''}
-        </button>
+      <footer className="chat-composer">
+        <div className="chat-composer-stack">
+      <div className="chat-options chat-mode-floating" role="group" aria-label="模式选择">
         <label className="chat-toggle" title="开启后生成图片而不是文字">
           <input type="checkbox" checked={composerMode === 'image'} onChange={event => setComposerMode(event.target.checked ? 'image' : 'text')} /><ImageIcon size={13} />图片模式
         </label>
         <label className="chat-toggle" title="开启后生成视频，通常需要 1-5 分钟">
           <input type="checkbox" checked={composerMode === 'video'} onChange={event => setComposerMode(event.target.checked ? 'video' : 'text')} /><Video size={13} />视频模式
         </label>
-        {composerMode === 'video' && <select className="chat-ratio" value={videoModel}
-          onChange={event => {
-            const nextModel = event.target.value;
+        {composerMode === 'video' && <VideoModelPicker value={videoModel}
+          onChange={nextModel => {
             setVideoModel(nextModel);
             if (nextModel === 'Seedance 2.5' && videoDuration < 10) {
               setVideoDuration(10);
             }
-          }} title="视频模型">
-          {['Seedance 2.0 Fast', 'Seedance 2.5', 'Seedance 2.0', 'Seedance 2.0 Mini'].map(m => <option key={m} value={m}>{m}</option>)}
-        </select>}
+          }} />}
         {composerMode === 'video' && <label className="chat-duration-control" title="视频时长（4-30 秒）">
           <span>时长</span>
           <input type="range"
@@ -457,8 +571,6 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
               {(composerMode === 'image' ? ['1:1', '4:3', '3:4', '16:9', '9:16'] : ['16:9', '9:16', '1:1', '4:3', '3:4']).map(ratio => <option key={ratio} value={ratio}>{ratio}</option>)}
             </select>}
       </div>
-      <footer className="chat-composer">
-        <div className="chat-composer-stack">
           {stagedImages.length > 0 && <div className="chat-staged">
             {stagedImages.map(item => <figure key={item.id} title={item.name} className={/\.(png|jpg|jpeg|webp|gif)$/i.test(item.name) ? 'is-image' : 'is-file'}>
               {/\.(png|jpg|jpeg|webp|gif)$/i.test(item.name)
@@ -468,10 +580,10 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
             </figure>)}
           </div>}
           <div className="chat-composer-row">
-            <button type="button" className="chat-attach" title="添加文件（图片 / 文档 / 代码 / 音频）发给模型" onClick={() => void pickImages()}>
-              <ImageIcon size={15} />
+            <button type="button" className="chat-attach" aria-label="添加文件" title="添加文件（图片 / 文档 / 代码 / 音频）发给模型" onClick={() => void pickImages()}>
+              <Plus size={18} />
             </button>
-            <textarea value={draft} placeholder={busy ? '可输入确认、修改要求或追问，Enter 发送补充（仅文字）' : composerMode === 'image' ? '描述要生成的图片，Enter 生成' : composerMode === 'video' ? '描述要生成的视频，Enter 生成（约 1-5 分钟）' : stagedImages.length ? '描述你想让模型怎么处理这些附件，Enter 发送' : '输入消息，Enter 发送，Shift+Enter 换行'}
+            <textarea ref={composerInput} rows={1} aria-label="消息输入框" value={draft} placeholder={busy ? '可输入确认、修改要求或追问，Enter 发送补充（仅文字）' : composerMode === 'image' ? '描述要生成的图片，Enter 生成' : composerMode === 'video' ? '描述要生成的视频，Enter 生成（约 1-5 分钟）' : stagedImages.length ? '描述你想让模型怎么处理这些附件，Enter 发送' : '输入消息，Enter 发送，Shift+Enter 换行'}
           onChange={event => setDraft(event.target.value)}
           onKeyDown={event => {
             if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); void send(); }
@@ -486,7 +598,16 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
   </main>;
 }
 
-function MessageBubble({ message, streamed, accountName, onDownload, downloadingId, onConfirm }: { message: GatewayMessage; streamed: string; accountName?: string; onDownload?: (item: GatewayAttachment) => void; downloadingId?: string | null; onConfirm?: (text: string) => void }) {
+function MessageBubble({ message, streamed, accountName, onDownload, downloadingId, onDownloadLastFrame, extractingLastFrameId, onConfirm }: {
+  message: GatewayMessage;
+  streamed: string;
+  accountName?: string;
+  onDownload?: (item: GatewayAttachment) => void;
+  downloadingId?: string | null;
+  onDownloadLastFrame?: (item: GatewayAttachment) => void;
+  extractingLastFrameId?: string | null;
+  onConfirm?: (text: string) => void;
+}) {
   const pending = message.status === 'streaming' || message.status === 'pending';
   const text = streamed || message.content;
   // Assistant replies are labelled with the account that produced them.
@@ -508,6 +629,11 @@ function MessageBubble({ message, streamed, accountName, onDownload, downloading
               title={item.kind === 'video' ? '按高清下载保存到本地（无水印原视频）' : '保存图片到本地下载目录'}>
               {downloadingId === item.id ? <Loader2 size={12} className="spin" /> : <Download size={12} />}{item.kind === 'video' ? '高清下载' : '下载'}
             </button>}
+            {item.kind === 'video' && onDownloadLastFrame && <button type="button" className="chat-media-download" disabled={extractingLastFrameId === item.id}
+              onClick={() => onDownloadLastFrame(item)}
+              title="提取并下载本视频最后一帧（高画质PNG）">
+              {extractingLastFrameId === item.id ? <Loader2 size={12} className="spin" /> : <Camera size={12} />}下载尾帧
+            </button>}
             {item.kind === 'video' ? <Video size={12} /> : <ImageIcon size={12} />}
             <span className="chat-media-name" title={item.name}>{item.name}</span>
           </figcaption>
@@ -520,8 +646,7 @@ function MessageBubble({ message, streamed, accountName, onDownload, downloading
 /** Small switch shown in the main window to move between the two modes. */
 export function ModeSwitch({ mode, onModeChange }: { mode: Mode; onModeChange: (next: Mode) => void }) {
   return <div className="mode-switch" role="tablist">
-    <button role="tab" aria-selected={mode === 'gateway'} className={mode === 'gateway' ? 'active' : ''} onClick={() => onModeChange('gateway')}>网关模式</button>
-    <button role="tab" aria-selected={mode === 'account'} className={mode === 'account' ? 'active' : ''} onClick={() => onModeChange('account')}>账号模式</button>
+    <button role="tab" aria-selected={mode === 'gateway'} className={mode === 'gateway' ? 'active' : ''} onClick={() => onModeChange('gateway')} title="统一聊天">统一聊天</button>
   </div>;
 }
 

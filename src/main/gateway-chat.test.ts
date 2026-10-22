@@ -220,3 +220,66 @@ test('image generation mode returns generated image attachment with done status'
   assert.equal(result.assistantMessage.content, '已生成图片');
   assert.deepEqual(result.assistantMessage.attachments, [imageAttachment]);
 });
+
+test('starts new conversation prepares account and syncs page upon sending message', async () => {
+  const store = memoryStore();
+  let preparedAccountId: number | null = null;
+  let syncedAccountId: number | null = null;
+  let syncedConversationId: string | null = null;
+
+  const chat = createGatewayChat(store, {
+    pickAccount: () => ({ id: 2 }),
+    viewForAccount: () => ({
+      webContents: {
+        isDestroyed: () => false,
+        executeJavaScript: async (script: string) => {
+          if (script.includes('frontierSign')) return true;
+          if (script.includes('__DSBUF')) return {
+            events: [
+              JSON.stringify({
+                text: '你好！我是豆包',
+                ack_client_meta: { conversation_id: 'conv-new-123' },
+                end_type: 3
+              })
+            ],
+            done: true,
+            error: null
+          };
+          return true;
+        }
+      }
+    }),
+    prepareNewConversation: async (accId) => {
+      preparedAccountId = accId;
+    },
+    syncConversationPage: async (accId, convId) => {
+      syncedAccountId = accId;
+      syncedConversationId = convId;
+    },
+    markAccountOk: () => undefined,
+    markAccountFailure: () => undefined,
+  });
+
+  const res = await chat.send({ prompt: '你好' });
+  assert.equal(preparedAccountId, 2);
+  assert.equal(res.thread.doubaoConversationId, 'conv-new-123');
+  assert.equal(syncedAccountId, 2);
+  assert.equal(syncedConversationId, 'conv-new-123');
+});
+
+test('image generation synchronizes account to new thread without polluting conversationId', async () => {
+  const store = memoryStore();
+
+  const chat = createGatewayChat(store, {
+    viewForAccount: () => null,
+    pickAccount: () => null,
+    markAccountOk: () => undefined,
+    markAccountFailure: () => undefined,
+    lastImageAccountId: () => 5,
+    generateImages: async () => [{ id: 'img-1', kind: 'image', url: 'file:///1.png', name: '1.png' }],
+  });
+
+  const res = await chat.generateImages({ prompt: '小狗' });
+  assert.equal(res.thread.accountId, 5);
+  assert.equal(res.thread.doubaoConversationId, '');
+});

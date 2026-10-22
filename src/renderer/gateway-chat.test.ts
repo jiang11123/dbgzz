@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { composerAction, ensureChatThread, reconcileMessages, threadDelta, toIpcAttachments, toStagedGeneratedImage } from './gateway-chat';
+import { calculateLastFrameTime, composerAction, ensureChatThread, reconcileMessages, threadDelta, toIpcAttachments, toStagedGeneratedImage } from './gateway-chat';
 import type { GatewayMessage, GatewayThread } from '../shared/types';
 
 test('normalizes empty, single and multiple staged attachments for IPC', () => {
@@ -15,6 +15,15 @@ test('normalizes empty, single and multiple staged attachments for IPC', () => {
     { id: 'a', assetId: 'asset-a', name: 'a.png', mimeType: 'image/png', url: 'file:///a.png' },
     { id: 'b', assetId: 'b', name: 'notes.txt', mimeType: 'application/octet-stream', url: undefined },
   ]);
+});
+
+test('calculates correct last frame time avoiding EOF black frames', () => {
+  assert.equal(calculateLastFrameTime(5.0), 4.95);
+  assert.equal(calculateLastFrameTime(10.0, 0.1), 9.9);
+  assert.equal(calculateLastFrameTime(0.02), 0);
+  assert.equal(calculateLastFrameTime(0), 0);
+  assert.equal(calculateLastFrameTime(-1), 0);
+  assert.equal(calculateLastFrameTime(NaN), 0);
 });
 
 test('maps a generated local image back into the staged attachment shape', () => {
