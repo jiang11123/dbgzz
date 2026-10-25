@@ -1,4 +1,5 @@
 node_modules/
+/verification/
 dist/
 release/
 exports/

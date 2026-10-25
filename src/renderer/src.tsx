@@ -243,6 +243,7 @@ function SettingsPage() {
 function NewAccount({ onClose, onCreated }: { onClose: () => void; onCreated: (account: Account) => Promise<void> }) {
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
+  const [platform, setPlatform] = useState<'doubao' | 'dola'>('doubao');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -262,7 +263,7 @@ function NewAccount({ onClose, onCreated }: { onClose: () => void; onCreated: (a
     >
       <div className="modal" role="dialog" aria-modal="true">
         <div className="modal-title">
-          <h2>添加豆包账号</h2>
+            <h2>添加账号</h2>
           <button type="button" className="modal-close" onClick={onClose} aria-label="关闭">×</button>
         </div>
         <form
@@ -275,7 +276,7 @@ function NewAccount({ onClose, onCreated }: { onClose: () => void; onCreated: (a
               const account = await window.workspace.createAccount({
                 name: name.trim(),
                 note: note.trim(),
-                sessionName: `persist:doubao_${Date.now().toString(36)}`,
+                  platform,
               });
               await onCreated(account);
             } finally {
@@ -283,6 +284,14 @@ function NewAccount({ onClose, onCreated }: { onClose: () => void; onCreated: (a
             }
           }}
         >
+            <label>
+              平台
+              <select value={platform} onChange={event => setPlatform(event.target.value as 'doubao' | 'dola')}>
+                <option value="doubao">豆包（国内版）</option>
+                <option value="dola">Dola（国际版）</option>
+              </select>
+            </label>
+            <p className="modal-hint">每个账号使用独立登录会话。Dola 需要在账号页面登录后使用。</p>
           <label>
             账号名称
             <input

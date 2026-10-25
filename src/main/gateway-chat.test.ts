@@ -2,6 +2,80 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGatewayChat, titleFromPrompt, extractMediaUrls, type ThreadStore } from './gateway-chat';
 
+test('Dola uses the unified chat store, streams deltas, and continues its own conversation', async () => {
+  const store = memoryStore();
+  const calls: any[] = [];
+  const prepared: number[] = [];
+  const chat = createGatewayChat(store, {
+    accountPlatform: id => id === 7 ? 'dola' : 'doubao',
+    pickAccount: () => ({id:7}),
+    viewForAccount: () => ({webContents:{isDestroyed:()=>false}}),
+    prepareNewConversation: async id => { prepared.push(id); },
+    streamForAccount: async (id, _view, prompt, options) => {
+      calls.push({id,prompt,conversationId:options?.conversationId});
+      options?.onDelta?.('Dola 回复', 'Dola 回复');
+      return {answer:'Dola 回复',conversationId:`conv-${id}`,messageId:'1',mediaUrls:[]};
+    },
+    markAccountOk:()=>undefined, markAccountFailure:()=>undefined,
+  });
+  const chunks: string[]=[];
+  const first=await chat.send({prompt:'你好', onDelta:(_chunk,full)=>chunks.push(full)});
+  const second=await chat.send({threadId:first.thread.id,prompt:'继续'});
+  assert.equal(second.thread.accountId,7);
+  assert.equal(second.assistantMessage.accountId,7);
+  assert.equal(second.assistantMessage.status,'done');
+  assert.deepEqual(chunks,['Dola 回复']);
+  assert.deepEqual(prepared,[7]);
+  assert.equal(calls[1].conversationId,'conv-7');
+  await chat.send({threadId:first.thread.id,prompt:'换成豆包',accountId:1});
+  assert.equal(calls[2].conversationId,undefined);
+  assert.equal(store.gatewayThread(first.thread.id)?.doubaoConversationId,'conv-1');
+  await chat.send({threadId:first.thread.id,prompt:'换回 Dola',accountId:7});
+  assert.equal(calls[3].conversationId,undefined);
+  assert.equal(store.gatewayThread(first.thread.id)?.doubaoConversationId,'conv-7');
+});
+
+test('two unified-chat threads cannot concurrently drive the same Dola composer', async () => {
+  const store=memoryStore();
+  let release!:()=>void;
+  const gate=new Promise<void>(r=>{release=r;});
+  const chat=createGatewayChat(store,{
+    pickAccount:()=>({id:7}),accountPlatform:()=> 'dola',
+    viewForAccount:()=>({webContents:{isDestroyed:()=>false}}),
+    streamForAccount:async()=>{await gate;return {answer:'ok',conversationId:'c',messageId:'1',mediaUrls:[]};},
+    markAccountOk:()=>undefined,markAccountFailure:()=>undefined,
+  });
+  const first=chat.send({prompt:'first',accountId:7});
+  await assert.rejects(chat.send({prompt:'second',accountId:7}),/另一条聊天/);
+  release();
+  await first;
+  assert.equal((await chat.send({prompt:'third',accountId:7})).assistantMessage.content,'ok');
+});
+
+test('Dola errors do not retry a potentially submitted native message',async()=>{
+  let attempts=0;
+  const chat=createGatewayChat(memoryStore(),{
+    pickAccount:()=>({id:7}),accountPlatform:()=> 'dola',
+    viewForAccount:()=>({webContents:{isDestroyed:()=>false}}),
+    streamForAccount:async()=>{attempts++;throw new Error('Dola 需要人机验证');},
+    markAccountOk:()=>undefined,markAccountFailure:()=>undefined,
+  });
+  await assert.rejects(chat.send({prompt:'hello'}),/人机验证/);
+  assert.equal(attempts,1);
+});
+
+test('Dola media modes never silently fall back to a domestic account',async()=>{
+  let called=false;
+  const chat=createGatewayChat(memoryStore(),{
+    pickAccount:()=>null,viewForAccount:()=>null,accountPlatform:()=> 'dola',
+    generateImages:async()=>{called=true;return[];},generateVideos:async()=>{called=true;return[];},
+    markAccountOk:()=>undefined,markAccountFailure:()=>undefined,
+  });
+  await assert.rejects(chat.generateImages({prompt:'cat',accountId:7}),/Dola/);
+  await assert.rejects(chat.generateVideos({prompt:'cat',accountId:7}),/Dola/);
+  assert.equal(called,false);
+});
+
 /** Minimal in-memory store mirroring the SQLite-backed one. */
 function memoryStore(): ThreadStore & { messages: Array<Record<string, unknown>> } {
   const threads = new Map<string, any>();

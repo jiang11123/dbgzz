@@ -1140,11 +1140,14 @@ body:has(.gateway-window) {
 }
 .chat-msg {
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr);
+  grid-template-columns: 88px minmax(0, 1fr);
   gap: 12px;
   align-items: start;
 }
 .chat-msg-role {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 11.5px;
   color: var(--muted);
   text-align: right;

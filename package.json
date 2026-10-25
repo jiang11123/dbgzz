@@ -1,6 +1,6 @@
 {
   "name": "doubao-video-workspace",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "private": true,
   "description": "Local multi-account video workspace for Doubao",
   "author": "jiang11123",
@@ -15,6 +15,7 @@
     "package:win": "npm run build && electron-builder --win --x64",
     "typecheck": "tsc --noEmit -p tsconfig.main.json && tsc --noEmit -p tsconfig.renderer.json",
     "test": "npm run build:main && npm run build:renderer-tests && node --test \"dist/main/main/**/*.test.js\" \"dist/main/renderer-tests/**/*.test.js\"",
+    "test:dola:integration": "npm run build && electron scripts/verify-dola-2.0.js",
     "build:icons": "electron scripts/build-icons.cjs"
   },
   "dependencies": {

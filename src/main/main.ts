@@ -18,7 +18,8 @@ import { createGatewayChat } from './gateway-chat';
 import { resolveStagedAttachments } from './staged-attachments';
 import { generateImages } from './doubao-image';
 import { uploadImageToDoubao } from './doubao-upload';
-import { waitForPageReady } from './doubao-api';
+import { streamChat, waitForPageReady } from './doubao-api';
+import { streamDolaChat, prepareDolaConversation } from './dola-chat';
 import { waitForComposer } from './page-composer';
 import { DownloadTracker } from './download-tracker';
 import { DoubaoShareService } from './doubao-share';
@@ -30,6 +31,9 @@ import type { DownloadStatus } from '../shared/types';
 const workspaceIcon = app.isPackaged
   ? path.join(process.resourcesPath, 'icon.png')
   : path.join(app.getAppPath(), 'build/icon.png');
+
+// A repair build can be verified alongside an installed newer version without sharing its database.
+if (process.env.DOUBAO_USER_DATA_DIR) app.setPath('userData', path.resolve(process.env.DOUBAO_USER_DATA_DIR));
 
 let windowRef: BrowserWindow | null = null;
 let settingsWindow: BrowserWindow | null = null;
@@ -227,7 +231,30 @@ function openAccountBrowser(accountId: number, background = false, preloadOnly =
         }
       });
     });
-    view.webContents.on('did-finish-load', () => { if (!db.accounts().some(item => item.id === accountId)) return; db.updateAccount(accountId, { isLoggedIn: true }); windowRef?.webContents.send('workspace:changed'); });
+    const accountCookies = view.webContents.session.cookies;
+    const refreshDolaLogin = async () => {
+      const cookies = await accountCookies.get({ url: 'https://www.dola.com/' });
+      if (!db.accounts().some(item => item.id === accountId)) return;
+      db.updateAccount(accountId, { isLoggedIn: cookies.some(cookie => /^(sessionid|sessionid_ss|sid_tt)$/.test(cookie.name) && Boolean(cookie.value)) });
+      windowRef?.webContents.send('workspace:changed');
+    };
+    view.webContents.on('did-finish-load', () => {
+      if (!db.accounts().some(item => item.id === accountId)) return;
+      if (account.platform === 'dola') {
+        // A loaded login/region-restricted page is not proof of an authenticated account.
+        void refreshDolaLogin().catch(() => undefined);
+      } else {
+        db.updateAccount(accountId, { isLoggedIn: true });
+        windowRef?.webContents.send('workspace:changed');
+      }
+    });
+    if (account.platform === 'dola') {
+      const changed: Parameters<typeof accountCookies.on>[1] = (_event: Electron.Event, cookie: Electron.Cookie) => {
+        if (/^(sessionid|sessionid_ss|sid_tt)$/.test(cookie.name)) void refreshDolaLogin().catch(() => undefined);
+      };
+      accountCookies.on('changed', changed);
+      view.webContents.once('destroyed', () => accountCookies.removeListener('changed', changed));
+    }
     void view.webContents.loadURL(platformConfig(account.platform, account.id).homeUrl).catch((error) => {
       windowRef?.webContents.send('browser:error', `${account.name} 网页加载失败：${error.message}`);
     });
@@ -283,6 +310,12 @@ function ensureAccountView(accountId: number): BrowserView | null {
  * Ensures the account page is opened to a clean new chat session before initiating a new turn.
  */
 async function prepareAccountNewConversation(accountId: number): Promise<void> {
+  if (db.accounts().find(account => account.id === accountId)?.platform === 'dola') {
+    const dola = ensureVideoAccountView(accountId);
+    if (!dola) throw new Error('Dola 账号不存在');
+    await prepareDolaConversation(dola);
+    return;
+  }
   const view = ensureAccountView(accountId);
   if (!view?.webContents || view.webContents.isDestroyed()) {
     throw new Error('账号页面不可用，请确认该账号已登录');
@@ -325,7 +358,8 @@ async function syncAccountConversationPage(accountId: number, conversationId: st
   if (!view?.webContents || view.webContents.isDestroyed()) return;
   const currentUrl = view.webContents.getURL() || '';
   if (!currentUrl.includes(conversationId)) {
-    const targetUrl = `https://www.doubao.com/chat/${conversationId}`;
+    const platform = db.accounts().find(account => account.id === accountId)?.platform;
+    const targetUrl = `${platform === 'dola' ? 'https://www.dola.com' : 'https://www.doubao.com'}/chat/${encodeURIComponent(conversationId)}`;
     await view.webContents.loadURL(targetUrl).catch(() => undefined);
   }
 }
@@ -1102,17 +1136,31 @@ app.whenReady().then(() => {
     assets: () => imageAssets, upload: useImageAssets, staged: stagedImageAssets, stagedUrls: stagedImageUrls,
     openAccount: (id, background) => openAccountBrowser(id, background) ?? null });
   gatewayChat = createGatewayChat(db as any, {
-    viewForAccount: (accountId) => ensureAccountView(accountId),
+    accountPlatform: accountId => db.accounts().find(account => account.id === accountId)?.platform,
+    streamForAccount: async (accountId, view, prompt, options) => {
+      const account = db.accounts().find(item => item.id === accountId);
+      if (!account) throw new Error('账号不存在，请重新选择发送账号');
+      if (account.platform === 'dola') {
+        if (options?.conversationId) {
+          await prepareDolaConversation(view, options.conversationId);
+        }
+        return streamDolaChat(view, prompt, options);
+      }
+      return streamChat(view, prompt, options);
+    },
+    viewForAccount: accountId => db.accounts().find(account => account.id === accountId)?.platform === 'dola'
+      ? ensureVideoAccountView(accountId) : ensureAccountView(accountId),
     prepareNewConversation: async (accountId) => {
       await prepareAccountNewConversation(accountId);
     },
     syncConversationPage: async (accountId, conversationId) => {
       await syncAccountConversationPage(accountId, conversationId);
     },
-    pickAccount: () => {
+    pickAccount: excluded => {
       const pool = canvasBridge?.poolRef;
-      const accounts = db.accounts().filter(account => account.platform === 'doubao');
-      const picked = pool ? pool.pick(accounts, canvasBridge?.busyIds() ?? new Set<number>()) : accounts.find(a => a.isLoggedIn);
+      const accounts = db.accounts();
+      const busy = new Set([...(canvasBridge?.busyIds() ?? []), ...(excluded ?? [])]);
+      const picked = pool ? pool.pick(accounts, busy) : accounts.find(a => a.isLoggedIn && !busy.has(a.id));
       return picked ? { id: picked.id } : null;
     },
     // Which account produced the last image/video, so the reply can be labelled.

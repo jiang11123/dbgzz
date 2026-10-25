@@ -13,6 +13,9 @@ import type { GatewayAttachment, GatewayMessage, GatewayThread, StagedAttachment
 import { streamChat } from './doubao-api';
 
 export type GatewayChatRuntime = {
+  /** Platform-specific transport; Doubao retains the existing HTTP implementation. */
+  streamForAccount?: (accountId: number, view: any, prompt: string, options: Parameters<typeof streamChat>[2]) => ReturnType<typeof streamChat>;
+  accountPlatform?: (accountId: number) => 'doubao' | 'dola' | undefined;
   /** Generates images for a prompt and returns them as locally stored attachments. */
   generateImages?: (prompt: string, options: { model?: string; ratio?: string; accountId?: number | null; threadId?: string; conversationId?: string; attachments?: { path: string; name: string; mimeType: string }[] }) => Promise<GatewayAttachment[]>;
   /** Generates a video and resolves with a locally stored attachment once the file is on disk. */
@@ -24,7 +27,7 @@ export type GatewayChatRuntime = {
   /** Syncs the account page to the newly created conversation URL. */
   syncConversationPage?: (accountId: number, conversationId: string) => Promise<void>;
   /** Picks a logged-in account when the thread has none bound yet. */
-  pickAccount: () => { id: number } | null;
+  pickAccount: (excluded?: ReadonlySet<number>) => { id: number } | null;
   markAccountOk: (accountId: number) => void;
   markAccountFailure: (accountId: number, message: string) => void;
   /** Uploads local image files to Doubao and returns attachment descriptors. */
@@ -59,6 +62,7 @@ export function titleFromPrompt(prompt: string, limit = 24): string {
 
 export function createGatewayChat(store: ThreadStore, runtime: GatewayChatRuntime) {
   const inFlight = new Map<string, true>();
+  const busyAccounts = new Set<number>();
   // Throttle state for the streaming snapshot written back to the database.
   let lastPersistedLength = 0;
   let lastPersistAt = 0;
@@ -81,6 +85,8 @@ export function createGatewayChat(store: ThreadStore, runtime: GatewayChatRuntim
     const prompt = String(request.prompt ?? '').trim();
     if (!prompt) throw new Error('提示词为空');
     if (!runtime.generateImages) throw new Error('当前版本未启用图片生成');
+    const imageAccount = request.accountId ?? (request.threadId ? store.gatewayThread(request.threadId)?.accountId : null);
+    if (imageAccount != null && runtime.accountPlatform?.(imageAccount) === 'dola') throw new Error('Dola 图片生成尚未验证接入，请在账号页使用；不会切换到豆包账号');
 
     let thread = ensureThread(request.threadId);
     if (!thread.title || thread.title === '新对话') thread = store.updateGatewayThread(thread.id, { title: titleFromPrompt(prompt) });
@@ -131,6 +137,8 @@ export function createGatewayChat(store: ThreadStore, runtime: GatewayChatRuntim
     const prompt = String(request.prompt ?? '').trim();
     if (!prompt) throw new Error('提示词为空');
     if (!runtime.generateVideos) throw new Error('当前版本未启用视频生成');
+    const videoAccount = request.accountId ?? (request.threadId ? store.gatewayThread(request.threadId)?.accountId : null);
+    if (videoAccount != null && runtime.accountPlatform?.(videoAccount) === 'dola') throw new Error('Dola 视频生成尚未验证接入，请在账号页使用；不会切换到豆包账号');
 
     let thread = ensureThread(request.threadId);
     if (!thread.title || thread.title === '新对话') thread = store.updateGatewayThread(thread.id, { title: titleFromPrompt(prompt) });
@@ -192,24 +200,30 @@ export function createGatewayChat(store: ThreadStore, runtime: GatewayChatRuntim
     let lastChatError: Error | null = null;
     let result: Awaited<ReturnType<typeof streamChat>> | null = null;
     let answeredBy: number | null = null;
+    let lockedAccount: number | null = null;
     try {
       for (let attempt = 0; attempt < 3 && !result; attempt += 1) {
         // An explicit account wins (指定账号); otherwise keep the thread's account so a
         // conversation stays with one identity, and fall back to the pool (随机账号).
         const pinned = request.accountId ?? thread.accountId ?? null;
-        const accountId = pinned ?? runtime.pickAccount()?.id ?? null;
-        if (!accountId) throw new Error('没有可用的豆包账号，请先在设置里添加并登录账号');
+        const accountId = pinned ?? runtime.pickAccount(busyAccounts)?.id ?? null;
+        if (!accountId) throw new Error('没有可用账号，请先添加并登录豆包或 Dola 账号');
+        if (busyAccounts.has(accountId) && lockedAccount !== accountId) throw new Error('该账号正在处理另一条聊天，请等待完成后重试');
+        if (lockedAccount != null && lockedAccount !== accountId) busyAccounts.delete(lockedAccount);
+        busyAccounts.add(accountId);
+        lockedAccount = accountId;
         const view = runtime.viewForAccount(accountId) as any;
         if (!view?.webContents || view.webContents.isDestroyed()) throw new Error('账号页面不可用，请在设置里打开该账号确认已登录');
         try {
-          if (!thread.doubaoConversationId && runtime.prepareNewConversation) {
+          if ((!thread.doubaoConversationId || thread.accountId !== accountId) && runtime.prepareNewConversation) {
             await runtime.prepareNewConversation(accountId);
           }
           // Images must be uploaded on THIS account's page before the turn is sent.
+          if (request.imageAssets?.length && runtime.accountPlatform?.(accountId) === 'dola') throw new Error('Dola 附件尚未接入，请在账号页发送附件');
           const attachments = request.imageAssets?.length && runtime.uploadImages
             ? await runtime.uploadImages(accountId, request.imageAssets.map(a => a.path), request.imageAssets.map(a => a.name))
             : [];
-          result = await streamChat(view, prompt, {
+          result = await (runtime.streamForAccount ? runtime.streamForAccount.bind(runtime, accountId) : streamChat)(view, prompt, {
             // A doubao conversation id is owned by the account that created it. Reusing it
             // from another account makes doubao reject the turn with 710018001 (跨分会话),
             // so only continue the thread when the account still matches.
@@ -232,6 +246,7 @@ export function createGatewayChat(store: ThreadStore, runtime: GatewayChatRuntim
         } catch (error) {
           const detail = error instanceof Error ? error : new Error(String(error));
           lastChatError = detail;
+          if (runtime.accountPlatform?.(accountId) === 'dola') throw detail;
           if (!/710022004|710022002|人机验证|安全验证|访问频繁|稍后重试/.test(detail.message)) throw detail;
           runtime.markAccountFailure?.(accountId, detail.message);
           await new Promise(resolve => setTimeout(resolve, 800));
@@ -258,9 +273,10 @@ export function createGatewayChat(store: ThreadStore, runtime: GatewayChatRuntim
 
       store.updateGatewayMessage(assistantId, { content: result.answer, status: 'done', attachments });
       if (answeredBy != null) runtime.markAccountOk(answeredBy);
-      const updated = thread.doubaoConversationId || !result.conversationId
-        ? thread
-        : store.updateGatewayThread(thread.id, { doubaoConversationId: result.conversationId, accountId: answeredBy ?? undefined });
+      if (answeredBy != null) thread = store.updateGatewayThread(thread.id, {
+        doubaoConversationId: result.conversationId || (thread.accountId === answeredBy ? thread.doubaoConversationId : ''),
+        accountId: answeredBy,
+      });
       // Remember which account owns this conversation so later turns stay with it.
       if (answeredBy != null) thread = store.updateGatewayThread(thread.id, { accountId: answeredBy });
       if (answeredBy != null && result.conversationId) {
@@ -281,6 +297,7 @@ export function createGatewayChat(store: ThreadStore, runtime: GatewayChatRuntim
       if (answeredBy != null) runtime.markAccountFailure(answeredBy, message);
       throw error;
     } finally {
+      if (lockedAccount != null) busyAccounts.delete(lockedAccount);
       inFlight.delete(thread.id);
     }
   };
