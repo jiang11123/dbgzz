@@ -8,13 +8,13 @@
 
 **[下载安装包](https://github.com/jiang11123/dbgzz/releases) · [完整使用教程](docs/user-guide.md) · [更新记录](CHANGELOG.md)**
 
-## Dola 修复验证版（2.0.3，预发布）
+## Dola 修复版（2.0.3）
 
 [下载 Dola 修复验证版](https://github.com/jiang11123/dbgzz/releases/tag/v2.0.3)。恢复“添加账号 → 豆包 / Dola”平台选择，并将 Dola 文字对话接入现有统一聊天窗口、发送账号选择和历史会话。
 
 203 项测试及隔离测试站点的多轮聊天验证通过，最终程序启动检查通过。**真实 Dola 发送测试仍返回地区不可用，尚未取得真实模型回复。** Dola 图片、视频、附件及深度思考控制尚未接入；豆包原有媒体功能保留。本地 OpenAI 兼容 API 仍使用豆包账号。
 
-预发布提供安装包和使用独立数据目录的便携版；稳定版仍为 2.0.2。详见 [2.0.3 发布说明](docs/releases/2.0.3.md) 和 [验证记录](docs/dola-2.0-verification.md)。
+2.0.3 已正式发布，提供安装包和使用独立数据目录的便携版。详见 [2.0.3 发布说明](docs/releases/2.0.3.md) 和 [验证记录](docs/dola-2.0-verification.md)。
 
 ## 2.0 功能
 
@@ -31,7 +31,7 @@
 
 ## 下载与安装
 
-1. 从 [Releases](https://github.com/jiang11123/dbgzz/releases) 下载 `dbgzz-Setup-2.0.2-x64.exe`。
+1. 从 [Releases](https://github.com/jiang11123/dbgzz/releases) 下载 `dbgzz-Setup-2.0.3-x64.exe`。
 2. 运行安装程序，选择目录，再从桌面打开“豆包工作站”。普通用户不需要安装 Node.js。
 3. 点击账号标签完成豆包登录，或点击“添加账号”创建独立会话。
 4. 切回“网关模式”开始文字聊天；按需启用图片或视频模式。
