@@ -2,41 +2,43 @@ import type { BrowserView } from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
 
-/** No send/paste fallback: a preview or populated FileList is not an upload receipt. */
-export const videoReferenceDomScript = String.raw`
-  // Returns a plain state object; never throws, so the message survives Electron serialization.
+/** Composer 定位逻辑（观察与清理脚本共用，保持单一来源）。 */
+const videoReferenceLocatorScript = String.raw`
   const visible=n=>{const r=n.getBoundingClientRect(),s=getComputedStyle(n);return r.width>0 && r.height>0 && s.visibility!=='hidden' && s.display!=='none' && !n.closest('[aria-hidden=true]');};
   const messages='[data-message-id],[data-message-role],[data-testid*=message],article,aside,nav,header';
   const editors=[...document.querySelectorAll('[contenteditable=true],textarea')].filter(n=>visible(n) && !n.disabled && !n.closest(messages));
   const eligible=n=>!n.disabled && (!n.accept || /image|png|jpe?g|webp|apng|gif/i.test(n.accept));
   let file=null;
+  let scope=null,multiple=false;
+  for(let n=editors.length?editors[0]:null,parent=n?n.parentElement:null,level=0;parent && parent!==document.body && parent!==document.documentElement && level<20;n=parent,parent=n.parentElement,level++){
+    if(parent.querySelector('[data-testid=message-list],[data-testid=message_list]'))break;
+    const found=[...parent.querySelectorAll('input[type=file]')].filter(eligible);
+    if(found.length>1){multiple=true;break;}
+    if(found.length===1){scope=parent;file=found[0];break;}
+  }
+  // Real Doubao video composer evidence: [data-testid=attachment_area] wraps
+  // [data-testid=attachment-image-card], which holds the decoded <img>, a
+  // [role=progressbar][aria-valuenow] while uploading, and the delete button once committed.
+  // The attachment strip is not always inside the ancestor that owns the file input, so fall
+  // back to the one strip that sits directly above this composer.
+  let area=scope ? scope.querySelector('[data-testid=attachment_area]') : null;
+  if(!area && scope){
+    const editorRect=editors[0].getBoundingClientRect();
+    const strips=[...document.querySelectorAll('[data-testid=attachment_area]')].filter(strip=>{
+      const rect=strip.getBoundingClientRect();
+      return rect.width>0 && rect.height>0 && rect.bottom<=editorRect.top+8 && editorRect.top-rect.bottom<480 && rect.right>editorRect.left-40 && rect.left<editorRect.right+40;
+    });
+    if(strips.length===1)area=strips[0];
+    else if(strips.length>1)area=strips.sort((a,b)=>Math.abs(a.getBoundingClientRect().bottom-editorRect.top)-Math.abs(b.getBoundingClientRect().bottom-editorRect.top))[0];
+  }
+`;
+
+/** No send/paste fallback: a preview or populated FileList is not an upload receipt. */
+export const videoReferenceDomScript = videoReferenceLocatorScript + String.raw`
   let state={count:0,ready:0,loading:false,failed:false,error:''};
   if(!editors.length){
     state.error='视频参考图：未找到作曲器输入框';
   } else {
-    const editor=editors[0];
-    let scope=null,multiple=false;
-    for(let n=editor.parentElement,level=0;n && n!==document.body && n!==document.documentElement && level<20;n=n.parentElement,level++){
-      if(n.querySelector('[data-testid=message-list],[data-testid=message_list]'))break;
-      const found=[...n.querySelectorAll('input[type=file]')].filter(eligible);
-      if(found.length>1){multiple=true;break;}
-      if(found.length===1){scope=n;file=found[0];break;}
-    }
-    // Real Doubao video composer evidence: [data-testid=attachment_area] wraps
-    // [data-testid=attachment-image-card], which holds the decoded <img>, a
-    // [role=progressbar][aria-valuenow] while uploading, and the delete button once committed.
-    // The attachment strip is not always inside the ancestor that owns the file input, so fall
-    // back to the one strip that sits directly above this composer.
-    let area=scope ? scope.querySelector('[data-testid=attachment_area]') : null;
-    if(!area && scope){
-      const editorRect=editor.getBoundingClientRect();
-      const strips=[...document.querySelectorAll('[data-testid=attachment_area]')].filter(strip=>{
-        const rect=strip.getBoundingClientRect();
-        return rect.width>0 && rect.height>0 && rect.bottom<=editorRect.top+8 && editorRect.top-rect.bottom<480 && rect.right>editorRect.left-40 && rect.left<editorRect.right+40;
-      });
-      if(strips.length===1)area=strips[0];
-      else if(strips.length>1)area=strips.sort((a,b)=>Math.abs(a.getBoundingClientRect().bottom-editorRect.top)-Math.abs(b.getBoundingClientRect().bottom-editorRect.top))[0];
-    }
     const cards=area ? [...area.querySelectorAll('[data-testid=attachment-image-card]')] : [];
     const cardState=cards.map(card=>{
       const image=card.querySelector('img');
@@ -54,8 +56,18 @@ export const videoReferenceDomScript = String.raw`
       failed:cardState.some(c=>c.failed) || /上传失败|图片过大|不支持/.test(text),error:''};
     if(multiple)state.error='视频参考图：composer 内存在多个图片上传入口';
     else if(!scope || !file)state.error='视频参考图：没有唯一的 composer 图片上传入口（不会使用全页控件）';
+  }`;
+
+/** 逐个点击残留附件的删除按钮；返回本轮点击数（0 = 没有可点的删除按钮）。 */
+export const videoReferenceClearScript = "(()=>{" + videoReferenceLocatorScript + String.raw`
+  let cleared=0;
+  if(area){
+    for(const button of [...area.querySelectorAll('[data-testid=attachment-delete-btn]')]){
+      try{button.click();cleared+=1;}catch(error){break;}
+    }
   }
-`;
+  return cleared;
+})()`;
 
 /** Serializable, composer-scoped observation, also usable for no-submit diagnostics. */
 export const videoReferenceStateScript = "(()=>{" + videoReferenceDomScript + " return state;})()";
@@ -99,6 +111,61 @@ async function readState(view: BrowserView): Promise<VideoReferenceState> {
   return { count: state.count, ready: state.ready, loading: Boolean(state.loading), failed: Boolean(state.failed) };
 }
 
+/**
+ * 豆包 3.0：composer 里残留的附件（上次任务未发送/中断留下）会挡住本次参考图。
+ * 自动逐个点删除按钮清空；等当前上传结束、清不掉时才抛错（消息里保留人工指引）。
+ */
+async function clearExistingAttachments(view: BrowserView, timeoutMs: number, pollMs: number): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  // 卡片先渲染、删除按钮晚 1~2 帧才出现：连续多轮都点不到才判失败，避免对渲染时序零容忍造成误报。
+  // （固定轮数：默认 pollMs=200ms 时约 1s 宽限，不被小 pollMs 放大成分钟级。）
+  const BUTTON_RENDER_GRACE_ROUNDS = 5;
+  let emptyClickRounds = 0;
+  // 没有卡片但残留"上传失败"文案：等提示自行消失（通常是即时 toast），只给有限耐心。
+  const FAILED_BANNER_GRACE_ROUNDS = 10;
+  let failedBannerRounds = 0;
+  // 页面瞬间跳转/重渲染会让 evaluate 短暂失败：有限重试，不立刻中止清理。
+  let readFailures = 0;
+  while (Date.now() < deadline) {
+    let state: VideoReferenceState;
+    try {
+      state = await readState(view);
+      readFailures = 0;
+    } catch (error) {
+      readFailures += 1;
+      if (readFailures > 5) throw error;
+      await pause(pollMs);
+      continue;
+    }
+    if (state.count === 0 && !state.loading && !state.failed) return;
+    if (state.loading) {
+      // 附件还在上传中：等它落定（commit 或 fail）再删，此时点删除不可靠。
+      await pause(pollMs);
+      continue;
+    }
+    if (state.count === 0 && state.failed) {
+      failedBannerRounds += 1;
+      if (failedBannerRounds >= FAILED_BANNER_GRACE_ROUNDS) {
+        throw new Error('视频参考图：残留的"上传失败"提示长时间未消失，请打开豆包窗口手动处理后重试');
+      }
+      await pause(pollMs);
+      continue;
+    }
+    const raw = await view.webContents.executeJavaScript(videoReferenceClearScript);
+    const clicked = Number(raw && typeof raw === 'object' && 'value' in (raw as Record<string, unknown>) ? (raw as { value: unknown }).value : raw) || 0;
+    if (clicked === 0) {
+      emptyClickRounds += 1;
+      if (emptyClickRounds >= BUTTON_RENDER_GRACE_ROUNDS) {
+        throw new Error('视频参考图：作曲器已有 ' + state.count + ' 个残留附件且无法自动清理（连续 ' + emptyClickRounds + ' 轮未找到删除按钮），请打开豆包窗口手动删除后重试');
+      }
+    } else {
+      emptyClickRounds = 0;
+    }
+    await pause(pollMs);
+  }
+  throw new Error('视频参考图：清理残留附件超时，请打开豆包窗口手动处理后重试');
+}
+
 /** Resolves the composer file input through CDP so no synthetic change event is required. */
 async function attachFiles(view: BrowserView, files: string[]): Promise<void> {
   const debuggerApi = view.webContents.debugger;
@@ -136,10 +203,20 @@ export async function uploadVideoReferences(
   for (const filePath of paths) assertImageFile(filePath);
   if (!view?.webContents || view.webContents.isDestroyed()) throw new Error('视频参考图：账号窗口已关闭');
 
-  const initial = await readState(view);
-  if (initial.failed) throw new Error('视频参考图：作曲器已有附件处于上传失败状态');
-  if (initial.loading) throw new Error('视频参考图：作曲器已有附件正在上传（已有附件）');
-  if (initial.count > 0) throw new Error('视频参考图：作曲器已有 ' + initial.count + ' 个附件（已有附件），不会覆盖');
+  // Mode/settings changes can briefly unmount the composer. Reuse the strict upload locator.
+  const composerDeadline = Date.now() + Math.min(timeoutMs, 15_000);
+  let initial: VideoReferenceState;
+  for (;;) {
+    try { initial = await readState(view); break; }
+    catch (error) {
+      if (view.webContents.isDestroyed() || Date.now() >= composerDeadline
+        || !(error instanceof Error) || !/未找到作曲器输入框|没有唯一的 composer 图片上传入口/.test(error.message)) throw error;
+      await pause(pollMs);
+    }
+  }
+  if (initial.failed || initial.loading || initial.count > 0) {
+    await clearExistingAttachments(view, timeoutMs, pollMs);
+  }
 
   const deadline = Date.now() + timeoutMs;
   for (let index = 0; index < paths.length; index += 1) {

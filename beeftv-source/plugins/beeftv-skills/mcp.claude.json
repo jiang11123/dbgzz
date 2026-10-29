@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "beeftv-skills": {
+      "type": "http",
+      "url": "https://beeftv.app/api/beeftv/skillhub/v1/mcp"
+    }
+  }
+}

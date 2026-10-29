@@ -1,0 +1,20 @@
+{
+  "title": "开发文档",
+  "root": true,
+  "defaultOpen": true,
+  "pages": [
+    "local-development",
+    "http-api",
+    "storyboard-operations",
+    "code-map",
+    "backend-database",
+    "task-runtime-stability",
+    "generation-errors",
+    "seedance-task-constraints",
+    "video-model-contracts",
+    "video-prompt-limits",
+    "desktop-updater",
+    "desktop-account",
+    "depth-video-runtime"
+  ]
+}

@@ -1,0 +1,103 @@
+import { describe, expect, test } from "bun:test";
+
+import { canvasNodeMaterialSummary, canvasNodeSearchContext, canvasNodeSearchTimes, searchCanvasNodes } from "@/lib/canvas/canvas-node-search";
+import { normalizeCanvasNodeTimestamps, stampCanvasNodeChanges, updateCanvasNodes } from "@/lib/canvas/canvas-node-timestamps";
+import { CanvasNodeType, type CanvasNodeData } from "@/types/canvas";
+
+function node(id: string, patch: Partial<CanvasNodeData> = {}): CanvasNodeData {
+    return {
+        id,
+        type: CanvasNodeType.Image,
+        title: id,
+        position: { x: 0, y: 0 },
+        width: 320,
+        height: 180,
+        metadata: {},
+        ...patch,
+    };
+}
+
+describe("canvas node timestamps", () => {
+    test("legacy nodes receive the project timestamp baseline", () => {
+        const normalized = normalizeCanvasNodeTimestamps([node("legacy")], {
+            createdAt: "2026-08-01T01:00:00.000Z",
+            updatedAt: "2026-08-20T02:00:00.000Z",
+        });
+        expect(normalized[0]?.createdAt).toBe("2026-08-01T01:00:00.000Z");
+        expect(normalized[0]?.updatedAt).toBe("2026-08-20T02:00:00.000Z");
+    });
+
+    test("new nodes and meaningful edits receive timestamps without touching unchanged nodes", () => {
+        const created = stampCanvasNodeChanges([], [node("new")], "2026-08-28T01:00:00.000Z");
+        expect(created[0]).toMatchObject({ createdAt: "2026-08-28T01:00:00.000Z", updatedAt: "2026-08-28T01:00:00.000Z" });
+
+        const unchanged = created[0]!;
+        const edited = { ...unchanged, title: "新标题" };
+        const updated = stampCanvasNodeChanges(created, [edited], "2026-08-28T02:00:00.000Z");
+        expect(updated[0]?.createdAt).toBe("2026-08-28T01:00:00.000Z");
+        expect(updated[0]?.updatedAt).toBe("2026-08-28T02:00:00.000Z");
+    });
+
+    test("media hydration does not pretend to be a user edit", () => {
+        const previous = node("image", {
+            createdAt: "2026-08-28T01:00:00.000Z",
+            updatedAt: "2026-08-28T01:00:00.000Z",
+            metadata: { storageKey: "resource:1", content: "resource:1" },
+        });
+        const hydrated = { ...previous, metadata: { ...previous.metadata, content: "blob:preview", naturalWidth: 1920, naturalHeight: 1080 } };
+        const updated = stampCanvasNodeChanges([previous], [hydrated], "2026-08-28T02:00:00.000Z");
+        expect(updated[0]?.updatedAt).toBe("2026-08-28T01:00:00.000Z");
+    });
+
+    test("batches media metadata updates while preserving untouched node references", () => {
+        const first = node("first");
+        const second = node("second");
+        const nodes = [first, second];
+        const next = updateCanvasNodes(nodes, new Map([
+            ["first", (current) => ({ ...current, metadata: { ...current.metadata, naturalWidth: 1920 } })],
+            ["second", (current) => ({ ...current, metadata: { ...current.metadata, naturalHeight: 1080 } })],
+        ]), "2026-08-28T03:00:00.000Z");
+        expect(next).not.toBe(nodes);
+        expect(next[0]).not.toBe(first);
+        expect(next[1]).not.toBe(second);
+        expect(next[0].metadata?.naturalWidth).toBe(1920);
+        expect(next[1].metadata?.naturalHeight).toBe(1080);
+    });
+});
+
+describe("canvas node search", () => {
+    test("defaults to recently edited order and searches model or tags", () => {
+        const older = node("older", { updatedAt: "2026-08-20T01:00:00.000Z", metadata: { model: "wan-video", assetTags: ["夜景"] } });
+        const newer = node("newer", { updatedAt: "2026-08-28T01:00:00.000Z", metadata: { model: "seedance" } });
+        expect(searchCanvasNodes([older, newer], "").map((item) => item.id)).toEqual(["newer", "older"]);
+        expect(searchCanvasNodes([older, newer], "夜景").map((item) => item.id)).toEqual(["older"]);
+        expect(searchCanvasNodes([older, newer], "seedance").map((item) => item.id)).toEqual(["newer"]);
+    });
+
+    test("summaries expose useful media metadata without leaking data URLs into context", () => {
+        const image = node("image", {
+            createdAt: "2026-08-28T01:00:00.000Z",
+            updatedAt: "2026-08-28T02:00:00.000Z",
+            metadata: { content: "data:image/png;base64,AAAA", naturalWidth: 1920, naturalHeight: 1080, bytes: 2 * 1024 * 1024, model: "image-model" },
+        });
+        expect(canvasNodeMaterialSummary(image)).toContain("1920×1080");
+        expect(canvasNodeSearchContext(image)).toBe("图片节点");
+        expect(canvasNodeSearchTimes(image)).toMatchObject({ createdAt: image.createdAt, updatedAt: image.updatedAt });
+    });
+
+    test("indexes textual node body so name-or-content search can find 123", () => {
+        const text = node("note", { type: CanvasNodeType.Text, title: "备注", metadata: { content: "123" } });
+        const markdown = node("doc", { type: CanvasNodeType.Markdown, title: "说明", metadata: { content: "abc 123 xyz" } });
+        expect(searchCanvasNodes([text, markdown], "123").map((item) => item.id)).toEqual(["note", "doc"]);
+    });
+
+    test("does not index media URLs stored in metadata.content", () => {
+        const video = node("clip", { type: CanvasNodeType.Video, title: "镜头A", metadata: { content: "blob:http://localhost/unique-media-token-xyz" } });
+        const image = node("pic", { type: CanvasNodeType.Image, title: "图片A", metadata: { content: "data:image/png;base64,AAAA123TOKEN" } });
+        const audio = node("snd", { type: CanvasNodeType.Audio, title: "音效A", metadata: { content: "blob:http://localhost/audio-secret-url" } });
+        expect(searchCanvasNodes([video, image, audio], "unique-media-token-xyz")).toEqual([]);
+        expect(searchCanvasNodes([video, image, audio], "AAAA123TOKEN")).toEqual([]);
+        expect(searchCanvasNodes([video, image, audio], "audio-secret-url")).toEqual([]);
+        expect(searchCanvasNodes([video, image, audio], "123")).toEqual([]);
+    });
+});

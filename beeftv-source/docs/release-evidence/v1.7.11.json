@@ -1,0 +1,127 @@
+{
+  "version": "v1.7.11",
+  "sourceDigest": "6c548d3df0f44e9ad8171d947b8c679f3979a9632adf5e9e4f193b9619151153",
+  "budgetCNY": null,
+  "spentCNY": null,
+  "pendingCNY": null,
+  "newSpentCNY": 0.42,
+  "newPendingCNY": 0,
+  "liveMatrixStatus": "not_run_owner_limited_to_one_image",
+  "paidSubmissionLimit": 1,
+  "releaseComplete": false,
+  "ownerException": {
+    "approvedBy": "Ender",
+    "instruction": "只复测一次生成图片看看会不会复现报错即可上线",
+    "scope": "canvas-image-bind-regression-20261007",
+    "evidence": [
+      "docs/release-evidence/v1.7.11-targeted.md"
+    ]
+  },
+  "cases": [
+    {
+      "path": "image-image",
+      "model": "beefapi::gpt-image-2.5",
+      "attempts": 1,
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 0.42,
+      "executedSourceDigest": "6c548d3df0f44e9ad8171d947b8c679f3979a9632adf5e9e4f193b9619151153",
+      "clientVersion": "v1.7.11",
+      "taskId": "a11b3608d8e25e2a8b45515ac42576a5",
+      "providerRequestId": "evt-UGBFRPNVRPSZ",
+      "artifactSHA256": "15bb548409275e10a45dafc1349bb7d00935ede833430a8380f1d2b5a0423f07",
+      "evidence": [
+        "docs/release-evidence/v1.7.11-image.json",
+        "docs/release-evidence/v1.7.11-targeted.md"
+      ]
+    }
+  ],
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.10",
+    "pendingCNY": null,
+    "evidence": [
+      "docs/release-evidence/v1.7.10.json",
+      "docs/release-evidence/v1.7.9.json"
+    ]
+  },
+  "financialUncertainty": {
+    "status": "unresolved",
+    "evidence": [
+      "docs/release-evidence/v1.7.10.json",
+      "docs/release-evidence/v1.7.9-acceptance.json"
+    ],
+    "note": "本次钱包扣费已确认；历史未确认账务不改写为零，本次钱包回执不代表供应商采购回执。"
+  },
+  "review": {
+    "result": "approved",
+    "independent": true,
+    "reviewer": "Grok Companion CLI final independent review; structural PASS",
+    "sourceDigest": "6c548d3df0f44e9ad8171d947b8c679f3979a9632adf5e9e4f193b9619151153",
+    "evidence": [
+      "docs/release-evidence/v1.7.11-review.md"
+    ]
+  },
+  "upgrade": {
+    "preservedData": true,
+    "sourceDigest": "6c548d3df0f44e9ad8171d947b8c679f3979a9632adf5e9e4f193b9619151153",
+    "evidence": [
+      "docs/release-evidence/v1.7.11-targeted.md"
+    ]
+  },
+  "verification": {
+    "saveBarrier": {
+      "status": "passed",
+      "sourceDigest": "6c548d3df0f44e9ad8171d947b8c679f3979a9632adf5e9e4f193b9619151153",
+      "method": "test",
+      "evidence": [
+        "docs/release-evidence/v1.7.11-targeted.md"
+      ]
+    },
+    "resultRecovery": {
+      "status": "passed",
+      "sourceDigest": "6c548d3df0f44e9ad8171d947b8c679f3979a9632adf5e9e4f193b9619151153",
+      "method": "test",
+      "evidence": [
+        "docs/release-evidence/v1.7.11-targeted.md"
+      ]
+    },
+    "scopeIsolation": {
+      "status": "passed",
+      "sourceDigest": "6c548d3df0f44e9ad8171d947b8c679f3979a9632adf5e9e4f193b9619151153",
+      "method": "test",
+      "evidence": [
+        "docs/release-evidence/v1.7.11-targeted.md"
+      ]
+    },
+    "localReleaseGate": {
+      "status": "passed",
+      "sourceDigest": "6c548d3df0f44e9ad8171d947b8c679f3979a9632adf5e9e4f193b9619151153",
+      "method": "test",
+      "evidence": [
+        "docs/release-evidence/v1.7.11-targeted.md"
+      ]
+    },
+    "ci": {
+      "status": "passed",
+      "sourceDigest": "6c548d3df0f44e9ad8171d947b8c679f3979a9632adf5e9e4f193b9619151153",
+      "method": "test",
+      "evidence": [
+        "https://github.com/glanderness/BeefTV/actions/runs/37615508305",
+        "https://github.com/glanderness/BeefTV/actions/runs/37615508284"
+      ]
+    }
+  },
+  "packages": {
+    "status": "pending_release_workflow",
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml"
+    ]
+  }
+}

@@ -1,0 +1,801 @@
+{
+  "version": "v1.7.9",
+  "ownerDecision": {
+    "scope": "portrait-release-evidence-20261007",
+    "approvedBy": "Ender",
+    "instruction": "上线吧",
+    "date": "2026-10-07",
+    "precedingQuestion": "是否仅对 v1.7.9 接受以下已披露的验收缺口后继续发布：①沿用目录修复前已成功的十二条生成及未受影响功能测试（保留真实执行版本）；②保留两次首次聊天超时、部分供应商采购币种和逐笔结算未知；③素材托盘拖入画布、干净 Mac 首次打开尚未验证。当前新版的两条真人生成、报价与重启已通过；独立 review、正式包检查、Windows 升级和上线后读回仍照常执行。",
+    "carryForward": true,
+    "financialGaps": true,
+    "assetTrayDrag": "unverified",
+    "cleanMacFirstLaunch": "unverified",
+    "evidence": [
+      "docs/release-evidence/v1.7.9-acceptance.json#ownerDecision"
+    ]
+  },
+  "review": {
+    "status": "approved",
+    "applicationReview": {
+      "status": "approved_layered",
+      "evidence": [
+        "portrait-catalog-independent-review.json",
+        "beeftv-independent-review.json",
+        "beeftv-ratio-independent-review.json"
+      ],
+      "testOnlyFixReview": "9620a1c authored by tv_release_audit and independently diff-reviewed by root; catalog7e70798 authored by tv_quote_guard and independently reviewed by tv_release_audit."
+    },
+    "unchangedApplicationSHA256": "6f1fa51c6770ef60b24511d4b65e39e268f096f57b18b5c9351588185194eb7a",
+    "reviewer": "Independent Codex /root/tv_release_audit",
+    "sourceDigest": "109df656d676b27aef4967ab5941a279939ab407b4639ca3c5b7ecda2eccece3",
+    "reviewedCommit": "b1162a7",
+    "artifactSHA256": "fa0839d92b81bdd177c40bbae81f414bdeaba27772e7a6834161adcfb098b2e8",
+    "result": "approved",
+    "validation": "Independent gate tests14/14 passed; application source objects unchanged; final source and exact owner exceptions reviewed"
+  },
+  "matrix": {
+    "recordedAt": "2026-10-07T07:30:03.400442+00:00",
+    "candidateGit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+    "candidateDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+    "newTaskCount": 12,
+    "historicalTasksExcluded": 147,
+    "databaseTotalTaskCount": 159,
+    "succeededCount": 12,
+    "nativeOpenedCount": 12,
+    "mediaChargeCNY": 11.421368,
+    "roundChargeCNY": {
+      "1": 5.710684,
+      "2": 5.710684
+    },
+    "cases": [
+      {
+        "round": 1,
+        "scenario": "image_to_image",
+        "taskId": "6bc717e51218e63a6fa65658b0f9c39b",
+        "providerTaskId": "evt-UKJQKQREIMHJ",
+        "caseFile": "native-final-r1-image_to_image.json",
+        "status": "succeeded",
+        "amountCNY": 0.49,
+        "nativeOpened": true,
+        "mediaSHA256": "08797f1d25b87e756f2698b7e0bc0c94f35074e7ffa19df473b204b30731aecf",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "route": 188
+      },
+      {
+        "round": 1,
+        "scenario": "image_to_video",
+        "taskId": "96af0ecab1df3046441d3fa99f2e5b75",
+        "providerTaskId": "task_eCX68XtfA2phyJENj9dxlsBsQ9WnP9j3",
+        "caseFile": "native-final-r1-image_to_video.json",
+        "status": "succeeded",
+        "amountCNY": 1.139354,
+        "nativeOpened": true,
+        "mediaSHA256": "213a23fc293ee96c5deefb6ba8a74a732b08deee559d8ed5bca7c3a9ee81a3fe",
+        "dimensions": [
+          864,
+          496
+        ],
+        "route": 343
+      },
+      {
+        "round": 1,
+        "scenario": "multimodal_to_video",
+        "taskId": "d505f20c052c1e2877d4b1f016a6df0b",
+        "providerTaskId": "task_jB9GV7ObzvRiedY5pIkWcS13Bew68r3e",
+        "caseFile": "native-final-r1-multimodal_to_video.json",
+        "status": "succeeded",
+        "amountCNY": 1.225988,
+        "nativeOpened": true,
+        "mediaSHA256": "9085b67e81385821b288847d3bf5efd690185029a4d9d5ef20c542613c181266",
+        "dimensions": [
+          864,
+          496
+        ],
+        "route": 343
+      },
+      {
+        "round": 1,
+        "scenario": "text_to_image",
+        "taskId": "d5763cb7990fa77f36c05cb43fb5fe29",
+        "providerTaskId": "evt-JKLXWWGNIVXY",
+        "caseFile": "native-final-r1-text_to_image.json",
+        "status": "succeeded",
+        "amountCNY": 0.49,
+        "nativeOpened": true,
+        "mediaSHA256": "9478e08daaaacc235518eb0fbe1a76e8d406803d066b19243bdeb2c0750e38cd",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "route": 188
+      },
+      {
+        "round": 1,
+        "scenario": "text_to_video",
+        "taskId": "c2d75b51ece435dacefc84235589b169",
+        "providerTaskId": "task_kXsDZHzWzqQV2RgasJMlC6AM6mA7D5uS",
+        "caseFile": "native-final-r1-text_to_video.json",
+        "status": "succeeded",
+        "amountCNY": 1.139354,
+        "nativeOpened": true,
+        "mediaSHA256": "358c9279b8cae72ea86675011369948d9ab2fc7609e9b43907ff480a2b272c11",
+        "dimensions": [
+          864,
+          496
+        ],
+        "route": 343
+      },
+      {
+        "round": 1,
+        "scenario": "video_to_video",
+        "taskId": "0e1b4fab13a54cc6a9769898f65a9c69",
+        "providerTaskId": "task_FhAb5OpuTAbnsgjgNeY7CLyXd7bXZZK1",
+        "caseFile": "native-final-r1-video_to_video.json",
+        "status": "succeeded",
+        "amountCNY": 1.225988,
+        "nativeOpened": true,
+        "mediaSHA256": "b0f068fc24851784ca92f3162b49c5b1c589c3fab6a69149063a75adfa9ed41f",
+        "dimensions": [
+          864,
+          496
+        ],
+        "route": 343
+      },
+      {
+        "round": 2,
+        "scenario": "image_to_image",
+        "taskId": "f0c22429c86d8ffa60120dc9219f04cb",
+        "providerTaskId": "evt-XDVLUZPKHRLR",
+        "caseFile": "native-final-r2-image_to_image.json",
+        "status": "succeeded",
+        "amountCNY": 0.49,
+        "nativeOpened": true,
+        "mediaSHA256": "bacc8ffd9895126ab63038853b58843ff7c6ceaf8cc99240d07b2d4659e15e78",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "route": 188
+      },
+      {
+        "round": 2,
+        "scenario": "image_to_video",
+        "taskId": "e41e3b60a517b3cb3b244e0708dc569b",
+        "providerTaskId": "task_3Q7nfO43cfOAglDpkLY5k6Y6cpx7lnX2",
+        "caseFile": "native-final-r2-image_to_video.json",
+        "status": "succeeded",
+        "amountCNY": 1.139354,
+        "nativeOpened": true,
+        "mediaSHA256": "8ba0d0c7328db28766200da85e6c0d5596df924fb19b7badea17c76b119bbcf8",
+        "dimensions": [
+          864,
+          496
+        ],
+        "route": 343
+      },
+      {
+        "round": 2,
+        "scenario": "multimodal_to_video",
+        "taskId": "6a570c75ad6e51a5512d1c67c62e72b1",
+        "providerTaskId": "task_2qvc5cGS01MvrKTW2lbz7m91pSO3eLHa",
+        "caseFile": "native-final-r2-multimodal_to_video.json",
+        "status": "succeeded",
+        "amountCNY": 1.225988,
+        "nativeOpened": true,
+        "mediaSHA256": "5d66e6170fcf96891b6a27c45925bf707578471c8e30adaa42d35d8c77444004",
+        "dimensions": [
+          864,
+          496
+        ],
+        "route": 343
+      },
+      {
+        "round": 2,
+        "scenario": "text_to_image",
+        "taskId": "fbcaa3ac56be8db0c9afde9502e2895d",
+        "providerTaskId": "evt-NPYBXCZBBHUK",
+        "caseFile": "native-final-r2-text_to_image.json",
+        "status": "succeeded",
+        "amountCNY": 0.49,
+        "nativeOpened": true,
+        "mediaSHA256": "f9d8b81beb8649549a7cd830b791271269ccc7ff407b38752e3f8f26660a9798",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "route": 188
+      },
+      {
+        "round": 2,
+        "scenario": "text_to_video",
+        "taskId": "099f624545dfd06c1bd463b2da666c9b",
+        "providerTaskId": "task_yZITXaqbjSkyPQYNJImGQVlK0S8uWq82",
+        "caseFile": "native-final-r2-text_to_video.json",
+        "status": "succeeded",
+        "amountCNY": 1.139354,
+        "nativeOpened": true,
+        "mediaSHA256": "3a7db9cc16a29c601f70cc66b14024079016a3728da122770a61cf282d1264f6",
+        "dimensions": [
+          864,
+          496
+        ],
+        "route": 343
+      },
+      {
+        "round": 2,
+        "scenario": "video_to_video",
+        "taskId": "9e598c73715a7aad839f22ae9d3a3216",
+        "providerTaskId": "task_Hj9skk59bjYoaLYIxILLE02peVzlbnXT",
+        "caseFile": "native-final-r2-video_to_video.json",
+        "status": "succeeded",
+        "amountCNY": 1.225988,
+        "nativeOpened": true,
+        "mediaSHA256": "c10783db4f7dab7c14775368853fc4814f2a51055dc32cd9b08b4a34837ffd05",
+        "dimensions": [
+          864,
+          496
+        ],
+        "route": 343
+      }
+    ],
+    "evidenceLimitations": [
+      "Images: production charges matched by unique account/model/endpoint/time window; no direct evt-to-gateway request ID bridge.",
+      "Images requested1024x1024 returned1254x1254.",
+      "Videos gateway declares16:9/480p; encoded864x496, duration5.041667s, no audio.",
+      "Both rounds text-to-video did not depict requested train; root recorded limited prompt adherence.",
+      "Final /v1/videos raw request body not retained in local logs; source-bound role/ratio inference explicitly distinguished from raw packet capture.",
+      "Chat charges and old-candidate attempts are separately recorded and excluded from12-media subtotal."
+    ],
+    "nativePlaybackSource": "Root reported all12 native images/video playback completed across two rounds; per-case observations preserved.",
+    "completionStatus": "12 new candidate tasks succeeded,12 native opened/played, production charge evidence collected; limitations remain explicitly recorded."
+  },
+  "portraitAcceptance": {
+    "budgetCNY": 20,
+    "spentCNY": 15.231452,
+    "pendingCNY": 0,
+    "executedSourceDigest": "3f2489a9fa52e45d0e0f0771c22c2430e939ad1f14443b3ecb5a6e0475f5e40c",
+    "cases": [
+      {
+        "model": "seedance-2.0-portrait",
+        "taskId": "f63c892df105ba844535ef2e9723ccd6",
+        "providerRequestId": "task_fs9Ho0wc0JJbsRS9lnygc7RxPPOYkEzQ",
+        "status": "succeeded",
+        "attempts": 1,
+        "billing": "settled",
+        "costCNY": 6.022112,
+        "mediaOpened": true,
+        "mediaDecoded": true,
+        "artifactSHA256": "4acad53f2d19e4adea304820026f71322cb7b7c93676b59862a35f4d1997888b",
+        "evidence": [
+          "docs/release-evidence/v1.7.9-acceptance.json#portraitAcceptance"
+        ]
+      },
+      {
+        "model": "seedance-2.5-portrait",
+        "taskId": "4a253b28b201a461ca1fbaefdddccbf3",
+        "providerRequestId": "task_3hZWEcH5nveEJUmSxm0NvBKMxcZlbvpV",
+        "status": "succeeded",
+        "attempts": 1,
+        "billing": "settled",
+        "costCNY": 9.20934,
+        "mediaOpened": true,
+        "mediaDecoded": true,
+        "artifactSHA256": "5db861ae5302d20fce28628d2e917b7b7c6cce741dd57e0c76a3429388f9e60f",
+        "evidence": [
+          "docs/release-evidence/v1.7.9-acceptance.json#portraitAcceptance"
+        ]
+      }
+    ]
+  },
+  "agentChecks": {
+    "canvas_read": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "observation": "Persisted SDK canvas_get completed in both native video proposal turns.",
+      "limits": []
+    },
+    "asset_reference": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "observation": "Twelve native tasks include image, video and multimodal reference paths; per-case proposal/revision and actual task/resource evidence retained.",
+      "limits": [
+        "Image reference original SHA not retained in compacted task/API body; do not infer it from filename."
+      ]
+    },
+    "canvas_mutation": {
+      "method": "native",
+      "executedCommit": "e1054ab1224caf3254179d424e2d4bf2613a5bee",
+      "executedSourceDigest": "1e2eac4b8ada72c080b02e101b96b4726fba6869a5c0ff445d4ba094109a9326",
+      "observation": "Original native assistant turn079815f5fd09ed3bcc450e80 created6nodes+6referenceedges at revisions12→19, all8 tools successful; same six nodes subsequently used by4219 matrix and retained after7e restart.",
+      "limits": [
+        "Read-only SDK/current-artifact review; root owns original native UI observation.",
+        "No original event prompts or credentials copied.",
+        "Owner accepted carry-forward for v1.7.9 only; original execution identity is retained.",
+        "Original creation happened before4219; continued use/persistence on4219 and7e is distinct evidence."
+      ]
+    },
+    "multi_turn": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "observation": "Same persisted session continued across round1 and round2 canvas_get/proposal turns; native history restored prior content.",
+      "limits": [
+        "The session originated on e1054ab; continuation/proposals and native history interactions were executed on4219."
+      ]
+    },
+    "proposal_decline": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "observation": "Root clicked Not now; UI declined and DB task count did not increase.",
+      "limits": [
+        "Exact historical proposal card ID is not independently resolved; native interaction occurred on4219."
+      ]
+    },
+    "proposal_stale": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "observation": "Root clicked old Generate; UI rejected changed canvas/settings; no new task.",
+      "limits": [
+        "Historical card creation may predate4219; interaction SHA and proposal creation SHA are not conflated."
+      ]
+    },
+    "proposal_idempotency": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "observation": "Double-click on gp-4cac63c04f00437d created exactly one task per two intended operations/nodes.",
+      "limits": []
+    },
+    "session_history": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "observation": "New dialogue, prior six-node dialogue restoration and imported-canvas history isolation observed.",
+      "limits": []
+    },
+    "session_restart": {
+      "method": "native",
+      "executedCommit": "7e707983e087b4913245236ccd27b69c47849fe8",
+      "executedSourceDigest": "3f2489a9fa52e45d0e0f0771c22c2430e939ad1f14443b3ecb5a6e0475f5e40c",
+      "observation": "Root completed normal native quit/reopen and confirmed native history/options after restart. Independent before/after readback preserved config45,51 managed models/quotes, defaults/custom channels, canvas290(15nodes/8edges),21canvases/161tasks/368resources, task ID digest,11 session file hashes/sizes and two portrait output hashes.",
+      "limits": [
+        "File/database persistence independently recorded by quote_guard; native UI completion attributed to root direct collaboration report."
+      ]
+    },
+    "cancel": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "observation": "Root stopped a text-only turn; UI stopped state and stored cancellation/no new media task were read back.",
+      "limits": []
+    },
+    "conflict_undo": {
+      "method": "deterministic",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "observation": "Approved deterministic fault checks with individual source assertions; original Node tests ran at e1054ab, selected Go tests reran at4219.",
+      "limits": [
+        "Original execution and rerun/carry-forward breakdown remain in referenced receipt."
+      ]
+    },
+    "host_recovery": {
+      "method": "deterministic",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "observation": "Approved deterministic fault checks with individual source assertions; original Node tests ran at e1054ab, selected Go tests reran at4219.",
+      "limits": [
+        "Original execution and rerun/carry-forward breakdown remain in referenced receipt."
+      ]
+    },
+    "scope_isolation": {
+      "method": "deterministic",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "observation": "Approved deterministic fault checks with individual source assertions; original Node tests ran at e1054ab, selected Go tests reran at4219.",
+      "limits": [
+        "Original execution and rerun/carry-forward breakdown remain in referenced receipt."
+      ]
+    },
+    "budget": {
+      "method": "deterministic",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "observation": "Approved deterministic fault checks with individual source assertions; original Node tests ran at e1054ab, selected Go tests reran at4219.",
+      "limits": [
+        "Only allowed deterministic contract coverage. Runtime budget test does not settle actual release costs or establish a user-approved historical CNY budget."
+      ]
+    },
+    "cli_mcp": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "observation": "Packaged CLI/MCP client-only read succeeds; write refused; UI revocation invalidates CLI/existing MCP/new MCP; temporary credential memory and clipboard cleaned.",
+      "limits": [
+        "Executed4219; no repeat execution on7e claimed."
+      ]
+    }
+  },
+  "restart": {
+    "candidateGit": "7e707983e087b4913245236ccd27b69c47849fe8",
+    "sourceDigest": "3f2489a9fa52e45d0e0f0771c22c2430e939ad1f14443b3ecb5a6e0475f5e40c",
+    "restartMethod": "Root reports native super+q; application list isRunning false; reopen /Applications/BeefTV.app",
+    "processChanged": true,
+    "checks": {
+      "configRevision": true,
+      "defaults": true,
+      "managedModelCount": true,
+      "managedModelIDs": true,
+      "portraits": true,
+      "customChannels": true,
+      "canvas": true,
+      "counts": true,
+      "taskIDsSHA256": true,
+      "portraitTasks": true,
+      "sessions": true
+    },
+    "allComparedStatePreserved": true,
+    "allPortraitMediaPreserved": true,
+    "counts": {
+      "canvas_projects": 21,
+      "tasks": 161,
+      "resources": 368
+    },
+    "sessionFiles": 11
+  },
+  "financialUncertainty": {
+    "historicalBudgetCNY": null,
+    "pendingCNY": null,
+    "enterpriseWalletBeforePortraitCNY": 17.463078,
+    "portraitWalletCNY": 15.231452,
+    "enterpriseKnownWalletTotalCNY": 32.69453,
+    "domesticSubscriptionEquivalentCNY": 15.188612,
+    "supplierPublicQuoteEstimateCNY": 161.756133773,
+    "supplierEstimateAssumption": "USD public quote multiplied by6.5; actual currency, discount and per-task ledger unverified; not actual cash total",
+    "byokImageQuotaUnits": 0.12,
+    "byokFiatCurrency": null,
+    "initialTimeoutDispatches": [
+      "2026-10-07T05:45:16.983Z",
+      "2026-10-07T05:54:42.057Z"
+    ],
+    "initialTimeoutState": "No attributable first request ID or final charge/refund; absence of a row does not prove zero",
+    "imageBillingCorrelation": "Unique account/model/endpoint/time; no direct local evt to gateway request bridge",
+    "supplierAttempts": {
+      "total": 46,
+      "success": 36,
+      "failed": 3,
+      "rejected": 7
+    },
+    "supplierFailedRefunds": "Provider claims are not independently reconciled",
+    "categoriesAreNotSummedAsActualCash": true
+  },
+  "unverified": {
+    "assetTrayHTML5Drag": "Unverified; two CUA drags did not insert. File-picker import and node movement separately passed.",
+    "cleanMacFirstLaunch": "No clean-Mac first-launch acceptance. Existing app ad hoc codesign verifies; Gatekeeper trust not claimed."
+  },
+  "evidenceFiles": [
+    {
+      "name": "beeftv-agent-deterministic-checks.json",
+      "sha256": "475c6e8e4df985bbcc86e2051228ee117859f410453e9c90505adedd2e65ea7b"
+    },
+    {
+      "name": "native-4219b28/matrix-summary.json",
+      "sha256": "9d025c58f94e941be5c93037fb14d5515f7c260e6ad098f84f2ce17071ddb104"
+    },
+    {
+      "name": "native-4219b28/native-canvas-archive.json",
+      "sha256": "b79f0c1125a1760d865ae6bc65fc6b0e3c6c73843db1ce15338adaeb287df120"
+    },
+    {
+      "name": "native-4219b28/native-canvas-node-drag.json",
+      "sha256": "1952904a461bb72a4e32641dd849ff42936ee1f72125812c084351803f68d2bf"
+    },
+    {
+      "name": "native-4219b28/native-final-r1-image_to_image.json",
+      "sha256": "c577141a966e0a4cb353b63a974fc2a89aec4ba782604992af5c85b5136f297e"
+    },
+    {
+      "name": "native-4219b28/native-final-r2-multimodal_to_video.json",
+      "sha256": "91710ce54cd226e33d4f00622be291ee712f032e1ed68ff066964a8c3cf28110"
+    },
+    {
+      "name": "native-4219b28/native-manual-video-import.json",
+      "sha256": "2266ba263db8cf313469664792db9795821000da589ab0bf1ccc0a6a6142b611"
+    },
+    {
+      "name": "native-4219b28/native-session-history.json",
+      "sha256": "366140f7716828a77a52bc6740ff370d7bf6ccc4e13ea293144843a2214f1345"
+    },
+    {
+      "name": "native-4219b28/native-stale-decline-cancel.json",
+      "sha256": "3ed3127f9c6908afeb608c1f623139af2b70fb9aa0d534635e8c5f1c21b00013"
+    },
+    {
+      "name": "native-4219b28/native-timeline-export.json",
+      "sha256": "5e2508437ff84b26ef2c8a031318919e8d08283065d4976d07fb3d7f37a10761"
+    },
+    {
+      "name": "native-4219b28/r1-image-native-save.json",
+      "sha256": "9f8fe8f85a275879a7639161d808c7058dc0d51a23d0cfdc2c9adf5bcd045d19"
+    },
+    {
+      "name": "native-4219b28/r1-video-proposal-host-state.json",
+      "sha256": "60f6195b85b29961f543e3d3631a7d43c319c0aae19b5a494bae4efe660e12c4"
+    },
+    {
+      "name": "native-4219b28/r2-multi-native-save.json",
+      "sha256": "83143ed76191842cd846e93085b62ebc8597553a04cc0addc5ceda833dcc7eb4"
+    },
+    {
+      "name": "native-4219b28/r2-proposal-idempotency.json",
+      "sha256": "1cee3fd8e299f26ba5a30b6f0f85bc8aa557453f124780d076f082da5c4e5241"
+    },
+    {
+      "name": "native-4219b28/r2-video-proposal-host-state.json",
+      "sha256": "4ea688adac5ddbf0eee771e7b838f21897001d37884ccc206d416b8e693c4890"
+    },
+    {
+      "name": "native-7e70798-portrait/budget-summary.json",
+      "sha256": "c29f8fecbf06505d5832636cab640f28895cf559a21e40a3fd796a8c630884f1"
+    },
+    {
+      "name": "native-7e70798-portrait/restart-after.json",
+      "sha256": "63b50f922bfc17659f15c1a798e0ce0278d71ad6df1560930c9cc4f490186250"
+    },
+    {
+      "name": "native-7e70798-portrait/restart-before.json",
+      "sha256": "98a6a3d9a471721166c3c1f53b1bc8f237f3f447f848c65dc879dfb89a9dc1e1"
+    },
+    {
+      "name": "native-7e70798-portrait/restart-persistence.json",
+      "sha256": "84afb31dc486bd21983d667ef5e9ba147142e04d3126e5d142bd418fd722700c"
+    },
+    {
+      "name": "native-client-ro-acceptance.json",
+      "sha256": "e808ae91d89d2eb11d560afe44704a63744062596c59f35a089c5fc5f7bf841d"
+    },
+    {
+      "name": "native-six-node-mutation-source-evidence.json",
+      "sha256": "01b3cf4d0e949a79c0240a52909ea67e66e411ba2fc9e65d417ff324af252b03"
+    },
+    {
+      "name": "portrait-catalog-independent-review.json",
+      "sha256": "a31d9c82218f8830cdcea200b31488fa5b4c1c417b92ffa122e500c2317b9df2"
+    },
+    {
+      "name": "release-cost-summary.json",
+      "sha256": "88f430b544675278d8e26a78dccd8f3c96c7b9295c9cf963a0bc2e7c8fa54e7a"
+    },
+    {
+      "name": "matrix-assistant-provenance.json",
+      "sha256": "f5f782879ca455718039b937b9da44e75e0880e864b2a30665e05a7eb6992922"
+    }
+  ],
+  "ciBeforeBookkeeping": [
+    {
+      "link": "https://github.com/glanderness/BeefTV/actions/runs/37591062274/job/112692389194",
+      "name": "Release publisher checks",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/glanderness/BeefTV/actions/runs/37591062274/job/112692389086",
+      "name": "Backend checks",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/glanderness/BeefTV/actions/runs/37591061913/job/112692385920",
+      "name": "Director P0 Chrome E2E",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/glanderness/BeefTV/actions/runs/37591062274/job/112692388756",
+      "name": "Web checks",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/glanderness/BeefTV/actions/runs/37591062274/job/112692390387",
+      "name": "Published Windows upgrade and rollback",
+      "state": "SKIPPED"
+    },
+    {
+      "link": "https://github.com/glanderness/BeefTV/actions/runs/37591062274/job/112692390267",
+      "name": "SQLite and runtime (${{ matrix.os }})",
+      "state": "SKIPPED"
+    }
+  ],
+  "otherNativeAcceptance": [
+    {
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "evidenceFile": "r1-image-native-save.json"
+    },
+    {
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "evidenceFile": "r2-multi-native-save.json"
+    },
+    {
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "evidenceFile": "native-timeline-export.json"
+    },
+    {
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "evidenceFile": "native-canvas-archive.json"
+    },
+    {
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "evidenceFile": "native-manual-video-import.json"
+    },
+    {
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "evidenceFile": "native-canvas-node-drag.json"
+    }
+  ],
+  "assistantProvenance": {
+    "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+    "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+    "sessionId": "01a114fa-8153-73b5-8cd4-268621b2f8f0",
+    "proposalGroups": [
+      {
+        "proposalId": "gp-bd69c92ae3676668",
+        "sessionId": "01a114fa-8153-73b5-8cd4-268621b2f8f0",
+        "turnId": "34f830361e52e450a829c8f2",
+        "kind": "image",
+        "nodeIds": [
+          "node-dlydse4jqvhk-51aee0fed3",
+          "node-dlydse4jqxsw-e388c654a5"
+        ],
+        "model": "gpt-image-2.5-flare",
+        "modelKey": "beefapi::gpt-image-2.5-flare",
+        "source": {
+          "canvasId": "YqdaEFzPAL1q5SjsNDZNA",
+          "canvasRevision": 88,
+          "modelConfigRevision": 36
+        },
+        "eventTimestamp": "2026-10-07T06:59:56.100Z",
+        "sourceLine": 66,
+        "sourceEventSHA256": "1acd9173ccfc2a9f1744e001f422619854c2f1aa9d1f0eb1cde7ff93d263a9c6",
+        "turnCancelled": false,
+        "turnErrorReason": null,
+        "successfulProposalTool": true,
+        "databaseTurn": {
+          "turn_id": "34f830361e52e450a829c8f2",
+          "canvas_id": "YqdaEFzPAL1q5SjsNDZNA",
+          "state": "settled",
+          "associated_task_ids": ""
+        },
+        "mappedTaskIds": [
+          "6bc717e51218e63a6fa65658b0f9c39b",
+          "d5763cb7990fa77f36c05cb43fb5fe29"
+        ]
+      },
+      {
+        "proposalId": "gp-c159f43f3ffafaf9",
+        "sessionId": "01a114fa-8153-73b5-8cd4-268621b2f8f0",
+        "turnId": "5a0155ee0050ddb2f573275d",
+        "kind": "video",
+        "nodeIds": [
+          "node-dlydse4jr048-68f240be20",
+          "node-dlydse4jr1ns-bc634a8b1f",
+          "node-dlydse4jr37c-8528080809",
+          "node-dlydse4jr3z4-424af877fe"
+        ],
+        "model": "seedance-2.0-fast",
+        "modelKey": "beefapi::seedance-2.0-fast",
+        "source": {
+          "canvasId": "YqdaEFzPAL1q5SjsNDZNA",
+          "canvasRevision": 97,
+          "modelConfigRevision": 36
+        },
+        "eventTimestamp": "2026-10-07T07:07:27.488Z",
+        "sourceLine": 74,
+        "sourceEventSHA256": "69a0171c2cf8780193c380d6d315afaf78936b8c97b4835bcdd42b3679bde60e",
+        "turnCancelled": false,
+        "turnErrorReason": null,
+        "successfulProposalTool": true,
+        "databaseTurn": {
+          "turn_id": "5a0155ee0050ddb2f573275d",
+          "canvas_id": "YqdaEFzPAL1q5SjsNDZNA",
+          "state": "settled",
+          "associated_task_ids": ""
+        },
+        "mappedTaskIds": [
+          "96af0ecab1df3046441d3fa99f2e5b75",
+          "d505f20c052c1e2877d4b1f016a6df0b",
+          "c2d75b51ece435dacefc84235589b169",
+          "0e1b4fab13a54cc6a9769898f65a9c69"
+        ]
+      },
+      {
+        "proposalId": "gp-4cac63c04f00437d",
+        "sessionId": "01a114fa-8153-73b5-8cd4-268621b2f8f0",
+        "turnId": "db7a2bb97d5641f0a5a65e03",
+        "kind": "image",
+        "nodeIds": [
+          "node-dlydse4jqvhk-51aee0fed3",
+          "node-dlydse4jqxsw-e388c654a5"
+        ],
+        "model": "gpt-image-2.5-flare",
+        "modelKey": "beefapi::gpt-image-2.5-flare",
+        "source": {
+          "canvasId": "YqdaEFzPAL1q5SjsNDZNA",
+          "canvasRevision": 143,
+          "modelConfigRevision": 36
+        },
+        "eventTimestamp": "2026-10-07T07:14:17.898Z",
+        "sourceLine": 82,
+        "sourceEventSHA256": "072687232e00c2e16e873cee093e018565b074b2ecf16710fb05de9ca1ac55c2",
+        "turnCancelled": false,
+        "turnErrorReason": null,
+        "successfulProposalTool": true,
+        "databaseTurn": {
+          "turn_id": "db7a2bb97d5641f0a5a65e03",
+          "canvas_id": "YqdaEFzPAL1q5SjsNDZNA",
+          "state": "settled",
+          "associated_task_ids": ""
+        },
+        "mappedTaskIds": [
+          "f0c22429c86d8ffa60120dc9219f04cb",
+          "fbcaa3ac56be8db0c9afde9502e2895d"
+        ]
+      },
+      {
+        "proposalId": "gp-58a78806f4692d3b",
+        "sessionId": "01a114fa-8153-73b5-8cd4-268621b2f8f0",
+        "turnId": "01b14ce75930fd66f9bfa83f",
+        "kind": "video",
+        "nodeIds": [
+          "node-dlydse4jr048-68f240be20",
+          "node-dlydse4jr1ns-bc634a8b1f",
+          "node-dlydse4jr37c-8528080809",
+          "node-dlydse4jr3z4-424af877fe"
+        ],
+        "model": "seedance-2.0-fast",
+        "modelKey": "beefapi::seedance-2.0-fast",
+        "source": {
+          "canvasId": "YqdaEFzPAL1q5SjsNDZNA",
+          "canvasRevision": 156,
+          "modelConfigRevision": 36
+        },
+        "eventTimestamp": "2026-10-07T07:20:48.120Z",
+        "sourceLine": 94,
+        "sourceEventSHA256": "c3c9267b3c2ed0aff98ebc8ae8f6a1d43721e8a3eb779bb699c09038deb96423",
+        "turnCancelled": false,
+        "turnErrorReason": null,
+        "successfulProposalTool": true,
+        "databaseTurn": {
+          "turn_id": "01b14ce75930fd66f9bfa83f",
+          "canvas_id": "YqdaEFzPAL1q5SjsNDZNA",
+          "state": "settled",
+          "associated_task_ids": ""
+        },
+        "mappedTaskIds": [
+          "e41e3b60a517b3cb3b244e0708dc569b",
+          "6a570c75ad6e51a5512d1c67c62e72b1",
+          "099f624545dfd06c1bd463b2da666c9b",
+          "9e598c73715a7aad839f22ae9d3a3216"
+        ]
+      }
+    ],
+    "summary": {
+      "cases": 12,
+      "uniqueTasks": 12,
+      "uniqueOperations": 12,
+      "uniqueProposals": 4,
+      "allExactMappingsVerified": true,
+      "allTasksSucceeded": true,
+      "allOperationTaskCountsOne": true
+    },
+    "limitations": [
+      "All twelve paid matrix tasks actually ran on4219b28, not7e70798.",
+      "Original session and six-node creation began under e1054ab; these four proposals and twelve tasks occurred on4219.",
+      "assistant_turns.associated_task_ids is empty for these proposals because UI execution is later; exact linkage comes from task.client_operation_id and SDK proposal node IDs.",
+      "Human click confirmation attributed to root native observations and corroborated by persisted proposal-operation tasks; no separate immutable click timestamp is manufactured.",
+      "providerRequestId here is native provider_request_id; image evt IDs are not gateway billing request IDs. Image billing remains uniquely time-correlated as separately documented."
+    ]
+  }
+}

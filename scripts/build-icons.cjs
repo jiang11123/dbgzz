@@ -4,8 +4,22 @@ const fs = require('node:fs');
 const path = require('node:path');
 app.whenReady().then(() => {
 const root = path.resolve(__dirname, '..');
-const avatar = nativeImage.createFromPath(path.join(root, 'build/brand-avatar.png'));
-if (avatar.isEmpty()) throw new Error('Avatar could not be decoded');
+const source = nativeImage.createFromPath(path.join(root, 'build/brand-avatar.png'));
+if (source.isEmpty()) throw new Error('Avatar could not be decoded');
+// Fit the original portrait inside a white square without stretching or cropping.
+const dimensions = source.getSize();
+const side = 1024;
+const scale = side / Math.max(dimensions.width, dimensions.height);
+const width = Math.round(dimensions.width * scale);
+const height = Math.round(dimensions.height * scale);
+const resized = source.resize({ width, height, quality: 'best' }).toBitmap();
+const square = Buffer.alloc(side * side * 4, 255);
+const left = Math.floor((side - width) / 2);
+const top = Math.floor((side - height) / 2);
+for (let row = 0; row < height; row++) {
+  resized.copy(square, ((top + row) * side + left) * 4, row * width * 4, (row + 1) * width * 4);
+}
+const avatar = nativeImage.createFromBitmap(square, { width: side, height: side });
 const sizes = [16, 24, 32, 48, 64, 128, 256];
 const entries = sizes.map(size => ({ size, png: avatar.resize({width:size,height:size,quality:'best'}).toPNG() }));
 const header = Buffer.alloc(6 + entries.length * 16);

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="28" viewBox="0 0 180 28" role="img" aria-labelledby="title desc">
+  <title id="title">Visit our website</title>
+  <desc id="desc">Visit the official BeefTV website</desc>
+  <rect width="180" height="28" fill="#E86C36"/>
+  <g transform="translate(2 1) scale(.66)" fill="none" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13 21l3-10h16"/>
+    <path d="M15 25l3-10h16"/>
+    <path d="M18 29l3-10h16l-3 11H18z"/>
+  </g>
+  <text x="32" y="18" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="10.5" font-weight="800" letter-spacing="1.2">VISIT OUR WEBSITE</text>
+</svg>

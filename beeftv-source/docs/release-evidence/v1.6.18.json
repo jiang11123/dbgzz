@@ -1,0 +1,67 @@
+{
+  "version": "v1.6.18",
+  "sourceCommit": "30d742bd77412c6fa9451d5b1eea512584570c57",
+  "sourceDigest": "83e7957cb223ef83056f5df349b4c95820003f2a2c0c37c49d6aa7922f1e9bc6",
+  "budgetCNY": 50,
+  "spentCNY": 24.254388,
+  "pendingCNY": 0,
+  "thisReleaseSpentCNY": 1.12,
+  "priorSpentCNY": 23.134388,
+  "liveTestWaiver": {
+    "approvedBy": "Ender",
+    "instruction": "没事 这轮就不用实测了",
+    "approvedDate": "2026-10-01",
+    "scope": "Only v1.6.18 real-generation matrix; no further paid requests. Prior authorization to review and publish remains in force."
+  },
+  "cases": [
+    {
+      "taskId": "eca629873f7324b91178c4847e9c44ec",
+      "path": "text-image",
+      "round": 1,
+      "status": "succeeded",
+      "providerRequestId": "evt-DOISLAEMUPPY",
+      "clientVersion": "v1.6.18",
+      "platform": "darwin-arm64",
+      "costCNY": 0.56,
+      "billing": "settled",
+      "note": "Submitted before Owner waived further live testing; not counted as complete release matrix."
+    },
+    {
+      "taskId": "03fcedd8b482c749ece7891d09a305bf",
+      "path": "image-image",
+      "round": 1,
+      "status": "succeeded",
+      "providerRequestId": "evt-YSNQXBHHCZDI",
+      "clientVersion": "v1.6.18",
+      "platform": "darwin-arm64",
+      "costCNY": 0.56,
+      "billing": "settled",
+      "note": "Submitted before Owner waived further live testing; not counted as complete release matrix."
+    }
+  ],
+  "upgrade": {
+    "preservedData": true,
+    "retainedIDs": {
+      "tasks": true,
+      "canvas_projects": true,
+      "resources": true
+    }
+  },
+  "review": {
+    "reviewer": "Independent Codex review_beeftv_video",
+    "result": "approved"
+  },
+  "verification": {
+    "windowsNativeRegression": "passed",
+    "windowsOldCode": "FAILED as expected: first WSAECONNRESET / WSAECONNABORTED query terminated",
+    "windowsFixedCode": "PASSED: wrapped Winsock codes; actual TCP RST queries original task; one creation POST; original-result GET only",
+    "windowsTestExecutable": "Cross-compiled test executable executed on native Windows amd64; CGO disabled, no database tests in this binary",
+    "windowsLogSHA256": "1ce04b0b867a599766be67f8b45e264032703e5611101d3d3b0e4ee7de80fe26",
+    "goSuite": "go test ./... passed",
+    "webErrorTests": "61 passed, 736 assertions",
+    "localReleaseGate": "passed",
+    "releaseWaiverTests": "passed; stale source, pending charges, missing review and later versions rejected",
+    "realGenerationMatrix": "WAIVED, not completed",
+    "integration": "Main includes independently merged PR #54 (dark workspace palette); all four CI checks passed; palette browser tests rerun: 2 pass, 8 assertions. Video recovery sources unchanged from reviewed candidate."
+  }
+}

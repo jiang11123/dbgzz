@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "output": { "width": 320, "height": 180, "fps": 30, "sampleRate": 44100, "burnSubtitles": true },
+  "durationMs": 6000,
+  "segments": [
+    { "kind": "video", "clipId": "v0", "sourceId": "v0", "startMs": 0, "durationMs": 2000, "volume": 1, "hasAudio": true },
+    { "kind": "video", "clipId": "v1", "sourceId": "v1", "startMs": 2000, "durationMs": 2000, "volume": 1, "hasAudio": true },
+    { "kind": "video", "clipId": "v2", "sourceId": "v2", "startMs": 4000, "durationMs": 2000, "volume": 1, "hasAudio": true }
+  ],
+  "audio": [
+    { "clipId": "bgm", "sourceId": "bgm", "startMs": 0, "durationMs": 6000, "sourceStartMs": 0, "volume": 0.2 },
+    { "clipId": "voice", "sourceId": "voice", "startMs": 1000, "durationMs": 2000, "sourceStartMs": 500, "volume": 1 }
+  ],
+  "subtitles": [
+    { "clipId": "sub", "startMs": 500, "durationMs": 5000, "text": "中文字幕完整性验证" }
+  ],
+  "subtitleSrt": "1\n00:00:00,500 --> 00:00:05,500\n中文字幕完整性验证\n\n"
+}

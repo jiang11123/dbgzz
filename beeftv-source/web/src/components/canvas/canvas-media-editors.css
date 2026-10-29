@@ -1,0 +1,187 @@
+/* Shared editor defaults; the timeline supplies its active canvas theme. */
+.canvas-subtitle-dialog,
+.canvas-timeline-dialog {
+    --editor-bg: #101112;
+    --editor-panel: #191a1c;
+    --editor-line: #303236;
+    --editor-text: #eceeef;
+    --editor-muted: #9b9fa6;
+    --editor-button-bg: #202225;
+    --editor-button-line: #36393e;
+}
+:is(.canvas-subtitle-dialog, .canvas-timeline-dialog) .ant-modal-content,
+:is(.canvas-subtitle-dialog, .canvas-timeline-dialog) .ant-modal-header {
+    background: var(--editor-bg) !important;
+    color: var(--editor-text);
+}
+:is(.canvas-subtitle-dialog, .canvas-timeline-dialog) .ant-modal-header {
+    padding: 20px 24px !important;
+    margin: 0;
+}
+.media-editor-body {
+    height: min(78vh, 820px);
+    min-height: 400px;
+    color: var(--editor-text) !important;
+}
+.media-editor-toolbar,
+.media-editor-transcription,
+.media-editor-footer {
+    padding: 12px 20px;
+    background: var(--editor-bg) !important;
+    border: 0;
+}
+.media-editor-toolbar {
+    gap: 8px;
+    border-bottom: 1px solid var(--editor-line);
+}
+.media-editor-transcription {
+    margin: 0 20px 8px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: var(--editor-panel) !important;
+}
+.media-editor-footer {
+    flex-shrink: 0;
+    border-top: 1px solid var(--editor-line);
+}
+.subtitle-editor-workspace {
+    display: grid;
+    grid-template-columns: minmax(300px, 1fr) minmax(260px, 1.3fr) 240px;
+    gap: 16px;
+    flex: 1;
+    min-height: 0;
+    padding: 16px 20px;
+}
+.media-editor-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+    min-height: 0;
+    padding: 16px;
+    background: var(--editor-panel);
+    border-radius: 12px;
+}
+.media-editor-pane-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+.media-editor-pane-heading h2 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 20px;
+}
+.media-editor-pane-heading span {
+    font-size: 12px;
+    color: var(--editor-muted);
+}
+.subtitle-editor-list > :last-child,
+.subtitle-editor-preview > :last-child {
+    flex: 1;
+    min-height: 0;
+}
+.subtitle-editor-entry {
+    background: #202124 !important;
+    border-color: transparent !important;
+}
+.subtitle-editor-entry[data-active="true"] {
+    border-color: #858b95 !important;
+    background: #292c30 !important;
+}
+.timeline-editor-tracks {
+    margin: 0 20px;
+    border: 1px solid var(--editor-line);
+    border-radius: 10px;
+    overflow: hidden;
+}
+.canvas-timeline-dialog .canvas-timeline-preview {
+    border: 0;
+    padding: 16px 20px;
+    background: var(--editor-bg) !important;
+}
+.canvas-timeline-dialog [data-timeline-clip-id] {
+    background: #303339 !important;
+    color: var(--editor-clip-text, var(--editor-text)) !important;
+    border-color: #484d55 !important;
+}
+.canvas-timeline-dialog [data-timeline-clip-kind="audio"] {
+    background: #242b2e !important;
+}
+.canvas-timeline-dialog [data-timeline-clip-kind="subtitle"] {
+    background: #333039 !important;
+}
+.canvas-timeline-dialog [data-timeline-clip-id][data-selected="true"] {
+    background: #444950 !important;
+    border-color: #c4c8d0 !important;
+}
+:is(.canvas-subtitle-dialog, .canvas-timeline-dialog) .ant-btn:not(.ant-btn-primary):not(.ant-btn-dangerous) {
+    background: var(--editor-button-bg);
+    border-color: var(--editor-button-line);
+    color: var(--editor-text);
+    box-shadow: none;
+}
+:is(.canvas-subtitle-dialog, .canvas-timeline-dialog) .ant-btn:disabled {
+    opacity: 0.4;
+}
+@media (max-width: 1000px) {
+    .subtitle-editor-workspace {
+        grid-template-columns: minmax(260px, 1fr) minmax(240px, 1fr);
+        overflow-y: auto;
+    }
+    .subtitle-editor-style {
+        grid-column: 1 / -1;
+        min-height: 220px;
+    }
+    .subtitle-editor-list,
+    .subtitle-editor-preview {
+        min-height: 280px;
+    }
+    .media-editor-body {
+        height: 80vh;
+    }
+    .canvas-timeline-dialog .media-editor-footer > .ml-auto {
+        flex-wrap: wrap;
+    }
+}
+@media (max-width: 640px) {
+    .subtitle-editor-workspace {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 12px;
+    }
+    .subtitle-editor-style {
+        grid-column: auto;
+    }
+    .media-editor-toolbar,
+    .media-editor-footer {
+        padding: 10px 12px;
+    }
+    .media-editor-transcription {
+        margin-inline: 12px;
+    }
+    .timeline-editor-tracks {
+        margin-inline: 12px;
+    }
+    .canvas-timeline-dialog .canvas-timeline-preview {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.media-editor-body {
+    background: var(--editor-bg);
+}
+.subtitle-editor-entry .ant-input-number {
+    width: 90px;
+}
+.media-editor-transcription .ant-select {
+    max-width: 460px;
+}
+.media-editor-transcription > div {
+    justify-content: flex-start;
+}
+.media-editor-transcription .ant-btn:last-child {
+    margin-left: auto;
+}

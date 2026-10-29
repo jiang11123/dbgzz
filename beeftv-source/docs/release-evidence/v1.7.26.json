@@ -1,0 +1,198 @@
+{
+  "version": "v1.7.26",
+  "sourceDigest": "03d9d5ce9c35a28b1cf2fa1c4fc2b344f6803b78746e47dd8ecbf0431065f165",
+  "ownerException": {
+    "sourceDigest": "03d9d5ce9c35a28b1cf2fa1c4fc2b344f6803b78746e47dd8ecbf0431065f165",
+    "evidence": [
+      "docs/release-evidence/v1.7.26-review.md"
+    ],
+    "scope": "combined-desktop-release-20261017",
+    "approvedBy": "Ender",
+    "instruction": "本版豁免付费矩阵，专项回归、独立 review、CI 和四平台安装升级门禁通过后发布；历史未知账务继续保留（推荐）"
+  },
+  "releaseAuthorization": {
+    "sourceDigest": "03d9d5ce9c35a28b1cf2fa1c4fc2b344f6803b78746e47dd8ecbf0431065f165",
+    "evidence": [
+      "docs/release-evidence/v1.7.26-review.md"
+    ],
+    "scope": "v1.7.26 only",
+    "additionalHumanReplyRequired": false,
+    "combinedScopeInstruction": "一并发布 #182/#185：补齐它们的验收，再审查完整版本后发布"
+  },
+  "baseRelease": "v1.7.25",
+  "baseCommit": "5f3c15c04c25eb4a786cfbe208091360c3eeb5e5",
+  "includedPullRequests": [
+    182,
+    183,
+    185,
+    186,
+    188
+  ],
+  "paidSubmissionPathChanged": true,
+  "paidSubmissionLimit": 0,
+  "newBudgetCNY": 0,
+  "newSpentCNY": 0,
+  "newPendingCNY": 0,
+  "cases": [],
+  "billingAttempts": [],
+  "budgetCNY": null,
+  "spentCNY": null,
+  "pendingCNY": null,
+  "liveMatrixStatus": "not_run_owner_waived",
+  "agentAcceptanceStatus": "not_run_owner_waived",
+  "acceptanceComplete": false,
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.25",
+    "pendingCNY": null,
+    "evidence": [
+      "docs/release-evidence/v1.7.25.json",
+      "docs/release-evidence/v1.7.26-review.md"
+    ]
+  },
+  "review": {
+    "sourceDigest": "03d9d5ce9c35a28b1cf2fa1c4fc2b344f6803b78746e47dd8ecbf0431065f165",
+    "evidence": [
+      "docs/release-evidence/v1.7.26-review.md"
+    ],
+    "result": "approved",
+    "independent": true,
+    "reviewer": "Grok 20261017-192313-continue-356da0f4 and 20261017-192314-continue-9a0154a9",
+    "reviewedHead": "bba8b7b15f19e48ac93b5e80e02310fb1f50c2ed",
+    "productAndBuildSourceUnchanged": true
+  },
+  "upgrade": {
+    "sourceDigest": "03d9d5ce9c35a28b1cf2fa1c4fc2b344f6803b78746e47dd8ecbf0431065f165",
+    "evidence": [
+      "docs/release-evidence/v1.7.26-review.md"
+    ],
+    "preservedData": true
+  },
+  "verification": {
+    "userScenario": {
+      "sourceDigest": "03d9d5ce9c35a28b1cf2fa1c4fc2b344f6803b78746e47dd8ecbf0431065f165",
+      "evidence": [
+        "docs/release-evidence/v1.7.26-review.md"
+      ],
+      "method": "synthetic-reference-and-fault-tests",
+      "status": "passed"
+    },
+    "generationAndRecovery": {
+      "sourceDigest": "03d9d5ce9c35a28b1cf2fa1c4fc2b344f6803b78746e47dd8ecbf0431065f165",
+      "evidence": [
+        "docs/release-evidence/v1.7.26-review.md"
+      ],
+      "method": "test",
+      "status": "passed",
+      "testedHead": "bba8b7b15f19e48ac93b5e80e02310fb1f50c2ed"
+    },
+    "errorContract": {
+      "sourceDigest": "03d9d5ce9c35a28b1cf2fa1c4fc2b344f6803b78746e47dd8ecbf0431065f165",
+      "evidence": [
+        "docs/release-evidence/v1.7.26-review.md"
+      ],
+      "method": "test",
+      "status": "passed"
+    },
+    "noNewPaidGeneration": {
+      "sourceDigest": "03d9d5ce9c35a28b1cf2fa1c4fc2b344f6803b78746e47dd8ecbf0431065f165",
+      "evidence": [
+        "docs/release-evidence/v1.7.26-review.md"
+      ],
+      "method": "source-diff",
+      "status": "passed"
+    },
+    "ci": {
+      "sourceDigest": "03d9d5ce9c35a28b1cf2fa1c4fc2b344f6803b78746e47dd8ecbf0431065f165",
+      "evidence": [
+        "docs/release-evidence/v1.7.26-review.md",
+        "https://github.com/glanderness/BeefTV/actions/runs/39028483516",
+        "https://github.com/glanderness/BeefTV/actions/runs/39028483546",
+        "https://github.com/glanderness/BeefTV/actions/runs/39028483522"
+      ],
+      "method": "github-actions",
+      "status": "passed",
+      "testedHead": "bba8b7b15f19e48ac93b5e80e02310fb1f50c2ed",
+      "checkoutCommit": "5f7b84e3211f9082fa01a9dfacc39a15fbb8f5a7"
+    },
+    "localReleaseGate": {
+      "sourceDigest": "03d9d5ce9c35a28b1cf2fa1c4fc2b344f6803b78746e47dd8ecbf0431065f165",
+      "evidence": [
+        ".github/workflows/release-desktop.yml",
+        "docs/release-evidence/v1.7.26-review.md"
+      ],
+      "method": "local-script",
+      "status": "pending_release_workflow",
+      "beforeDraft": true
+    },
+    "depthMirrors": {
+      "sourceDigest": "03d9d5ce9c35a28b1cf2fa1c4fc2b344f6803b78746e47dd8ecbf0431065f165",
+      "evidence": [
+        "docs/release-evidence/v1.7.26-review.md",
+        "docs/release-evidence/v1.7.26-depth-mirrors.json"
+      ],
+      "method": "signed-manifest-and-public-readback",
+      "status": "passed"
+    },
+    "windowsDepthProcesses": {
+      "sourceDigest": "03d9d5ce9c35a28b1cf2fa1c4fc2b344f6803b78746e47dd8ecbf0431065f165",
+      "evidence": [
+        "docs/release-evidence/v1.7.26-review.md",
+        "docs/release-evidence/v1.7.26-windows-depth.json"
+      ],
+      "method": "native-windows",
+      "status": "passed"
+    },
+    "referenceTransport": {
+      "sourceDigest": "03d9d5ce9c35a28b1cf2fa1c4fc2b344f6803b78746e47dd8ecbf0431065f165",
+      "evidence": [
+        "docs/release-evidence/v1.7.26-review.md",
+        "https://github.com/glanderness/BeefTV/actions/runs/39028483516"
+      ],
+      "method": "test",
+      "status": "passed"
+    },
+    "midjourneyFourOutputs": {
+      "sourceDigest": "03d9d5ce9c35a28b1cf2fa1c4fc2b344f6803b78746e47dd8ecbf0431065f165",
+      "evidence": [
+        "docs/release-evidence/v1.7.26-review.md",
+        "https://github.com/glanderness/BeefTV/pull/185",
+        "https://github.com/glanderness/BeefTV/actions/runs/39028483516"
+      ],
+      "method": "test",
+      "status": "passed"
+    },
+    "uiCrossReview": {
+      "sourceDigest": "03d9d5ce9c35a28b1cf2fa1c4fc2b344f6803b78746e47dd8ecbf0431065f165",
+      "evidence": [
+        "docs/release-evidence/v1.7.26-review.md",
+        "https://github.com/glanderness/BeefTV/pull/183",
+        "https://github.com/glanderness/BeefTV/pull/185",
+        "https://github.com/glanderness/BeefTV/pull/188"
+      ],
+      "method": "human-review",
+      "status": "passed"
+    }
+  },
+  "packages": {
+    "platforms": [
+      "darwin-arm64",
+      "darwin-amd64",
+      "windows-amd64",
+      "linux-amd64"
+    ],
+    "status": "pending_release_workflow",
+    "archives": null,
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "linuxNativeWindowBeforeUpload": true,
+    "signedManifestBeforePublish": true,
+    "publicReadbackAfterPublish": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml",
+      "docs/release-evidence/v1.7.26-review.md"
+    ]
+  },
+  "releasePublished": false,
+  "releaseComplete": false
+}

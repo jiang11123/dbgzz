@@ -140,12 +140,14 @@ export function extractMediaUrlsFromNode(node: any): string[] {
     if (!Array.isArray(blocks)) return;
     for (const block of blocks) {
       if (block?.block_type !== 2074) continue;
-      const creations = block.content?.creation_block?.creations;
+      const creations = block.content?.creation_block?.creations
+        || block.content_obj?.creations
+        || block.content?.creations;
       if (!Array.isArray(creations)) continue;
       for (const creation of creations) {
         if (creation?.type !== 1) continue;
         const image = creation.image;
-        const url = [image?.image_ori?.url, image?.image_ori_raw?.url, image?.image_raw?.url, image?.image_thumb?.url]
+        const url = [image?.image_ori?.url, image?.image_ori_raw?.url, image?.image_raw?.url, image?.image_preview?.url, image?.image_thumb?.url]
           .find(value => typeof value === 'string' && /^https?:\/\//i.test(value));
         if (typeof url !== 'string') continue;
         const clean = url.replace(/\\u0026/g, '&').replace(/&amp;/g, '&');
@@ -159,6 +161,8 @@ export function extractMediaUrlsFromNode(node: any): string[] {
     const container = decode(value);
     if (!container || typeof container !== 'object' || container.user_type === 1 || container.role === 'user') return;
     readBlocks(container.content_block);
+    readBlocks(container.content_blocks);
+    readBlocks(container.content_blocks_v2);
     readBlocks(decode(container.content)?.content_block);
     const packets = decode(container.ext?.creation_full_content);
     if (Array.isArray(packets)) {
@@ -167,6 +171,9 @@ export function extractMediaUrlsFromNode(node: any): string[] {
   };
   readContainer(node);
   readContainer(node?.message);
+  if (Array.isArray(node?.msgList)) {
+    for (const msg of node.msgList) readContainer(msg?.messageData || msg);
+  }
   if (Array.isArray(node?.patch_op)) {
     for (const op of node.patch_op) {
       if (op?.patch_object === 1 || op?.patch_object === 50) readContainer(op.patch_value);

@@ -1,0 +1,128 @@
+{
+  "version": "v1.7.7",
+  "sourceDigest": "1bffa4937ab8c511868113a381283633a1bfdb78b6ec8f9eb79f090e20fb942a",
+  "budgetCNY": 0,
+  "spentCNY": 0,
+  "newSpentCNY": 0,
+  "pendingCNY": 0,
+  "liveMatrixStatus": "not_run_owner_waived",
+  "cases": [],
+  "releaseComplete": true,
+  "liveTestWaiver": {
+    "approvedBy": "Ender",
+    "instruction": "本版豁免付费矩阵，专项验收、review 和 CI 通过后发布",
+    "scope": "reference-media-targeted-acceptance"
+  },
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.2",
+    "pendingCNY": null,
+    "failedRequestIds": [
+      "202610020816334239151708268d9d6eZ5lRPwt",
+      "202610021242434383740578268d9d6BAoXA1u1"
+    ],
+    "evidence": [
+      "docs/release-evidence/v1.7.2.json"
+    ]
+  },
+  "review": {
+    "result": "approved",
+    "independent": true,
+    "reviewer": "Grok Companion 20261004-235728-continue-5ce6fdf4; approved 3cb51cf",
+    "sourceDigest": "1bffa4937ab8c511868113a381283633a1bfdb78b6ec8f9eb79f090e20fb942a",
+    "evidence": [
+      "docs/release-evidence/v1.7.7-targeted.md#独立复审"
+    ]
+  },
+  "upgrade": {
+    "preservedData": true,
+    "sourceDigest": "1bffa4937ab8c511868113a381283633a1bfdb78b6ec8f9eb79f090e20fb942a",
+    "evidence": [
+      "docs/release-evidence/v1.7.7-targeted.md#原生启动与数据保留"
+    ]
+  },
+  "verification": {
+    "mediaAdmission": {
+      "status": "passed",
+      "sourceDigest": "1bffa4937ab8c511868113a381283633a1bfdb78b6ec8f9eb79f090e20fb942a",
+      "evidence": [
+        "docs/release-evidence/v1.7.7-targeted.md#专项验证"
+      ]
+    },
+    "referenceLinks": {
+      "status": "passed",
+      "sourceDigest": "1bffa4937ab8c511868113a381283633a1bfdb78b6ec8f9eb79f090e20fb942a",
+      "evidence": [
+        "docs/release-evidence/v1.7.7-targeted.md#专项验证"
+      ]
+    },
+    "preparationStage": {
+      "status": "passed",
+      "sourceDigest": "1bffa4937ab8c511868113a381283633a1bfdb78b6ec8f9eb79f090e20fb942a",
+      "evidence": [
+        "docs/release-evidence/v1.7.7-targeted.md#专项验证"
+      ]
+    },
+    "configScalars": {
+      "status": "passed",
+      "sourceDigest": "1bffa4937ab8c511868113a381283633a1bfdb78b6ec8f9eb79f090e20fb942a",
+      "evidence": [
+        "docs/release-evidence/v1.7.7-targeted.md#专项验证"
+      ]
+    },
+    "localReleaseGate": {
+      "status": "passed",
+      "sourceDigest": "1bffa4937ab8c511868113a381283633a1bfdb78b6ec8f9eb79f090e20fb942a",
+      "evidence": [
+        "docs/release-evidence/v1.7.7-targeted.md#专项验证"
+      ]
+    },
+    "ci": {
+      "status": "passed",
+      "sourceDigest": "1bffa4937ab8c511868113a381283633a1bfdb78b6ec8f9eb79f090e20fb942a",
+      "evidence": [
+        "https://github.com/glanderness/BeefTV/actions/runs/37215082071",
+        "https://github.com/glanderness/BeefTV/actions/runs/37215082076"
+      ]
+    }
+  },
+  "packages": {
+    "status": "passed",
+    "finalArchiveSmokeBeforeUpload": true,
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml",
+      "https://github.com/glanderness/BeefTV/actions/runs/37215560537"
+    ],
+    "archives": {
+      "darwin-amd64": {
+        "sourceDigest": "1bffa4937ab8c511868113a381283633a1bfdb78b6ec8f9eb79f090e20fb942a",
+        "sha256": "b9ecce012b2ae21a9643772dd14cf68cdda8ea6dd87df36c6ebe3524f3d99dfa",
+        "size": 158194228,
+        "evidence": ["https://updates.beefapi.com/beeftv/v1.7.7/BeefTV-v1.7.7-darwin-amd64.zip", "https://github.com/glanderness/BeefTV/actions/runs/37215560537"]
+      },
+      "darwin-arm64": {
+        "sourceDigest": "1bffa4937ab8c511868113a381283633a1bfdb78b6ec8f9eb79f090e20fb942a",
+        "sha256": "c1696d54a57d11cd32f8bfe306cff08f8e20c31b43dec964cd52410afdc58026",
+        "size": 153822309,
+        "evidence": ["https://updates.beefapi.com/beeftv/v1.7.7/BeefTV-v1.7.7-darwin-arm64.zip", "https://github.com/glanderness/BeefTV/actions/runs/37215560537"]
+      },
+      "windows-amd64": {
+        "sourceDigest": "1bffa4937ab8c511868113a381283633a1bfdb78b6ec8f9eb79f090e20fb942a",
+        "sha256": "307e762a98d7da90bb9ce812ca8e6108537bc6bfe7838959020f98350dc456f7",
+        "size": 145134170,
+        "evidence": ["https://updates.beefapi.com/beeftv/v1.7.7/BeefTV-v1.7.7-windows-amd64.zip", "https://github.com/glanderness/BeefTV/actions/runs/37215560537"]
+      }
+    }
+  },
+  "publishedCommit": "f083b50e80f956feef2b57511d4f58d66e6dc6a6",
+  "publication": {
+    "status": "passed",
+    "publishedAt": "2026-10-04T16:25:46Z",
+    "release": "https://github.com/glanderness/BeefTV/releases/tag/v1.7.7",
+    "feed": "https://updates.beefapi.com/beeftv/desktop-update.json",
+    "signatureVerified": true,
+    "allPublicArchivesDownloadedAndHashVerified": true,
+    "githubAndPublicFeedIdentical": true
+  }
+}

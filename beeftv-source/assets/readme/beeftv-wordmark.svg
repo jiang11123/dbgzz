@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="240" viewBox="0 0 1200 240" role="img" aria-labelledby="title desc">
+  <title id="title">BeefTV</title>
+  <desc id="desc">White BeefTV italic wordmark with the Beef symbol on a black background.</desc>
+  <rect width="1200" height="240" fill="#050505"/>
+  <g fill="#fff" transform="translate(255 38)">
+    <path d="M0 0h104c46 0 72 22 72 58 0 18-8 32-22 42 18 11 28 28 28 50 0 40-30 64-80 64H0V0Zm44 39v43h59c18 0 27-8 27-21 0-14-9-22-27-22H44Zm0 82v53h62c20 0 30-10 30-26 0-17-10-27-30-27H44Z" transform="scale(.76)"/>
+    <path d="M118 2h124l-24 40H146c-5-16-14-30-28-40Zm28 80h96l-24 40h-72c-1-14-6-28-14-40Z"/>
+  </g>
+  <g transform="translate(570 0) skewX(-8)">
+    <text x="0" y="164" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="128" font-weight="800" font-style="italic" letter-spacing="-8">BeefTV</text>
+  </g>
+</svg>

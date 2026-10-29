@@ -1,0 +1,54 @@
+---
+title: 视频提示词长度
+description: 按实际接入接口和模型校验长度，区分字符、UTF-16 和 token
+---
+
+## 规则
+
+视频没有统一的 8000 或 32000 字符限制。默认值按协议和模型选取，用户已保存的能力配置或内置渠道目录中的明确值优先。`promptMaxChars: 0` 表示本地没有字符上限，由服务商继续校验，不能理解为服务商无限接收。系统不自动截断提示词。
+
+字符数按 Unicode 码点统计；明确使用 UTF-16 的接口另存 `promptMaxUtf16Units`，前后端统一计数，常见表情占两个单位。Veo 的 token 上限不换算成字符数，交由上游校验。图片与文本模型的既有限制不受这次视频调整影响。
+
+## 已核实的接口
+
+核对日期：2026-10-22。不同供应商转接同名模型不一定沿用原生接口限制。
+
+| 接入接口与模型 | 默认上限 | 依据与边界 |
+| --- | --- | --- |
+| Ark Seedance | 未公开字符硬上限，本地 0 | [原生创建任务 API](https://docs.volcengine.com/docs/ark/create-video-generation-task-api?lang=zh)；[MCP 工具](https://github.com/byteplus-sa/ark-mcp/blob/4ae9fbc31c98246607f83d32d4381b6e27305666/src/ark_mcp/tools/seedance_create_task.py) 的 32000 不是原生接口保证 |
+| MiniMax H3 原生 V2 | 每个文本内容 7000 字符 | [V2 文档](https://platform.minimax.io/docs/api-reference/video/generation/api/v2-video-generation.json)；regenerate 的 40000 不适用于普通生成 |
+| fal H3 Max | 50000 字符，部分风格更短 | [fal schema](https://fal.ai/api/openapi/queue/openapi.json?endpoint_id=minimax/h3-max/text-to-video)；BeefAPI 目录保留各风格限制 |
+| DashScope Wan 2.1/2.2 | 800 字符 | [旧版文档](https://www.alibabacloud.com/help/en/model-studio/legacy-wan-text-to-video-api-reference) |
+| DashScope Wan 2.5/2.6、2.7、3.0 | 分别 1500、5000、20000 字符 | [文生视频](https://www.alibabacloud.com/help/en/model-studio/text-to-video-api-reference)、[Wan 3.0](https://help.aliyun.com/en/model-studio/wan3-video-generation-api-reference)；超长会被上游截断，客户端提前明确报错 |
+| OpenAI Videos Sora 2 / Pro | 32000 字符 | [Videos API](https://developers.openai.com/api/reference/resources/videos/methods/create)；字段合同不代表当前线路可用性 |
+| 即梦 CVSync2Async `jimeng_t2v_v30` | 800 字符 | [3.0 文生视频](https://docs.volcengine.com/docs/JimengAI/JimengAI-VideoGeneration30720P-Text-to-Video-InterfaceDocumentation?lang=zh)；其他 req_key 不外推 |
+| Luma Dream Machine `ray-2` / `ray-flash-2` | 5000 字符 | [创建接口](https://docs.lumalabs.ai/reference/creategeneration)、[错误合同](https://docs.lumalabs.ai/docs/errors) |
+| PixVerse text/generate 已列出的 v3.5 至 v6、c1 | 5000 字符 | [当前官方 schema](https://docs.platform.pixverse.ai/text-to-video-13016634e0)；不套用其他动作的旧 2048 |
+| 智谱 videos/generations 已列出的 CogVideoX、Vidu 模型 | 512 字符 | [官方 OpenAPI](https://docs.bigmodel.cn/api-reference/模型-api/视频生成异步.md)；仅匹配 schema 中的确切模型 ID |
+| Gemini Veo 3/3.1 | 1024 token，由上游校验 | [Veo 文档](https://ai.google.dev/gemini-api/docs/veo?hl=en)；不按 1024 字符拦截 |
+| FullVideo 接口 | 保留 4000 字符 | 接入协议既有限制；不当作 Seedance 原生限制。BeefAPI Laoli 线路也保留自己的 4000 校验 |
+
+### Runway
+
+[Runway 官方 API](https://docs.dev.runwayml.com/api.md) 的同一生成接口会接入不同模型，按确切模型 ID 区分：
+
+| 模型 ID | 上限 |
+| --- | --- |
+| `gen4.5`、`gen4_turbo`、`veo3.1`、`veo3.1_fast` | 1000 UTF-16 单位 |
+| `happyhorse_1_0` | 2500 UTF-16 单位 |
+| `seedance2`、`seedance2_fast`、`seedance2_mini` | 3500 字符 |
+| `seedance2_5` | 15000 字符 |
+| `hailuo3`、`h3_max` | 6000 字符 |
+| 已列出的 Kling 2.5/3.0/O3、`grok_imagine_1_5`、`grok_imagine_1_5_lite` | schema max length 2500 |
+| `wan3`、`wan3_prime` | schema max length 20000 |
+| `gemini_omni_flash`、`gemini_omni_flash_1.1` | schema max length 4000 |
+
+未明确写 UTF-16 的 schema 长度按 Unicode 字符校验，不额外推断 token 上限。未知或新增 ID 不通过前缀猜测限制。
+
+## 未核实与升级
+
+Agnes 文档未公开字符硬上限；Kling、Hunyuan、Baidu、Vidu 插件当前端点与找到的官方文档不一致，无法套用其他端点的上限。动态 fal、Replicate 和自定义工作流也不能从模型显示名确定合同。这些无配置默认值为 0，不沿用通用 8000，也不宣称所有供应商路径均已验收。MiniMax 插件走 V2，仅匹配 `MiniMax-H3` / `MiniMax-H3-Max` 的 7000，不把 V1 Hailuo2 的 2000 套到该协议。
+
+旧配置中的 8000 可能来自历史默认，也可能是用户主动设置，不能仅凭数值猜测并覆盖。内置 BeefAPI 渠道升级到支持 0 的客户端后刷新模型目录；自定义渠道在模型能力设置中选择“恢复默认限制”，或填写该渠道明确要求的数值。目录刷新沿用现有整体更新策略；本地默认合并保留已保存的自定义值。
+
+旧客户端可能拒绝包含 0 的新目录能力并沿用缓存，服务端更新不能替代客户端升级。真实生成成功只证明该请求被执行；允许更长提示词不保证人物对应、台词、构图等全部遵循。

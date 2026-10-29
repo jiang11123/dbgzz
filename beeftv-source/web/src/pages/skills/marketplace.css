@@ -1,0 +1,24 @@
+.skill-market-page .skill-market-toolbar { display: flex; gap: 12px; margin-bottom: 20px; }
+.skill-market-page .skill-market-toolbar .ant-input-search { max-width: 480px; }
+.skill-market-row { display: flex; align-items: flex-start; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--border); }
+.skill-market-copy { flex: 1; min-width: 0; }
+.skill-market-copy h2, .skill-market-preview h2 { font-size: var(--fs-body); font-weight: 600; line-height: 1.6; overflow-wrap: anywhere; }
+.skill-market-copy h2 > span { font-size: var(--fs-label); font-weight: 400; color: var(--muted-foreground); }
+.skill-market-copy p, .skill-market-preview p { margin: 8px 0; line-height: 1.65; overflow-wrap: anywhere; }
+.skill-market-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: var(--fs-label); color: var(--muted-foreground); overflow-wrap: anywhere; }
+.skill-market-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.skill-market-help, .skill-market-empty { margin: 24px 0; line-height: 1.8; color: var(--muted-foreground); }
+.skill-market-help a { margin-left: 8px; text-decoration: underline; }
+.skill-market-warning { color: var(--muted-foreground); }
+.skill-market-preview { max-height: 65vh; overflow-y: auto; overflow-wrap: anywhere; }
+.skill-market-preview h3 { font-weight: 600; margin: 16px 0 8px; }
+.skill-market-preview ul { padding-left: 20px; list-style: disc; }
+.skill-market-preview .skill-market-trials li { margin-bottom: 16px; }
+.skill-market-preview pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 12px; background: var(--muted); border-radius: var(--r-sm); max-height: 300px; overflow: auto; }
+.skill-publish-layout { display: grid; grid-template-columns: minmax(180px, 260px) minmax(0, 1fr); gap: 24px; }
+.skill-publish-list { display: flex; flex-direction: column; gap: 8px; }
+.skill-publish-list button { text-align: left; white-space: normal; height: auto; padding: 12px; justify-content: flex-start; }
+.skill-publish-list button[aria-pressed="true"] { background: var(--muted); border-color: var(--border); }
+.skill-publish-status { padding: 16px 0; margin-bottom: 12px; border-bottom: 1px solid var(--border); }
+.skill-publish-status p { margin-bottom: 10px; }
+@media (max-width: 640px) { .skill-market-row { flex-direction: column; gap: 12px; } .skill-publish-layout { grid-template-columns: minmax(0, 1fr); } }

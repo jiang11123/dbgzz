@@ -147,3 +147,23 @@ test('falls back to image_ori_raw when the original is invalid', () => {
 test('deduplicates full content and block patches for the same generated image', () => {
   assert.deepEqual(parseEvent({ content: { content_block: [creationBlock] }, patch_op: [{ patch_object: 1, patch_value: { content_block: [creationBlock] } }] }).mediaUrls, [outputUrl]);
 });
+
+test('extracts media URLs from content_obj and message list shapes', () => {
+  const { extractMediaUrlsFromNode } = require('./doubao-api');
+  const node = {
+    msgList: [{
+      messageData: {
+        content_blocks_v2: [{
+          block_type: 2074,
+          content_obj: {
+            creations: [{
+              type: 1,
+              image: { key: 'img-1', image_ori: { url: 'https://cdn.example/rabbit.png' } },
+            }],
+          },
+        }],
+      },
+    }],
+  };
+  assert.deepEqual(extractMediaUrlsFromNode(node), ['https://cdn.example/rabbit.png']);
+});

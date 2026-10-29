@@ -1,0 +1,107 @@
+{
+  "version": "v1.7.2",
+  "sourceDigest": "4d013a63e4daab6268936d282387ad2dcf68989ba3e75abc0fb0f44e9de37fd3",
+  "releaseComplete": false,
+  "budgetCNY": 100,
+  "spentCNY": 43.74479,
+  "newSpentCNY": 0,
+  "pendingCNY": null,
+  "knownPendingCNY": 0,
+  "liveTestWaiver": {
+    "approvedBy": "Ender",
+    "instruction": "本版豁免付费生成，专项验收通过后上线",
+    "scope": "mcp-assistant-targeted-acceptance"
+  },
+  "financialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.1",
+    "failedRequestIds": [
+      "202610020816334239151708268d9d6eZ5lRPwt",
+      "202610021242434383740578268d9d6BAoXA1u1"
+    ],
+    "evidence": [
+      "docs/release-evidence/v1.7.1.json"
+    ]
+  },
+  "review": {
+    "result": "approved",
+    "sourceDigest": "4d013a63e4daab6268936d282387ad2dcf68989ba3e75abc0fb0f44e9de37fd3",
+    "independent": true,
+    "reviewer": "Grok independent source review",
+    "evidence": [
+      "docs/release-evidence/v1.7.2-targeted.md#integrated-checks"
+    ]
+  },
+  "upgrade": {
+    "preservedData": true,
+    "sourceDigest": "4d013a63e4daab6268936d282387ad2dcf68989ba3e75abc0fb0f44e9de37fd3",
+    "evidence": [
+      "docs/release-evidence/v1.7.2-targeted.md#integrated-checks",
+      "Final canonical macOS candidate rebuilt at 5b3e4d5; before/after 121 assets, 101 tasks, 0 server project rows, 33 assistant turns."
+    ]
+  },
+  "liveMatrixStatus": "not_run_owner_waived",
+  "cases": [],
+  "verification": {
+    "mcpStartup": {
+      "status": "passed",
+      "sourceDigest": "4d013a63e4daab6268936d282387ad2dcf68989ba3e75abc0fb0f44e9de37fd3",
+      "evidence": [
+        "https://github.com/glanderness/BeefTV/actions/runs/37107978947",
+        "docs/release-evidence/v1.7.2-targeted.md#integrated-checks"
+      ]
+    },
+    "assistantRuntime": {
+      "status": "passed",
+      "sourceDigest": "4d013a63e4daab6268936d282387ad2dcf68989ba3e75abc0fb0f44e9de37fd3",
+      "evidence": [
+        "https://github.com/glanderness/BeefTV/actions/runs/37107978947",
+        "docs/release-evidence/v1.7.2-targeted.md#integrated-checks"
+      ]
+    },
+    "windowsNativeRuntime": {
+      "status": "passed",
+      "sourceDigest": "4d013a63e4daab6268936d282387ad2dcf68989ba3e75abc0fb0f44e9de37fd3",
+      "evidence": [
+        "https://github.com/glanderness/BeefTV/actions/runs/37107978947",
+        "Windows native canonical shadow, workspace identity, terminated PID, no-window and official MCP client tests passed."
+      ],
+      "method": "native"
+    },
+    "packagedCLI": {
+      "status": "passed",
+      "sourceDigest": "4d013a63e4daab6268936d282387ad2dcf68989ba3e75abc0fb0f44e9de37fd3",
+      "evidence": [
+        "https://github.com/glanderness/BeefTV/actions/runs/37107978947",
+        "docs/release-evidence/v1.7.2-targeted.md#integrated-checks"
+      ],
+      "method": "package-validator",
+      "platforms": [
+        "darwin-arm64",
+        "darwin-amd64",
+        "windows-amd64"
+      ],
+      "finalArchiveSmokeBeforeUpload": true,
+      "releaseWorkflowEvidence": [
+        ".github/workflows/release-desktop.yml: Verify MCP from final packaged CLI precedes platform artifact upload."
+      ],
+      "finalArchivesStatus": "pending_release_workflow"
+    },
+    "localReleaseGate": {
+      "status": "passed",
+      "sourceDigest": "4d013a63e4daab6268936d282387ad2dcf68989ba3e75abc0fb0f44e9de37fd3",
+      "evidence": [
+        "docs/release-evidence/v1.7.2-targeted.md#integrated-checks",
+        "Final source scripts/verify-beeftv-local-release.sh passed, including production web build."
+      ]
+    },
+    "ci": {
+      "status": "passed",
+      "sourceDigest": "4d013a63e4daab6268936d282387ad2dcf68989ba3e75abc0fb0f44e9de37fd3",
+      "evidence": [
+        "https://github.com/glanderness/BeefTV/actions/runs/37107978947",
+        "https://github.com/glanderness/BeefTV/pull/70/checks"
+      ]
+    }
+  }
+}

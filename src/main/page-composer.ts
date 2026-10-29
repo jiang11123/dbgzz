@@ -52,9 +52,9 @@ export const composerSettingsScript = `(() => {
     const nearTexts = near.map(n => getText(n)).filter(Boolean);
     const modelRaw = nearTexts.find(s => /^模型\\s*\\S/.test(s)) || '';
     const model = modelRaw ? modelRaw.replace(/^模型\\s*/, '').trim() : undefined;
-    const ratio = nearTexts.map(s => s.replace(/\\s+/g, '').replace('：', ':')).find(s => /^\\d+:\\d+$/.test(s));
+    const ratio = nearTexts.map(s => s.replace(/\\s+/g, '').replace('：', ':').match(/^(\\d+:\\d+)(?:[·.]|$)/)?.[1]).find(Boolean);
     // 'auto · 10s' carries the duration the page will actually use.
-    const durationRaw = nearTexts.find(s => /^(?:自动|auto)\\s*[·.]?\\s*\\d+\\s*s?$/i.test(s)) || '';
+    const durationRaw = nearTexts.find(s => /^(?:自动|auto|\\d+\\s*[:：]\\s*\\d+)\\s*[·.]?\\s*\\d+\\s*s?$/i.test(s)) || '';
     const duration = (() => { const m = /(\\d+)\\s*s?$/i.exec(durationRaw); return m ? Number(m[1]) : undefined; })();
     const video = /视频生成|生成视频|video/i.test(chipText) || /视频生成|生成视频/i.test(modeBtnText) || (!chipText && /描述你想要的视频|视频/.test(placeholder));
     const image = !video && (/图像生成|图片生成|生成图片|画图|image/i.test(chipText) || /图像生成|图片生成/i.test(modeBtnText));
@@ -275,111 +275,84 @@ export async function ensureComposerMode(view: BrowserView, settings: ComposerSe
 /**
  * Sets video ratio and duration through Doubao's native panel (4s-30s slider + ratio grid).
  */
+export const videoDurationPanelScript = String.raw`(() => {
+  const visible = n => { const r=n.getBoundingClientRect(); return r.width>0 && r.height>0 && getComputedStyle(n).visibility!=='hidden'; };
+  const panel=[...document.querySelectorAll('[data-creation-params-panel-id][role=menu]')].find(visible);
+  const slider=panel && [...panel.querySelectorAll('[role=slider],input[type=range]')].find(visible);
+  if(!slider)return null;
+  const section=slider.closest('section') || slider.parentElement;
+  const values=[...(section.innerText||'').matchAll(/(\d+)\s*(?:s|秒)/gi)].map(m=>Number(m[1]));
+  const minSec=values.length>=3 ? values.at(-2) : Number(slider.min);
+  const maxSec=values.length>=3 ? values.at(-1) : Number(slider.max);
+  const minIndex=Number(slider.getAttribute('aria-valuemin') ?? slider.min);
+  const maxIndex=Number(slider.getAttribute('aria-valuemax') ?? slider.max);
+  const index=Number(slider.getAttribute('aria-valuenow') ?? slider.value);
+  return {minSec,maxSec,minIndex,maxIndex,index,currentSec:values[0]};
+})()`;
+
 export async function selectDoubaoVideoSettings(view: BrowserView, options: { ratio?: string; duration?: number }) {
   const { ratio, duration } = options;
   if (!ratio && (!duration || duration <= 0)) return;
-
-  const triggerKey = '自动|时长|比例|·|\\d+\\s*[:：]\\s*\\d+|\\d+\\s*s$';
-  const openTrigger = async () => {
-    const isOpen = await view.webContents.executeJavaScript(`(() => {
-      const text = document.body ? (document.body.innerText || '') : '';
-      return text.includes('比例') && (text.includes('时长') || text.includes('30s'));
+  const openPanel = async () => {
+    if (await view.webContents.executeJavaScript(videoDurationPanelScript)) return;
+    // Dismiss a model/menu overlay that would consume the first settings click.
+    view.webContents.sendInputEvent({type:'keyDown',keyCode:'Escape'});
+    view.webContents.sendInputEvent({type:'keyUp',keyCode:'Escape'});
+    await pause(100);
+    const point = await view.webContents.executeJavaScript(String.raw`(() => {
+      const visible=n=>{const r=n.getBoundingClientRect();return r.width>0&&r.height>0&&getComputedStyle(n).visibility!=='hidden';};
+      const chip=[...document.querySelectorAll('[data-testid=skill_input_exit_button]')].find(visible);
+      if(!chip)return null;
+      const bottom=chip.getBoundingClientRect().bottom;
+      const target=[...document.querySelectorAll('button,[role=button]')].find(n=>visible(n)&&Math.abs(n.getBoundingClientRect().bottom-bottom)<24&&/^(?:自动|auto|\d+\s*[:：]\s*\d+)\s*[·.]\s*\d+\s*(?:s|秒)$/i.test((n.innerText||'').trim()));
+      if(!target)return null;const r=target.getBoundingClientRect();return {x:Math.round(r.x+r.width/2),y:Math.round(r.y+r.height/2)};
     })()`);
-    if (isOpen) return true;
-
-    const point = await view.webContents.executeJavaScript(`(() => {
-      const input = [...document.querySelectorAll('[contenteditable=true],textarea')].find(n => n.getBoundingClientRect().width > 0);
-      const bottom = input?.getBoundingClientRect().bottom || window.innerHeight;
-      const nodes = [...document.querySelectorAll('button,[role=button]')].filter(n => {
-        const r = n.getBoundingClientRect();
-        return r.width > 0 && r.height > 0 && Math.abs(r.bottom - bottom) < 260;
-      });
-      const re = new RegExp(${JSON.stringify(triggerKey)}, 'i');
-      const target = nodes.find(n => re.test((n.innerText || n.getAttribute('aria-label') || '').trim()));
-      if (!target) return null;
-      const r = target.getBoundingClientRect();
-      return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
-    })()`);
-    if (!point) return false;
-    await clickPoint(view, point);
-    await pause(600);
-    return true;
+    if (!point) throw new Error('目标账号未找到视频比例与时长设置入口');
+    for (let attempt=0;attempt<2;attempt++) {
+      await clickPoint(view, point);
+      for(let wait=0;wait<15;wait++) {
+        if(await view.webContents.executeJavaScript(videoDurationPanelScript)) return;
+        await pause(100);
+      }
+    }
+    throw new Error('未确认视频时长设置面板打开');
   };
-
-  const opened = await openTrigger();
-  if (!opened) throw new Error('目标账号未找到比例与时长设置入口');
-
-  // 1. Select Ratio if specified
-  if (ratio) {
-    const wantedRatio = ratio.replace(/\s+/g, '').replace('：', ':');
-    const ratioPoint = await view.webContents.executeJavaScript(`(() => {
-      const nodes = [...document.querySelectorAll('button,[role=button],div,span')].filter(n => {
-        const r = n.getBoundingClientRect();
-        return r.width > 0 && r.height > 0;
-      });
-      const target = nodes.find(n => {
-        const t = (n.innerText || '').trim().replace(/\\s+/g, '').replace('：', ':');
-        return t === ${JSON.stringify(wantedRatio)};
-      });
-      if (!target) return null;
-      const r = target.getBoundingClientRect();
-      return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
-    })()`);
-    if (ratioPoint) {
-      await clickPoint(view, ratioPoint);
-      await pause(400);
-    }
-  }
-
-  // 2. Select Duration if specified
-  if (duration && duration > 0) {
-    const targetSec = Math.min(30, Math.max(4, Math.round(duration)));
-    const durationApplied = await view.webContents.executeJavaScript(`(() => {
-      const range = [...document.querySelectorAll('input[type=range]')].find(n => n.getBoundingClientRect().width > 0 || n.offsetWidth > 0);
-      if (range) {
-        const proto = Object.getPrototypeOf(range);
-        Object.getOwnPropertyDescriptor(proto, 'value')?.set?.call(range, String(${targetSec}));
-        range.dispatchEvent(new Event('input', { bubbles: true }));
-        range.dispatchEvent(new Event('change', { bubbles: true }));
-        return true;
-      }
-      return false;
-    })()`);
-
-    if (!durationApplied) {
-      const clickResult = await view.webContents.executeJavaScript(`(() => {
-        const dots = [...document.querySelectorAll('[class*="dot"], [class*="mark"], [class*="step"]')].filter(n => {
-          const r = n.getBoundingClientRect();
-          return r.width > 0 && r.height > 0;
-        });
-        const dotIndex = ${targetSec} - 4;
-        if (dots.length > dotIndex && dotIndex >= 0) {
-          const r = dots[dotIndex].getBoundingClientRect();
-          return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
-        }
-        const tracks = [...document.querySelectorAll('[class*="track"], [class*="rail"], [role="slider"]')].filter(n => {
-          const r = n.getBoundingClientRect();
-          return r.width > 50 && r.height > 0;
-        });
-        if (tracks.length) {
-          const r = tracks[0].getBoundingClientRect();
-          const ratio = (${targetSec} - 4) / (30 - 4);
-          return { x: Math.round(r.left + r.width * ratio), y: Math.round(r.top + r.height / 2) };
-        }
-        return null;
+  await openPanel();
+  try {
+    if (ratio) {
+      const point=await view.webContents.executeJavaScript(`(() => {
+        const panel=[...document.querySelectorAll('[data-creation-params-panel-id][role=menu]')].find(n=>n.getBoundingClientRect().width>0);
+        const wanted=${JSON.stringify(ratio.replace(/\s+/g,'').replace('：',':'))};
+        const target=panel && [...panel.querySelectorAll('button,[role=button],div,span')].reverse().find(n=>n.getBoundingClientRect().width>0&&(n.innerText||'').trim().replace(/\\s+/g,'').replace('：',':')===wanted);
+        if(!target)return null;const r=target.getBoundingClientRect();return {x:Math.round(r.x+r.width/2),y:Math.round(r.y+r.height/2)};
       })()`);
-
-      if (clickResult) {
-        await clickPoint(view, clickResult);
-        await pause(400);
-      }
+      if(!point)throw new Error('视频比例选项不可用：'+ratio);
+      await clickPoint(view,point); await pause(150); await openPanel();
     }
+    if (duration && duration > 0) {
+      const state = await view.webContents.executeJavaScript(videoDurationPanelScript) as {minSec:number;maxSec:number;minIndex:number;maxIndex:number;currentSec:number};
+      const steps=(duration-state.minSec)/(state.maxSec-state.minSec)*(state.maxIndex-state.minIndex);
+      if(!Number.isInteger(steps)||steps<0||steps>state.maxIndex-state.minIndex)throw new Error('当前视频模型不支持 '+duration+' 秒，请选择支持的时长');
+      await view.webContents.executeJavaScript(String.raw`[...document.querySelectorAll('[data-creation-params-panel-id][role=menu] [role=slider],[data-creation-params-panel-id][role=menu] input[type=range]')].find(n=>n.getBoundingClientRect().width>0).focus()`);
+      for(const keyCode of ['Home', ...Array<string>(steps).fill('Right')]) {
+        view.webContents.sendInputEvent({type:'keyDown',keyCode});
+        view.webContents.sendInputEvent({type:'keyUp',keyCode});
+        await pause(35);
+      }
+      const actual=await view.webContents.executeJavaScript(videoDurationPanelScript) as {currentSec?:number}|null;
+      if(actual?.currentSec!==duration)throw new Error('视频时长未生效：要求 '+duration+' 秒，豆包实际为 '+(actual?.currentSec??'未知')+' 秒，已停止发送');
+    }
+  } finally {
+    view.webContents.sendInputEvent({type:'keyDown',keyCode:'Escape'});
+    view.webContents.sendInputEvent({type:'keyUp',keyCode:'Escape'});
+    await pause(150);
   }
+  if(duration)await assertVideoDuration(view,duration);
+}
 
-  // Close the popup by pressing Escape
-  view.webContents.sendInputEvent({ type: 'keyDown', keyCode: 'Escape' });
-  view.webContents.sendInputEvent({ type: 'keyUp', keyCode: 'Escape' });
-  await pause(300);
+export async function assertVideoDuration(view: BrowserView, duration: number) {
+  const actual=await readComposerSettings(view);
+  if(actual.duration!==duration)throw new Error('视频时长未确认：要求 '+duration+' 秒，豆包实际为 '+(actual.duration??'未知')+' 秒，已停止发送');
 }
 
 /**
@@ -573,3 +546,4 @@ export async function clickComposerSend(view: BrowserView, prompt: string) {
   })()`) : (await view.webContents.executeJavaScript(draftImageStateScript)).count > 0;
   if (pending) throw new Error('目标账号未确认发送，内容已保留在输入框');
 }
+

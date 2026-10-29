@@ -1,320 +1,524 @@
 import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Check, FolderOpen, GripVertical, Heart, MonitorPlay, Music2, Plus, Server, Settings, Upload } from 'lucide-react';
+import { Check, FolderOpen, Plus, Settings, Play, RefreshCw, LayoutGrid, Globe, ShieldCheck } from 'lucide-react';
 import type { Account, DownloadStatus } from '../shared/types';
 import './style.css';
 import './theme.css';
-import productLogo from './assets/logo.png';
 import { ThemeToggle } from './theme';
-import { ImageAssetsPanel } from './image-assets-panel';
-import { BarResizer, useResizableBar } from './resizable-bar';
-import { ImageAssetsBar } from './image-assets-bar';
-import { MessageSyncPanel } from './message-sync-panel';
-import { AccountShortcutInput, ResetAccountShortcuts } from './account-shortcut-settings';
-import { accountShortcut } from '../shared/account-shortcuts';
-import { DonationPanel } from './donation-panel';
+import { BeefTvCanvas } from './beeftv-canvas/BeefTvCanvas';
+import { BeefTvTopBar } from './beeftv-canvas/BeefTvTopBar';
+import { BeefTvSidebar, type BeefTvActiveTab } from './beeftv-canvas/BeefTvSidebar';
+import { BeefTvDrawer } from './beeftv-canvas/BeefTvDrawer';
+import { useCanvasState } from './beeftv-canvas/useCanvasState';
+import { useCanvasKeyboard } from './beeftv-canvas/useCanvasKeyboard';
 import { GatewayPanel } from './gateway-panel';
-import { GatewayChat, ModeSwitch } from './gateway-chat';
+import { DonationPanel } from './donation-panel';
 
-type Workspace = { accounts: Account[]; downloadDirectory: string; accountShortcuts: Record<string,string> };
-function getDownloadNoticeTitle(status: DownloadStatus): string {
-  const isImage = Boolean(status.name && /\.(png|jpe?g|webp|gif)$/i.test(status.name));
-  const media = isImage ? '图片' : '视频';
-  if (status.state === 'started') return `正在下载${media}`;
-  if (status.state === 'completed') return `${media}已保存`;
-  if (status.state === 'duplicate') return '已阻止重复下载';
-  return `${media}下载失败`;
-}
+type Workspace = { accounts: Account[]; downloadDirectory: string; accountShortcuts: Record<string, string> };
 
 function App() {
-  // Secondary windows (设置 / API 网关 / 消息同步) render a single panel by query
-  // param. This MUST run before any hook: a settings window must not start the
-  // account-opening effects of the main workspace.
   const panel = new URLSearchParams(window.location.search).get('panel');
   if (panel === 'settings') return <div className="settings-page"><SettingsPage /></div>;
   if (panel === 'gateway') return <GatewayPanel />;
-  if (panel === 'messages') return <MessageSyncPanel />;
-  if (panel === 'image-assets') return <ImageAssetsPanel />;
   if (panel === 'donation') return <DonationPanel />;
+
   const [data, setData] = useState<Workspace | null>(null);
   const [currentAccountId, setCurrentAccountId] = useState<number | null>(null);
   const [showNewAccount, setShowNewAccount] = useState(false);
   const [downloadNotice, setDownloadNotice] = useState<DownloadStatus | null>(null);
   const [toast, setToast] = useState('');
-  const [mode, setMode] = useState<'gateway' | 'account'>('gateway');
-  const [stagedImages, setStagedImages] = useState<import('../shared/types').StagedAttachment[]>([]);
-  const accountShortcuts = data?.accountShortcuts ?? {};
-  const startupAccountOpened = useRef(false);
-  const message = (text: string) => { setToast(text); window.setTimeout(() => setToast(''), 2400); };
-  const accountBar = useResizableBar('account', message);
-  const refresh = async () => {
-    const next = await window.workspace.load(); setData(next);
+  const [mode, setMode] = useState<'account' | 'beeftv'>('account');
+
+  // BeefTV 画布状态
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [activeTab, setActiveTab] = useState<BeefTvActiveTab>('canvas');
+  const [isSpacePressed, setIsSpacePressed] = useState(false);
+
+  const message = (text: string) => {
+    setToast(text);
+    window.setTimeout(() => setToast(''), 2600);
   };
+
+  const canvas = useCanvasState(8788, data?.accounts || []);
+
+  useCanvasKeyboard({
+    selectedNodeId: canvas.selectedNodeId,
+    onRemoveNode: canvas.removeNode,
+    onResetView: canvas.resetViewport,
+    onZoomIn: () => canvas.setScale(Math.min(2.5, canvas.scale + 0.15)),
+    onZoomOut: () => canvas.setScale(Math.max(0.25, canvas.scale - 0.15)),
+    setIsSpacePressed,
+  });
+
+  const refresh = async () => {
+    const next = await window.workspace.load();
+    setData(next);
+    if (!currentAccountId && next.accounts?.length) {
+      setCurrentAccountId(next.accounts[0].id);
+    }
+  };
+
   const openAccount = async (account?: Account) => {
     if (!account) return;
     try {
       await window.workspace.openAccount(account.id);
       setCurrentAccountId(account.id);
-      if (mode !== 'account') changeMode('account');
+      if (mode !== 'account') {
+        setMode('account');
+      }
+    } catch (error) {
+      message(`打开账号失败：${error instanceof Error ? error.message : String(error)}`);
     }
-    catch (error) { message(`打开账号失败：${error instanceof Error ? error.message : String(error)}`); }
   };
+
+  const switchToCanvas = async () => {
+    await window.workspace.hideBrowser();
+    setMode('beeftv');
+  };
+
+  const switchToAccount = async (account?: Account) => {
+    const target = account || data?.accounts?.find(a => a.id === currentAccountId) || data?.accounts?.[0];
+    if (target) {
+      await openAccount(target);
+    } else {
+      setShowNewAccount(true);
+    }
+  };
+
+  const launchBeefTv = async () => {
+    const ok = await window.workspace.beeftvLaunch();
+    if (ok) {
+      message('🚀 正在启动原生态 BeefTV 客户端...');
+    } else {
+      message('未找到 BeefTV 安装程序，请确认 E:\\beeftv\\BeefTV.exe 路径');
+    }
+  };
+
+  const syncToBeefTv = async () => {
+    const res = await window.workspace.beeftvSync();
+    if (res.ok) {
+      message(`⚡ 已成功将 ${res.count} 个账号与模型配置同步至 BeefTV！`);
+    } else {
+      message(`同步失败：${res.error || '未知错误'}`);
+    }
+  };
+
   useEffect(() => {
-    void refresh();
-    void window.workspace.getAppMode().then(setMode).catch(() => undefined);
-    const disposers = [window.workspace.onChanged(refresh), window.workspace.onAppModeChanged(setMode), window.workspace.onAccountOpened(setCurrentAccountId),
-      window.workspace.onBrowserError(message), window.workspace.onAccountSendStatus(message), window.workspace.onDownloadStatus(setDownloadNotice)];
-    return () => disposers.forEach(dispose => dispose());
+    void refresh().then(async () => {
+      // 启动时默认打开第一个账号网页，供用户快速扫码或确认登录
+      const initial = await window.workspace.load();
+      if (initial?.accounts?.length) {
+        const first = initial.accounts[0];
+        setCurrentAccountId(first.id);
+        void window.workspace.openAccount(first.id);
+      }
+    });
+
+    const offChanged = window.workspace.onChanged(() => void refresh());
+    const offDownload = window.workspace.onDownloadStatus((notice) => {
+      setDownloadNotice(notice);
+      if (notice.state === 'completed') {
+        message(`视频下载成功：${notice.name}`);
+      }
+    });
+
+    return () => {
+      offChanged();
+      offDownload();
+    };
   }, []);
-  useEffect(() => {
-    if (!data) return;
-    // Clean the selection only when the chosen account really disappeared; never
-    // clobber a freshly opened account during a concurrent refresh.
-    setCurrentAccountId(old => (old != null && !data.accounts.some((a: Account) => a.id === old)) ? null : old);
-  }, [data]);
-  useEffect(() => {
-    if (!data || mode !== 'account' || startupAccountOpened.current || !data.accounts.length) return;
-    // An explicit openAccount (a check script, a shortcut, a click) wins over the startup
-    // default: without this, a fast caller that opens its own account gets overridden
-    // when this effect re-fires on the next data refresh.
-    if (currentAccountId != null) { startupAccountOpened.current = true; return; }
-    startupAccountOpened.current = true; void openAccount(data.accounts[0]);
-  }, [data, mode]);
-  useEffect(() => {
-    if (!downloadNotice || downloadNotice.state === 'started') return;
-    const timer = window.setTimeout(() => setDownloadNotice(null), 3000); return () => window.clearTimeout(timer);
-  }, [downloadNotice]);
-  if (!data) return <div className="loading">正在打开豆包工作站...</div>;
-  const changeMode = (next: 'gateway' | 'account') => { setMode(next); void window.workspace.setAppMode(next).catch(error => message(String(error))); };
 
-  const renderTopBar = () => (
-    <header className="topbar" style={{ height: accountBar.height, '--account-scale': Math.max(0.75, Math.min(2.5, accountBar.height / 58)) } as React.CSSProperties}>
-      <div className="brand"><img className="product-logo" src={productLogo} alt="奶蛙老师头像" /><span>豆包工作站</span></div>
-      <ModeSwitch mode={mode} onModeChange={changeMode} />
-      <div className="account-tabs">
-        {data.accounts.map((account, index) => (
-          <button key={account.id} className={mode === 'account' && account.id === currentAccountId ? 'account active' : 'account'} onClick={() => void openAccount(account)} title={accountShortcut(index, data.accountShortcuts || {}) || undefined}>
-            <span className={account.isLoggedIn ? 'login-dot on' : 'login-dot'} />{account.name}
-          </button>
-        ))}
-        <button className="add-account" onClick={() => setShowNewAccount(true)} title="添加账号"><Plus size={15} />添加账号</button>
-      </div>
-      <div className="topbar-actions">
-        <ThemeToggle />
-        <button className="browser-size-toggle" onClick={() => void window.workspace.openAuthorDouyin().catch(error => message(`打开抖音主页失败：${String(error)}`))} title="前往奶蛙老师的抖音主页"><Music2 size={15} />抖音奶蛙老师开源</button>
-        <button className="watermark-shortcut donation-button" onClick={() => void window.workspace.openDonation()} title="赞赏奶蛙老师"><Heart size={15} />赞赏奶蛙老师</button>
-        <button className="browser-size-toggle" title="图片资产" onClick={() => void window.workspace.openImageAssets()}><Upload size={15} />图片资产</button>
-        <button className="browser-size-toggle" title="网关设置" onClick={() => void window.workspace.openGateway()}><Server size={15} />网关设置</button>
-        <button className="browser-size-toggle" title="设置" onClick={() => void window.workspace.openSettings()}><Settings size={15} />设置</button>
-      </div>
-      <BarResizer bar={accountBar} />
-    </header>
-  );
-
-  if (mode === 'gateway') return <main className="app-shell gateway-shell">
-    {renderTopBar()}
-    <ImageAssetsBar accountId={currentAccountId ?? data?.accounts[0]?.id ?? null} message={message}
-      onStage={items => setStagedImages(current => [...current, ...items.filter(item => !current.some(x => x.id === item.id)).map(item => ({ id: item.id, assetId: item.id, name: item.name, mimeType: item.name.match(/\.(png|jpe?g|webp|gif)$/i)?.[0] ? 'image/' + item.name.split('.').pop()!.toLowerCase().replace('jpg', 'jpeg') : 'application/octet-stream', url: item.url }))])} />
-    <GatewayChat mode={mode} onModeChange={changeMode} stagedImages={stagedImages} onStagedChange={setStagedImages} />
-    {showNewAccount && <NewAccount onClose={() => setShowNewAccount(false)} onCreated={async account => { setShowNewAccount(false); await refresh(); await openAccount(account); }} />}
-    {toast && <div className="toast"><Check size={16} />{toast}</div>}
-  </main>;
-
-  return <main className="app-shell browser-fullscreen">
-    {renderTopBar()}
-    <ImageAssetsBar accountId={currentAccountId} message={message} />
-    {showNewAccount && <NewAccount onClose={() => setShowNewAccount(false)} onCreated={async account => { setShowNewAccount(false); await refresh(); await openAccount(account); }} />}
-    {downloadNotice && <div className={`download-notice ${downloadNotice.state}`} role="status"><div><b>{getDownloadNoticeTitle(downloadNotice)}</b><span>{downloadNotice.name}</span></div>
-      {downloadNotice.state === 'completed' && downloadNotice.path && <button className="download-location" onClick={() => void window.workspace.openFolder(downloadNotice.path as string)}><FolderOpen size={13} />打开下载位置</button>}
-      <button className="download-dismiss" aria-label="关闭下载提示" onClick={() => setDownloadNotice(null)}>×</button></div>}
-    {toast && <div className="toast"><Check size={16} />{toast}</div>}
-  </main>;
-}
-
-/** Settings window: account management, quotas, deletion and drag reordering. */
-/**
- * IME-safe rename field: commits on blur/Enter, never commits mid-composition,
- * and keeps focus + caret through unrelated data refreshes.
- */
-function NameInput({ ariaLabel, initial, onCommit }: { ariaLabel: string; initial: string; onCommit: (value: string) => void }) {
-  const [value, setValue] = useState(initial);
-  const [composing, setComposing] = useState(false);
-  const field = useRef<HTMLInputElement | null>(null);
-  const committed = useRef(initial);
-  // A reorder changes this row's account: follow the new name unless the user is
-  // mid-edit, otherwise the field keeps showing the previous account's name.
-  const lastInitial = useRef(initial);
-  if (lastInitial.current !== initial) {
-    lastInitial.current = initial;
-    if (!composing) { committed.current = initial; setValue(initial); }
+  if (!data) {
+    return <div className="loading" style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>正在加载豆奶画布...</div>;
   }
-  const commit = () => {
-    if (composing) return;
-    if (field.current !== document.activeElement && value === committed.current) return;
-    if (value.trim() && value !== committed.current) { committed.current = value; onCommit(value); }
-  };
-  return <input ref={field} aria-label={ariaLabel} value={value}
-    onFocus={() => { committed.current = value; }}
-    onChange={event => setValue(event.target.value)}
-    onBlur={() => { const final = field.current ? field.current.value : value; setComposing(false); const trimmed = final.trim(); if (trimmed && trimmed !== committed.current) { committed.current = trimmed; onCommit(trimmed); setValue(trimmed); } else { setValue(committed.current); } }}
-    onKeyDown={event => {
-      if (event.nativeEvent.isComposing || composing) return;
-      if (event.key === 'Enter') { event.preventDefault(); (event.target as HTMLInputElement).blur(); }
-      if (event.key === 'Escape') { setValue(initial); (event.target as HTMLInputElement).blur(); }
-    }}
-    onCompositionStart={() => setComposing(true)}
-    onCompositionEnd={event => { setComposing(false); setValue(event.data); }} />;
+
+  const currentAccount = data.accounts.find(a => a.id === currentAccountId);
+
+  return (
+    <main className="app-shell browser-fullscreen" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+      {/* 统一顶部控制台导航条 */}
+      <header className="topbar" style={{ height: '54px', borderBottom: '1px solid #2d333b', padding: '0 16px', display: 'flex', alignItems: 'center', gap: '12px', background: '#181b20', flexShrink: 0, zIndex: 10 }}>
+        {/* Logo 与网关运行标识 */}
+        <div className="brand" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => void switchToAccount()}>
+          <span style={{ fontWeight: 700, fontSize: '15px', color: '#fff', letterSpacing: '-0.2px' }}>豆奶画布</span>
+          <span style={{ background: '#2563eb', color: '#fff', fontSize: '11px', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>3.0</span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(34, 197, 94, 0.15)', border: '1px solid rgba(34, 197, 94, 0.3)', padding: '2px 7px', borderRadius: '12px', fontSize: '11px', color: '#4ade80' }} title="本地网关正常监听在 127.0.0.1:8788">
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e' }} />
+            网关 8788
+          </div>
+        </div>
+
+        {/* 账号快速切换标签 */}
+        <div className="account-tabs" style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1, overflowX: 'auto', padding: '0 4px' }}>
+          {data.accounts.map(acc => (
+            <button
+              key={acc.id}
+              className={`account ${acc.id === currentAccountId && mode === 'account' ? 'active' : ''}`}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                height: '32px',
+                padding: '0 10px',
+                borderRadius: '6px',
+                border: acc.id === currentAccountId && mode === 'account' ? '1px solid #3b82f6' : '1px solid #30363d',
+                background: acc.id === currentAccountId && mode === 'account' ? '#1e293b' : '#21262d',
+                color: acc.id === currentAccountId && mode === 'account' ? '#60a5fa' : '#c9d1d9',
+                fontSize: '12px',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+              onClick={() => void openAccount(acc)}
+              title={`点击切换到【${acc.name}】进行网页扫码登录或对话`}
+            >
+              <span className={`login-dot ${acc.isLoggedIn ? 'on' : ''}`} style={{ width: '7px', height: '7px', borderRadius: '50%', background: acc.isLoggedIn ? '#22c55e' : '#f59e0b' }} />
+              <span>{acc.name}</span>
+            </button>
+          ))}
+
+          {/* + 添加账号按钮 */}
+          <button
+            className="add-account"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              height: '32px',
+              padding: '0 10px',
+              borderRadius: '6px',
+              border: '1px dashed #3b82f6',
+              background: 'rgba(59, 130, 246, 0.08)',
+              color: '#60a5fa',
+              fontSize: '12px',
+              cursor: 'pointer',
+              fontWeight: 600,
+              whiteSpace: 'nowrap',
+            }}
+            onClick={() => setShowNewAccount(true)}
+            title="添加新的豆包账号并扫码登录"
+          >
+            <Plus size={14} />
+            添加豆包账号
+          </button>
+        </div>
+
+        {/* BeefTV 协同操作按钮区 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+          {/* 启动原生态 BeefTV 按钮 */}
+          <button
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              height: '32px',
+              padding: '0 12px',
+              borderRadius: '6px',
+              background: '#2563eb',
+              color: '#fff',
+              border: 'none',
+              fontSize: '12px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              boxShadow: '0 2px 6px rgba(37, 99, 235, 0.35)',
+            }}
+            onClick={launchBeefTv}
+            title="启动本地安装的原生态 BeefTV 客户端"
+          >
+            <Play size={13} fill="#fff" />
+            启动原生态 BeefTV
+          </button>
+
+          {/* 一键同步至 BeefTV */}
+          <button
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              height: '32px',
+              padding: '0 10px',
+              borderRadius: '6px',
+              background: '#21262d',
+              color: '#c9d1d9',
+              border: '1px solid #30363d',
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+            onClick={syncToBeefTv}
+            title="将所有豆包账号与网关配置一键同步写入 BeefTV 数据库"
+          >
+            <RefreshCw size={13} />
+            同步至 BeefTV
+          </button>
+
+          {/* 视图模式切换：网页登录 VS 内置画布 */}
+          <div style={{ display: 'inline-flex', background: '#16191d', padding: '2px', borderRadius: '6px', border: '1px solid #30363d' }}>
+            <button
+              style={{
+                height: '28px',
+                padding: '0 10px',
+                borderRadius: '4px',
+                border: 'none',
+                background: mode === 'account' ? '#30363d' : 'transparent',
+                color: mode === 'account' ? '#fff' : '#8b949e',
+                fontSize: '12px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                cursor: 'pointer',
+              }}
+              onClick={() => void switchToAccount()}
+              title="查看与扫码登录豆包网页"
+            >
+              <Globe size={13} />
+              账号网页
+            </button>
+            <button
+              style={{
+                height: '28px',
+                padding: '0 10px',
+                borderRadius: '4px',
+                border: 'none',
+                background: mode === 'beeftv' ? '#30363d' : 'transparent',
+                color: mode === 'beeftv' ? '#fff' : '#8b949e',
+                fontSize: '12px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                cursor: 'pointer',
+              }}
+              onClick={() => void switchToCanvas()}
+              title="切换到内置 BeefTV 节点画布"
+            >
+              <LayoutGrid size={13} />
+              内置画布
+            </button>
+          </div>
+
+          <ThemeToggle />
+
+          <button
+            className="browser-size-toggle"
+            style={{ height: '32px', width: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#21262d', border: '1px solid #30363d', borderRadius: '6px', color: '#c9d1d9', cursor: 'pointer' }}
+            title="系统与网关设置"
+            onClick={() => void window.workspace.openSettings()}
+          >
+            <Settings size={15} />
+          </button>
+        </div>
+      </header>
+
+      {/* 主工作区 */}
+      {mode === 'account' ? (
+        // 模式 1: 豆包账号官方网页（支持微信扫码登录、人机验证与会话同步）
+        <div style={{ flex: 1, position: 'relative', width: '100%', height: 'calc(100vh - 54px)', background: '#17191d' }}>
+          {/* 页面底部提示条 */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 12,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              background: 'rgba(23, 25, 29, 0.92)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid #30363d',
+              borderRadius: '24px',
+              padding: '6px 18px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              zIndex: 5,
+              fontSize: '12px',
+              color: '#94a3b8',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+              pointerEvents: 'none',
+            }}
+          >
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#38bdf8' }}>
+              <ShieldCheck size={14} />
+              当前活跃账号：<strong style={{ color: '#fff' }}>{currentAccount?.name || '未选择'}</strong>
+            </span>
+            <span style={{ color: '#475569' }}>|</span>
+            <span>💡 扫码登录后该账号即自动同步进入 BeefTV 节点模型库，可直接在原生态 BeefTV 任意画布中被选用！</span>
+          </div>
+        </div>
+      ) : (
+        // 模式 2: 内置 BeefTV 节点画布
+        <div style={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex' }}>
+          <BeefTvSidebar
+            activeTab={activeTab}
+            onSelectTab={setActiveTab}
+            collapsed={sidebarCollapsed}
+            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+            accountCount={data.accounts.length}
+            loggedInCount={data.accounts.filter(a => a.isLoggedIn).length}
+            runningTaskCount={0}
+            onOpenSettings={() => void window.workspace.openSettings()}
+            onOpenGateway={() => void window.workspace.openGateway()}
+          />
+
+          <div style={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            <BeefTvTopBar
+              accounts={data.accounts}
+              currentAccountId={currentAccountId}
+              gatewayPort={8788}
+              onAddNode={canvas.addNode}
+              onOpenAccount={openAccount}
+              onAddAccount={() => setShowNewAccount(true)}
+              onSwitchMode={(m) => (m === 'account' ? void switchToAccount() : void switchToCanvas())}
+              activeMode={mode}
+            />
+
+            <BeefTvCanvas
+              nodes={canvas.nodes}
+              connections={canvas.connections}
+              selectedNodeId={canvas.selectedNodeId}
+              accounts={data.accounts}
+              pan={canvas.pan}
+              scale={canvas.scale}
+              onPanChange={canvas.setPan}
+              onScaleChange={canvas.setScale}
+              onSelectNode={canvas.setSelectedNodeId}
+              onNodeMove={canvas.updateNodePosition}
+              onNodeDataChange={canvas.updateNodeData}
+              onRemoveNode={canvas.removeNode}
+              onConnect={canvas.connectNodes}
+              onRelayNext={canvas.relayNextShot}
+              onGenerateVideo={canvas.generateVideoForNode}
+              onSendToDoubaoAccount={canvas.sendPromptToDoubaoAccount}
+              onResetView={canvas.resetViewport}
+            />
+
+            <BeefTvDrawer
+              activeTab={activeTab}
+              onClose={() => setActiveTab('canvas')}
+              nodes={canvas.nodes}
+              accounts={data.accounts}
+              onOpenAccount={openAccount}
+              onLocateNode={(nodeId) => {
+                canvas.setSelectedNodeId(nodeId);
+                setActiveTab('canvas');
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* 新增账号弹窗 */}
+      {showNewAccount && (
+        <NewAccount
+          onClose={() => setShowNewAccount(false)}
+          onCreated={async account => {
+            setShowNewAccount(false);
+            await refresh();
+            await openAccount(account);
+            await syncToBeefTv();
+            message(`已添加账号【${account.name}】！请在下方扫码登录豆包，该账号已同步至 BeefTV。`);
+          }}
+        />
+      )}
+
+      {toast && <div className="toast"><Check size={16} />{toast}</div>}
+    </main>
+  );
 }
 
 function SettingsPage() {
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const [accountShortcuts, setAccountShortcuts] = useState<Record<string, string>>({});
-  const [downloadDirectory, setDownloadDirectory] = useState('');
-  const [message, setMessage] = useState('');
-  const [showNewAccount, setShowNewAccount] = useState(false);
+  const [dir, setDir] = useState('');
+  const [toast, setToast] = useState('');
+
+  const message = (text: string) => { setToast(text); window.setTimeout(() => setToast(''), 2400); };
   const refresh = async () => {
-    const next = await window.workspace.load();
-    setAccounts(next.accounts);
-    setAccountShortcuts(next.accountShortcuts ?? {});
-    setDownloadDirectory(next.downloadDirectory ?? '');
+    const data = await window.workspace.load();
+    setAccounts(data.accounts);
+    setDir(data.downloadDirectory);
   };
-  useEffect(() => { void refresh().catch(error => setMessage(String(error))); }, []);
-  const setDownloads = async () => {
-    try {
-      const folder = await window.workspace.selectDirectory();
-      if (folder) {
-        await window.workspace.watchDownloads(folder);
-        await refresh();
-        setMessage('下载目录已更新并开始监听');
-      }
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : String(error));
-    }
-  };
-  const rename = async (id: number, name: string) => {
-    try { await window.workspace.renameAccount(id, name); await refresh(); }
-    catch (error) { setMessage(error instanceof Error ? error.message : String(error)); }
-  };
-  const remove = async (account: Account) => {
-    try { await window.workspace.confirmDeleteAccount(account.id); await refresh(); }
-    catch (error) { setMessage(error instanceof Error ? error.message : String(error)); }
-  };
-  const move = async (sourceId: number, targetId: number, before: boolean) => {
-    try { await window.workspace.moveAccount(sourceId, targetId, before); await refresh(); }
-    catch (error) { setMessage(error instanceof Error ? error.message : String(error)); }
-  };
-  // AccountShortcutInput is index-based; the stored map is keyed by account id.
-  const indexKeyedShortcuts: Record<string, string> = {};
-  accounts.forEach((account, i) => { const s = accountShortcuts[String(account.id)]; if (s) indexKeyedShortcuts[String(i)] = s; });
-  return <div className="settings-window">
-    <h2>下载设置</h2>
-    {message && <div className="chat-alert">{message}</div>}
-    <div className="download-settings-card">
-      <div className="download-settings-info">
-        <span className="download-settings-label">视频保存与监听目录</span>
-        <span className="download-settings-path" title={downloadDirectory || '未设置'}>
-          {downloadDirectory || '未设置。选择豆包视频下载保存的本地目录。'}
-        </span>
-      </div>
-      <div className="download-settings-actions">
-        {downloadDirectory && <button type="button" className="outline" onClick={() => void window.workspace.openFolder(downloadDirectory)} title="在资源管理器中打开"><FolderOpen size={15} />打开目录</button>}
-        <button type="button" className="outline" onClick={() => void setDownloads()}><FolderOpen size={15} />选择目录</button>
-      </div>
-    </div>
 
-    <h2 style={{ marginTop: 32 }}>账号管理</h2>
-    <button className="primary add-account-settings" onClick={() => setShowNewAccount(true)}><Plus size={15} />添加账号</button>
-    <div className="account-settings">
-      {accounts.map((account, index) => <div key={account.id} className="account-setting" data-account-id={account.id}
-          onDragOver={event => event.preventDefault()}
-          onDrop={event => { event.preventDefault(); const from = Number(event.dataTransfer.getData('text/plain')); if (from && from !== account.id) { const rect = event.currentTarget.getBoundingClientRect(); const before = event.clientY < rect.top + rect.height / 2; void move(from, account.id, before); } }}>
-        <span className="account-drag-handle" draggable
-          onDragStart={event => { event.dataTransfer.setData('text/plain', String(account.id)); }}
-          title="拖动调整顺序">⋮⋮</span>
-        <NameInput ariaLabel={`${account.name}名称`} initial={account.name} onCommit={value => { const v = value.trim(); if (v && v !== account.name) void rename(account.id, v); }} />
-        <AccountShortcutInput index={index} custom={indexKeyedShortcuts} refresh={refresh} message={setMessage} />
-        <button className="delete-account" onClick={() => void remove(account)} title="删除账号">删除</button>
-      </div>)}
-    </div>
-    <ResetAccountShortcuts refresh={refresh} message={setMessage} />
-    {showNewAccount && <NewAccount onClose={() => setShowNewAccount(false)} onCreated={async () => { setShowNewAccount(false); await refresh(); }} />}
-  </div>;
-}
-function NewAccount({ onClose, onCreated }: { onClose: () => void; onCreated: (account: Account) => Promise<void> }) {
-  const [name, setName] = useState('');
-  const [note, setNote] = useState('');
-  const [platform, setPlatform] = useState<'doubao' | 'dola'>('doubao');
-  const [busy, setBusy] = useState(false);
+  useEffect(() => { void refresh(); }, []);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  const chooseDir = async () => {
+    const selected = await window.workspace.selectDirectory();
+    if (!selected) return;
+    await window.workspace.watchDownloads(selected);
+    setDir(selected);
+    message('下载保存目录已更新');
+  };
+
+  const deleteAccount = async (id: number) => {
+    const confirmed = await window.workspace.confirmDeleteAccount(id);
+    if (!confirmed) return;
+    await refresh();
+    await window.workspace.beeftvSync();
+    message('账号已移除并同步至 BeefTV');
+  };
 
   return (
-    <div
-      className="modal-backdrop"
-      onClick={event => {
-        if (event.target === event.currentTarget) onClose();
-      }}
-    >
-      <div className="modal" role="dialog" aria-modal="true">
-        <div className="modal-title">
-            <h2>添加账号</h2>
-          <button type="button" className="modal-close" onClick={onClose} aria-label="关闭">×</button>
+    <div className="settings-page">
+      <h2>设置中心</h2>
+      <section className="settings-section">
+        <h3>下载与存储</h3>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <input type="text" readOnly value={dir} style={{ flex: 1 }} />
+          <button className="outline" onClick={chooseDir}><FolderOpen size={14} />选择文件夹</button>
         </div>
-        <form
-          className="modal-card"
-          onSubmit={async event => {
-            event.preventDefault();
-            if (busy) return;
-            setBusy(true);
-            try {
-              const account = await window.workspace.createAccount({
-                name: name.trim(),
-                note: note.trim(),
-                  platform,
-              });
-              await onCreated(account);
-            } finally {
-              setBusy(false);
-            }
-          }}
-        >
-            <label>
-              平台
-              <select value={platform} onChange={event => setPlatform(event.target.value as 'doubao' | 'dola')}>
-                <option value="doubao">豆包（国内版）</option>
-                <option value="dola">Dola（国际版）</option>
-              </select>
-            </label>
-            <p className="modal-hint">每个账号使用独立登录会话。Dola 需要在账号页面登录后使用。</p>
-          <label>
-            账号名称
+      </section>
+
+      <section className="settings-section">
+        <h3>豆包账号池管理</h3>
+        <div className="accounts-list">
+          {accounts.map(acc => (
+            <div key={acc.id} className="account-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #30363d' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span className={`status-dot ${acc.isLoggedIn ? '' : 'warning'}`} style={{ width: '8px', height: '8px', borderRadius: '50%', background: acc.isLoggedIn ? '#22c55e' : '#f59e0b' }} />
+                <span style={{ fontWeight: 600 }}>{acc.name}</span>
+              </div>
+              <button className="outline danger" onClick={() => void deleteAccount(acc.id)}>删除</button>
+            </div>
+          ))}
+        </div>
+      </section>
+      {toast && <div className="toast"><Check size={16} />{toast}</div>}
+    </div>
+  );
+}
+
+function NewAccount({ onClose, onCreated }: { onClose: () => void; onCreated: (account: Account) => Promise<void> }) {
+  const [name, setName] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) return setError('请输入账号名称');
+    setBusy(true);
+    try {
+      const created = await window.workspace.createAccount({ name: name.trim(), platform: 'doubao', note: '' });
+      await onCreated(created);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="modal-backdrop">
+      <div className="modal-card">
+        <h3>添加新豆包账号</h3>
+        <form onSubmit={submit}>
+          <div className="form-item">
+            <label>账号名称</label>
             <input
+              type="text"
               value={name}
-              onChange={event => setName(event.target.value)}
-              placeholder="例如：主号"
-              required
+              onChange={e => setName(e.target.value)}
+              placeholder="例如：主号、生图号A、视频号B"
               autoFocus
             />
-          </label>
-          <label>
-            备注
-            <input
-              value={note}
-              onChange={event => setNote(event.target.value)}
-              placeholder="可选"
-            />
-          </label>
+          </div>
+          {error && <div className="error-text">{error}</div>}
           <div className="modal-actions">
-            <button type="button" className="outline" onClick={onClose}>取消</button>
-            <button type="submit" className="primary" disabled={busy || !name.trim()}>
-              {busy ? '创建中…' : '创建'}
-            </button>
+            <button type="button" className="outline" onClick={onClose} disabled={busy}>取消</button>
+            <button type="submit" className="primary" disabled={busy}>创建并开始扫码登录</button>
           </div>
         </form>
       </div>
@@ -322,4 +526,7 @@ function NewAccount({ onClose, onCreated }: { onClose: () => void; onCreated: (a
   );
 }
 
-createRoot(document.getElementById('root')!).render(<App />);
+const rootElement = document.getElementById('root');
+if (rootElement) {
+  createRoot(rootElement).render(<App />);
+}

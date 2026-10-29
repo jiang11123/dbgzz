@@ -1,0 +1,39 @@
+{
+  "version": "v1.7.1",
+  "sourceDigest": "6ed971ef5f3e21ea90aed56cc8309e0796edd2e7f39a4073ac96cbe8749fa6eb",
+  "sourceCommit": "db22654",
+  "state": "targeted_acceptance_owner_authorized",
+  "releaseComplete": false,
+  "budgetCNY": 100,
+  "spentCNY": 43.74479,
+  "newSpentCNY": 0,
+  "pendingCNY": null,
+  "knownPendingCNY": 0,
+  "liveMatrixStatus": "not_run_owner_waived",
+  "cases": [],
+  "liveTestWaiver": {
+    "approvedBy": "Ender",
+    "instruction": "上线吧 1.7.1 值得一个大版本",
+    "scope": "model-picker-targeted-acceptance"
+  },
+  "financialUncertainty": {
+    "status": "unresolved",
+    "failedRequestIds": ["202610020816334239151708268d9d6eZ5lRPwt", "202610021242434383740578268d9d6BAoXA1u1"]
+  },
+  "financialEvidenceException": {
+    "approvedBy": "Ender",
+    "instruction": "上线吧 1.7.1 值得一个大版本",
+    "scope": "two-failed-chat-refund-evidence-only",
+    "requestIds": ["202610020816334239151708268d9d6eZ5lRPwt", "202610021242434383740578268d9d6BAoXA1u1"],
+    "evidence": ["v1.7.1-targeted.md#financial-and-coverage-boundaries"]
+  },
+  "upgrade": {"preservedData": true, "evidence": ["v1.7.1-targeted.md#targeted-results"]},
+  "review": {"result": "approved", "sourceDigest": "6ed971ef5f3e21ea90aed56cc8309e0796edd2e7f39a4073ac96cbe8749fa6eb", "reviewer": "/root/release_review", "evidence": ["v1.7.1-targeted.md#final-increment-review"]},
+  "verification": {
+    "modelPicker": {"status": "passed", "evidence": ["v1.7.1-targeted.md#targeted-results"]},
+    "authorizationDefaultRecovery": {"status": "passed", "evidence": ["v1.7.1-targeted.md#targeted-results"]},
+    "saveBarrier": {"status": "passed", "evidence": ["v1.7.1-targeted.md#targeted-results"]},
+    "localReleaseGate": {"status": "passed", "evidence": ["v1.7.1-targeted.md#targeted-results"]},
+    "ci": {"status": "passed", "evidence": ["https://github.com/glanderness/BeefTV/actions/runs/37028188928", "https://github.com/glanderness/BeefTV/actions/runs/37028188715"]}
+  }
+}

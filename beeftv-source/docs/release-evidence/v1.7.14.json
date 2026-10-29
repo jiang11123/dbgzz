@@ -1,0 +1,2850 @@
+{
+  "version": "v1.7.14",
+  "contractVersion": 3,
+  "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+  "testedSourceCommit": "acef83684bf180a7abe919bb231540422646b001",
+  "budgetCNY": 50,
+  "spentCNY": 27.47509241,
+  "pendingCNY": 0,
+  "liveMatrixStatus": "passed",
+  "agentAcceptanceStatus": "passed",
+  "acceptanceComplete": true,
+  "releasePublished": false,
+  "releaseComplete": false,
+  "scenario": {
+    "id": "quiet-reading-bookstore-20261008-v1714",
+    "title": "把手机放下，翻开一本书｜15秒阅读短片",
+    "source": "https://www.unesco.org/en/days/world-book-and-copyright",
+    "queryDate": "2026-10-08",
+    "fixtures": {
+      "image-1.jpg": "a24e3cc4b298ed5f791b774d93afdf0e0630b570d4e92a45467ddccaf7ae3663",
+      "image-2.jpg": "9874aef14d3b55546882bb848f6f1899b284cf0f600b34a8df6a6739f870bb65",
+      "reference.mp4": "3df9084969a258a51e03444e5fee608281b802300b4f5155da1b1ca9078dae1c",
+      "reference.wav": "ad976152304ac953617b8eb687cd87a17bac5ff8eae1b93950de251441b440e2"
+    },
+    "provenance": "All visuals newly self-drawn synthetic geometric illustrations,72procedural moving frames depicting page turn and changing window light; not news footage or a real bookstore. Existing offline macOS Tingting voice speaks the full supplied Chinese sentence including final production instruction. UNESCO reading advocacy is theme context only, World Book Day is23April; no claim today is that day. No external image/media downloads, no new dependencies installed, no paid model/service used."
+  },
+  "cases": [
+    {
+      "taskId": "fbaba34f34558eb5c23e4a5e92447a1b",
+      "providerRequestId": "evt-UKBYFVERNEYT",
+      "model": "beefapi::gpt-image-2.5",
+      "round": 1,
+      "path": "text-image",
+      "costCNY": 0.42,
+      "artifactSHA256": "0ac35067dff7a5ee3af6857407bab64f45dd1850525d9a8e344af3415b7bfebb",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "clientVersion": "v1.7.14",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "e2e332d2abf8a8268ecee4b57953c6a1b5fccf230856a20dc77226283c190bfa",
+      "status": "succeeded",
+      "billing": "settled",
+      "attempts": 1,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "sessionId": "durable:c52ad596-edf1-47f7-997c-18e55be0768d",
+      "turnId": "f4f327941f3db556f4314f62",
+      "proposalId": "gp-f16b370fbc1e03e1",
+      "operationId": "proposal:gp-f16b370fbc1e03e1:node-dlzimb8w6bnk-257d55ee26",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ]
+    },
+    {
+      "taskId": "5181b6147301e6d227b60330fedd0975",
+      "providerRequestId": "evt-UNOWXABHYTPO",
+      "model": "beefapi::gpt-image-2.5",
+      "round": 1,
+      "path": "image-image",
+      "costCNY": 0.42,
+      "artifactSHA256": "cb470b8df8b21312477bfe5bb5a70909e0b03d03a43079b915cfa53090b08219",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "clientVersion": "v1.7.14",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "e2e332d2abf8a8268ecee4b57953c6a1b5fccf230856a20dc77226283c190bfa",
+      "status": "succeeded",
+      "billing": "settled",
+      "attempts": 1,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "sessionId": "durable:c52ad596-edf1-47f7-997c-18e55be0768d",
+      "turnId": "f4f327941f3db556f4314f62",
+      "proposalId": "gp-f16b370fbc1e03e1",
+      "operationId": "proposal:gp-f16b370fbc1e03e1:node-dlzimb8w6cfc-487af8932e",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ]
+    },
+    {
+      "taskId": "e41e8755f7c2caaeef82b8107a9702b6",
+      "providerRequestId": "task_XGpRP5Q37dOvGOnCwDGngL1HiMPdYcDm",
+      "model": "beefapi::seedance-2.0-fast",
+      "round": 1,
+      "path": "image-video",
+      "costCNY": 0.96151,
+      "artifactSHA256": "edb99b2c916c0272fcd4acbe8b293defc834f852e95dc0cb4374a211250662f6",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "clientVersion": "v1.7.14",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "e2e332d2abf8a8268ecee4b57953c6a1b5fccf230856a20dc77226283c190bfa",
+      "status": "succeeded",
+      "billing": "settled",
+      "attempts": 1,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "sessionId": "durable:c52ad596-edf1-47f7-997c-18e55be0768d",
+      "turnId": "70e6a8b6850df0abd40ae257",
+      "proposalId": "gp-2997ff667ced304f",
+      "operationId": "proposal:gp-2997ff667ced304f:node-dlzimb8w6dyw-d60252ae7a",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ]
+    },
+    {
+      "taskId": "e4901eb2caf44a690696df0600831924",
+      "providerRequestId": "task_7QJVFKej9ax69x58stqTn63fXNSZUOng",
+      "model": "beefapi::seedance-2.0-fast",
+      "round": 1,
+      "path": "text-video",
+      "costCNY": 0.96151,
+      "artifactSHA256": "47fec3afdf0483e6511a046e6c1ea809d5b803d8e68130a50bc484149209dfb3",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "clientVersion": "v1.7.14",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "e2e332d2abf8a8268ecee4b57953c6a1b5fccf230856a20dc77226283c190bfa",
+      "status": "succeeded",
+      "billing": "settled",
+      "attempts": 1,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "sessionId": "durable:c52ad596-edf1-47f7-997c-18e55be0768d",
+      "turnId": "70e6a8b6850df0abd40ae257",
+      "proposalId": "gp-2997ff667ced304f",
+      "operationId": "proposal:gp-2997ff667ced304f:node-dlzimb8w6d74-2033133aeb",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ]
+    },
+    {
+      "taskId": "6f090a240dd916ee0ca86b35ca29b47c",
+      "providerRequestId": "task_8CckRwIfDyBH2X57UsLSFch7D2HioEoP",
+      "model": "beefapi::seedance-2.0-fast",
+      "round": 1,
+      "path": "video-video",
+      "costCNY": 1.016144,
+      "artifactSHA256": "f639d447aef04f100bea5f65a07adc1b716ca2bad29cca6b56c09d1337ebbb1d",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "clientVersion": "v1.7.14",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "e2e332d2abf8a8268ecee4b57953c6a1b5fccf230856a20dc77226283c190bfa",
+      "status": "succeeded",
+      "billing": "settled",
+      "attempts": 1,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "sessionId": "durable:c52ad596-edf1-47f7-997c-18e55be0768d",
+      "turnId": "70e6a8b6850df0abd40ae257",
+      "proposalId": "gp-2997ff667ced304f",
+      "operationId": "proposal:gp-2997ff667ced304f:node-dlzimjbx28eo-23c9bf2060",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ]
+    },
+    {
+      "taskId": "7dc3b150b9fd35edd971f2fa46146e4b",
+      "providerRequestId": "task_T8h65tNHffJPq87VnlxC6bAMBmwg6rup",
+      "model": "beefapi::seedance-2.0-fast",
+      "round": 1,
+      "path": "multi-video",
+      "costCNY": 1.016144,
+      "artifactSHA256": "9fdf2d0aa43211af53d6561ff0c1ff420dae01157e1176b71ac1a937b0f69cbe",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "clientVersion": "v1.7.14",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "e2e332d2abf8a8268ecee4b57953c6a1b5fccf230856a20dc77226283c190bfa",
+      "status": "succeeded",
+      "billing": "settled",
+      "attempts": 1,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "sessionId": "durable:c52ad596-edf1-47f7-997c-18e55be0768d",
+      "turnId": "70e6a8b6850df0abd40ae257",
+      "proposalId": "gp-2997ff667ced304f",
+      "operationId": "proposal:gp-2997ff667ced304f:node-dlzimjbx29y8-fd867c1c6d",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ]
+    },
+    {
+      "taskId": "16ca3591949a43f300220435e0557600",
+      "providerRequestId": "evt-QKEKYMYUVJNE",
+      "model": "beefapi::gpt-image-2.5",
+      "round": 2,
+      "path": "text-image",
+      "costCNY": 0.42,
+      "artifactSHA256": "41aa05000ce6abf1852723d7b47e8aa9745b076b315291873872c28d1c362165",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "clientVersion": "v1.7.14",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "e2e332d2abf8a8268ecee4b57953c6a1b5fccf230856a20dc77226283c190bfa",
+      "status": "succeeded",
+      "billing": "settled",
+      "attempts": 1,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "sessionId": "durable:c52ad596-edf1-47f7-997c-18e55be0768d",
+      "turnId": "26cfded6941ab91aca0fbc07",
+      "proposalId": "gp-a71d9e7e3472a678",
+      "operationId": "proposal:gp-a71d9e7e3472a678:node-dlzks45e90h4-9d31adf4ce",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ]
+    },
+    {
+      "taskId": "31071e31b29368b70a22ba112a4d9e00",
+      "providerRequestId": "evt-YNRTGFYJWWDC",
+      "model": "beefapi::gpt-image-2.5",
+      "round": 2,
+      "path": "image-image",
+      "costCNY": 0.42,
+      "artifactSHA256": "9c9cf028c8999174ed4367ac366073533bc822b1e3ddb2b3b0cd8bb145ff0916",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "clientVersion": "v1.7.14",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "e2e332d2abf8a8268ecee4b57953c6a1b5fccf230856a20dc77226283c190bfa",
+      "status": "succeeded",
+      "billing": "settled",
+      "attempts": 1,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "sessionId": "durable:c52ad596-edf1-47f7-997c-18e55be0768d",
+      "turnId": "26cfded6941ab91aca0fbc07",
+      "proposalId": "gp-a71d9e7e3472a678",
+      "operationId": "proposal:gp-a71d9e7e3472a678:node-dlzks45e918w-3cc63ebc06",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ]
+    },
+    {
+      "taskId": "2e5c10370873d76027e91ee9a70c5f71",
+      "providerRequestId": "task_h1zjTbldyVCDj7vEV0gmijcVmVapgd35",
+      "model": "beefapi::seedance-2.0-fast",
+      "round": 2,
+      "path": "image-video",
+      "costCNY": 0.96151,
+      "artifactSHA256": "c67009a5b55a4ff4365d7b00dbafd7daa1096077bb76250b329ce3cb5c6b2224",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "clientVersion": "v1.7.14",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "e2e332d2abf8a8268ecee4b57953c6a1b5fccf230856a20dc77226283c190bfa",
+      "status": "succeeded",
+      "billing": "settled",
+      "attempts": 1,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "sessionId": "durable:c52ad596-edf1-47f7-997c-18e55be0768d",
+      "turnId": "ccf13e1db699dd7ddac4d617",
+      "proposalId": "gp-e027666c5e1ca055",
+      "operationId": "proposal:gp-e027666c5e1ca055:node-dlzks45e92sg-51f61a9581",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ]
+    },
+    {
+      "taskId": "46981b938f25465c47c1ce49ab439bbc",
+      "providerRequestId": "task_WbbrOG7UCZomu27mQuJiR6hovXMbp19O",
+      "model": "beefapi::seedance-2.0-fast",
+      "round": 2,
+      "path": "text-video",
+      "costCNY": 0.96151,
+      "artifactSHA256": "98911c6f97781463a8274b8e9bef2caee69dd76ece22ba93fc9b457d2c12e851",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "clientVersion": "v1.7.14",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "e2e332d2abf8a8268ecee4b57953c6a1b5fccf230856a20dc77226283c190bfa",
+      "status": "succeeded",
+      "billing": "settled",
+      "attempts": 1,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "sessionId": "durable:c52ad596-edf1-47f7-997c-18e55be0768d",
+      "turnId": "ccf13e1db699dd7ddac4d617",
+      "proposalId": "gp-e027666c5e1ca055",
+      "operationId": "proposal:gp-e027666c5e1ca055:node-dlzks45e920o-89336b945d",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ]
+    },
+    {
+      "taskId": "8ec578a8773daba40b28f721929e6474",
+      "providerRequestId": "task_TQlWWS6Hxee0ULkSvyTPZ4cSnVVXguSB",
+      "model": "beefapi::seedance-2.0-fast",
+      "round": 2,
+      "path": "video-video",
+      "costCNY": 1.016144,
+      "artifactSHA256": "b3e8fc904db5a5c2ada108b7ee5d2ca5a476e93d0fe8311e5742683a0b7279dc",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "clientVersion": "v1.7.14",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "e2e332d2abf8a8268ecee4b57953c6a1b5fccf230856a20dc77226283c190bfa",
+      "status": "succeeded",
+      "billing": "settled",
+      "attempts": 1,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "sessionId": "durable:c52ad596-edf1-47f7-997c-18e55be0768d",
+      "turnId": "ccf13e1db699dd7ddac4d617",
+      "proposalId": "gp-e027666c5e1ca055",
+      "operationId": "proposal:gp-e027666c5e1ca055:node-dlzks45e93k8-0de76f7b30",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ]
+    },
+    {
+      "taskId": "8f57f2110f6c6ff14a0652c0c38e1509",
+      "providerRequestId": "task_pxZYJDS93ljmLg9WS4Eo3xuWdcaO9R6P",
+      "model": "beefapi::seedance-2.0-fast",
+      "round": 2,
+      "path": "multi-video",
+      "costCNY": 1.016144,
+      "artifactSHA256": "3703f59bc94928b6591312355d66c5b6dee30b3b94e10ce53d27280e0f50593a",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "clientVersion": "v1.7.14",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "e2e332d2abf8a8268ecee4b57953c6a1b5fccf230856a20dc77226283c190bfa",
+      "status": "succeeded",
+      "billing": "settled",
+      "attempts": 1,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "sessionId": "durable:c52ad596-edf1-47f7-997c-18e55be0768d",
+      "turnId": "ccf13e1db699dd7ddac4d617",
+      "proposalId": "gp-e027666c5e1ca055",
+      "operationId": "proposal:gp-e027666c5e1ca055:node-dlzks45e94c0-d2f0b002d9",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ]
+    }
+  ],
+  "agentChecks": {
+    "canvas_read": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "Actualcurrentcanvas config/refs inspected; real pagedread views and currentnode targetedreads; selectedcontext preserved inrealturn",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "48816dbf33a555adda621d30448819df553fb27abec9bc1c7287afc2383717f4",
+        "10065c60071591fe9fbe10ef99df2fdfeef75bc328af5ad6155f54c4573a7ebf"
+      ]
+    },
+    "asset_reference": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "All12 actualpreterminalinputs exact originalfixture references, ownedresources andSHA verified",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "94efcd712c6977dbebffe030c605a4aaf8b39ad0164e3b1610b5e90098273166",
+        "fa9db099dd6a1a6156735e352165a0508703c6aa96dcd4ce33ecdf1ff36757b8"
+      ]
+    },
+    "canvas_mutation": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "Real nodecreate/configure/edges and UI persistence; genuine3stale attempts preserved separately",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "10065c60071591fe9fbe10ef99df2fdfeef75bc328af5ad6155f54c4573a7ebf"
+      ]
+    },
+    "multi_turn": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "Samebooksession R2turn26cfded official916updatedexistingnotecontent to第一轮已审片，准备第二轮, preservedR1media and sixnewR2drafts",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "10065c60071591fe9fbe10ef99df2fdfeef75bc328af5ad6155f54c4573a7ebf"
+      ]
+    },
+    "proposal_decline": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "Sixactualcards closed via先不用; eachactual0tasks",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "1b302cace9101c1de427e1ac0fc24aa87bd70caf0d3cf24f24cda1a44d3a9df8"
+      ]
+    },
+    "proposal_stale": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "True GUI drag24→25, oldGP refused0tasks, manualCmdZrestored26; not assistantUndo",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "1b302cace9101c1de427e1ac0fc24aa87bd70caf0d3cf24f24cda1a44d3a9df8"
+      ]
+    },
+    "proposal_idempotency": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "Rootnative doubleclicksinglecard, exactlyfour distincttargettasks andfour finalbillnets; no duplicate task. Two HTTP requests notclaimed",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "366a5436df01fffe752aa463d5cf8fbf3c95648f0c4cf3535be025ccf7c780c6",
+        "056db253527664e72b9875a029406a277fd2792a96d2aebdc0476375c26f6b5c"
+      ]
+    },
+    "session_history": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "Rootactualnative history/switch; oldbooksix+R2messages retained; newreadonlysession separate",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "cab8c1a844ee42b6a0d0d638f1834831ab6c1e0671bc6e84df0f416622fad684"
+      ]
+    },
+    "session_restart": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "Actual canonicalquit/relaunch sameprofile newPID84464; resources/nodes/existingturnpins exactunchanged; draft restored by RootAX",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "0e9195f43ce851cbcea4e786e5c00be8c169f094476833eb3c3d63747cafb1d1",
+        "cab8c1a844ee42b6a0d0d638f1834831ab6c1e0671bc6e84df0f416622fad684"
+      ]
+    },
+    "cancel": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "Real Stop8ba14 turn; officialtask380terminalaborted true; oldsessioncommit1201unchanged after restart; no taskwrite or restartdispatch",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "f4792f76c726f1604b9bc0c4b1180f4f940b92c0720fc29c5f2b6db23149a161",
+        "cab8c1a844ee42b6a0d0d638f1834831ab6c1e0671bc6e84df0f416622fad684"
+      ]
+    },
+    "conflict_undo": {
+      "status": "passed",
+      "method": "deterministic",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": null,
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "0c856caae8341419e4d225960ee7ea5088aab326e92008b02d22045140a07ee7",
+        "03acf53131dd84424cd978773ab9a6189f9ff140fef277c3c35ef59a8a604515"
+      ]
+    },
+    "host_recovery": {
+      "status": "passed",
+      "method": "deterministic",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": null,
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "0c856caae8341419e4d225960ee7ea5088aab326e92008b02d22045140a07ee7",
+        "7f59aebf868ca90a55f83ba30f77d3c34fe5c2bfe7a7c4926f8f709d90ca4545",
+        "03acf53131dd84424cd978773ab9a6189f9ff140fef277c3c35ef59a8a604515"
+      ]
+    },
+    "scope_isolation": {
+      "status": "passed",
+      "method": "deterministic",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": null,
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "0c856caae8341419e4d225960ee7ea5088aab326e92008b02d22045140a07ee7",
+        "03acf53131dd84424cd978773ab9a6189f9ff140fef277c3c35ef59a8a604515",
+        "7f59aebf868ca90a55f83ba30f77d3c34fe5c2bfe7a7c4926f8f709d90ca4545"
+      ]
+    },
+    "budget": {
+      "status": "passed",
+      "method": "deterministic",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": null,
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "0c856caae8341419e4d225960ee7ea5088aab326e92008b02d22045140a07ee7",
+        "7c9c0e413246c048ac145c62b48465114d220755b4127bac2f366305cfee2582",
+        "e73197c803a3ca589ce534d6b4af20c7dabf7272e21bedd38957a783f18d9640",
+        "7f59aebf868ca90a55f83ba30f77d3c34fe5c2bfe7a7c4926f8f709d90ca4545"
+      ]
+    },
+    "cli_mcp": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "InstalledsourceboundCLI SHA/MCP192toolactualdiscovery+canvasread; CLIownedbusinessscratchcreate/update/historyrestore/crosscanvas, activeROreads/writesdenied; normalRW/ROrevokedthenoriginalcredential readsrefused.",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "3a7205de13199cab0d3eec118fe42c331596ff8a3c8cdb896dc1e2d20d34cfc7",
+        "1d676061c02c01cba5cbebfc4afdc11bd984d81b55f7540fe12467afa7801d49",
+        "985aa312a7cdbb17794e2cbb35d11d98ab3821ebaa91db05349ecda1add690b3",
+        "e4229578e632e87fba4e49498167dad25cc43703809aed6a66ccf793550bb9dc",
+        "4eff292e7456bb50eae5f422ff8b2aab47937f68b81a28dce591db858a476ec2"
+      ]
+    },
+    "durable_resume": {
+      "status": "passed",
+      "method": "deterministic",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": null,
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "0c856caae8341419e4d225960ee7ea5088aab326e92008b02d22045140a07ee7",
+        "7f59aebf868ca90a55f83ba30f77d3c34fe5c2bfe7a7c4926f8f709d90ca4545",
+        "03acf53131dd84424cd978773ab9a6189f9ff140fef277c3c35ef59a8a604515"
+      ]
+    },
+    "native_video": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "Actualnativevideo0..3000 originalversion+partSHA, actualdispatch/modelmotionfacts andRootnativeoriginal3s playback/humanvisualcorroboration.",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "93971c2fa2c5a48fdb9b6739e83fe999435b3c9e71dbd3ac4d130d26e0a8a07c",
+        "48816dbf33a555adda621d30448819df553fb27abec9bc1c7287afc2383717f4",
+        "9559e7ffc9c117ca9a8fff8f7530dee16532df71595069eb6bc5aaac41e32641"
+      ]
+    },
+    "native_audio": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "Nativeoriginal0–7441 and actual runningWAVsupplement771. Complete3spokenadvocacylines+finalproductioninstruction matched; objectivecheck4807–5050. Croppedaudioaudition stillfilm requirement",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "48816dbf33a555adda621d30448819df553fb27abec9bc1c7287afc2383717f4",
+        "6f4b63bba5f2c5b8ec095575ace726796d2bc5f2e338251890c0eee9cc342dc6"
+      ]
+    },
+    "skill_version": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "Realnativefixedpin/helper/restartretain; actualinstalledpackageV1toV2 frozenpinreadsV1/newpinV2; wronghash/tampered/deletedpackageactualreject; no silentupgrade.",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "252a41af700bd0f37688a828958db715e7c614ee6def20d114cf7e120bdacec8",
+        "72a52f6993aecf485ebdfadecff305fe4847773af272923416b2fdb1f7086882",
+        "cab8c1a844ee42b6a0d0d638f1834831ab6c1e0671bc6e84df0f416622fad684",
+        "bfed1c2d05aa6926040a5431c78b088a0eeb5c00b5d87d9caf1f611b8351d9c6",
+        "53096d7ec408d3becb5008940f16f10eda3bf5a684aa7c251470c058e4199cf7",
+        "37a06b63432627278f62426c39d6be94758722bab1567953bfef175f453f70b4",
+        "8d2eedc0f35ebce6e241012e5c4da4c1049c570c919c08fc306c06c80a481307"
+      ]
+    },
+    "skill_files": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "Nativehelper/scripttextactualread; unselectedturn actualskill_getscope_deniedbeforefileaccess; actualinstalled-ownerAPIpathescape400; executionSupported=false andnativeexplicitno execution.",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "252a41af700bd0f37688a828958db715e7c614ee6def20d114cf7e120bdacec8",
+        "ce73e91663091910051f629e1ba047d26e03926f45add1781e78b56a276eafb1",
+        "72a52f6993aecf485ebdfadecff305fe4847773af272923416b2fdb1f7086882",
+        "3a74b9a45a0203cd8dab9868840dcdb22c133b9c628c37f799143b26b3e3aafb",
+        "88575310bdb1ddefe9d5abf195df62734dd044e1421f640a1fdd410ae5989562",
+        "5b72026c2a2eec9d732b8a859b5c0d04ede20ef310b7aa08a8c77d99614a05af"
+      ]
+    },
+    "permission_modes": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "Realfullownedcrosscanvascreate4→5; canvasactualotherownednodeupdate scope_denied nochange; readonlyintentdeclined/noteunchanged; frozenmode/recover/foreignowner/CAS currentactualGo guards.",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "252a41af700bd0f37688a828958db715e7c614ee6def20d114cf7e120bdacec8",
+        "7eaf614ef9e675fecc9299ce486957a6726c27ad2e680fc12849b5e4a396a147",
+        "3a74b9a45a0203cd8dab9868840dcdb22c133b9c628c37f799143b26b3e3aafb",
+        "cab8c1a844ee42b6a0d0d638f1834831ab6c1e0671bc6e84df0f416622fad684",
+        "0c856caae8341419e4d225960ee7ea5088aab326e92008b02d22045140a07ee7"
+      ]
+    },
+    "external_business": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "Actual3image/WAV/MP4uploads/downloadSHAidentity; ownedscratchcrosscanvas/historyrestore; local1srenderfullDecode; activeROoperation/render denied; management403; revokeafter normalUI thenread refused; originalsunchanged.",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "3a7205de13199cab0d3eec118fe42c331596ff8a3c8cdb896dc1e2d20d34cfc7",
+        "f0a01747789ae1da37a679c5d69e81c35c22c541953a54c22d96ca3b4885caa8",
+        "985aa312a7cdbb17794e2cbb35d11d98ab3821ebaa91db05349ecda1add690b3",
+        "4eff292e7456bb50eae5f422ff8b2aab47937f68b81a28dce591db858a476ec2"
+      ]
+    },
+    "media_film_review": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md"
+      ],
+      "observed": "Actual5050msbodyaudition thenfirstlocal15srender; samefilmnativeupload15svideo/6saudio; actual3fieldedit freeV2render/2taskboundnodes/node-basedfullAV; RootnativeV1/V2play15/15/historyready/downloadV2exactSHA.",
+      "limitations": null,
+      "originalEvidenceSHA256": [
+        "9d52a1ba23e81deae9abbc1ac66b6cca96978512088bf07b7cc52cf7c3c139aa",
+        "ae983948523b278ba12eba952b3c5e552dad6365a60e7069c40a9bffe84b7a6d",
+        "107860e4b2f16845811aef1eea50b526c464b0f8a4e874aa50086df136267327",
+        "e1800896308ede7332314cb32b81aaab4035c02121d1bedb4f43efa30d3c6755",
+        "e6f1631e4468082a35787168626071072a65f27fc54aba57adefd174d6691c19",
+        "f3642692427c32522db87f2ecc2c28dfbbc42c44fbea6b1c90d0d8842bf31de4",
+        "721200f5645dd52dbc4b8e771f26c85ec6fe6cdc9d3f39fbf81ae79c179fa267",
+        "2db399eb9866b25821697d0a5ad9acdde0c14376bc42ebbc0932f7c6f86099de",
+        "a680b14f8c1d900b0e692fc895fd13caabad36f4c706ce38db1dce9815700b46",
+        "d56bbde18456d664d34d175be64af408502a252fd37bf10bfe725060b935f2b6"
+      ]
+    }
+  },
+  "billingAttempts": [
+    {
+      "id": "chat-0d1e332ac09952e0c05e8645",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.01177,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "ff9ce7f06394507e7b854ff783b341614a3cb6cbea338dbc2ffea035d5120f6b",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-a0529d0124392d7175ef583f",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.018664,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "ff9ce7f06394507e7b854ff783b341614a3cb6cbea338dbc2ffea035d5120f6b",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-c4080fb6c040a303ae4c105a",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.020558,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "ff9ce7f06394507e7b854ff783b341614a3cb6cbea338dbc2ffea035d5120f6b",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-7441cd9c53dcaded8730c068",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.01919,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "ff9ce7f06394507e7b854ff783b341614a3cb6cbea338dbc2ffea035d5120f6b",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-b29f106be8098e0d953d5b84",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.018328,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "ff9ce7f06394507e7b854ff783b341614a3cb6cbea338dbc2ffea035d5120f6b",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-10eda5f5b997b5f54e496070",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.018586,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "ff9ce7f06394507e7b854ff783b341614a3cb6cbea338dbc2ffea035d5120f6b",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-e24775931447d7be8401f6d3",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.016596,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "ff9ce7f06394507e7b854ff783b341614a3cb6cbea338dbc2ffea035d5120f6b",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-f9e89204a2d7b36936177e76",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.04089,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "ff9ce7f06394507e7b854ff783b341614a3cb6cbea338dbc2ffea035d5120f6b",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-6611c6f131f7d37718251cc4",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.042546,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "ff9ce7f06394507e7b854ff783b341614a3cb6cbea338dbc2ffea035d5120f6b",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-9da439b1615985c0e641b48b",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.050888,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "ff9ce7f06394507e7b854ff783b341614a3cb6cbea338dbc2ffea035d5120f6b",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-f495b60a4af813d9460f1dee",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.05761,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "ff9ce7f06394507e7b854ff783b341614a3cb6cbea338dbc2ffea035d5120f6b",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-0d478d96689b3e9e3a2e5de1",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.052678,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "336ddfbd3a10fced6d3450f05a0de8e9a72767c370261a672ffd9e117ee04c73",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-f4fd1275a9a68e60b440367d",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.053644,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "336ddfbd3a10fced6d3450f05a0de8e9a72767c370261a672ffd9e117ee04c73",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-bd7dfc1ba989b6a44e862c06",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.05667,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "336ddfbd3a10fced6d3450f05a0de8e9a72767c370261a672ffd9e117ee04c73",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-d3704dc63ff223fc997785dc",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.063736,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "336ddfbd3a10fced6d3450f05a0de8e9a72767c370261a672ffd9e117ee04c73",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-6db4964b6d659dda9d337ac3",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.09963,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "336ddfbd3a10fced6d3450f05a0de8e9a72767c370261a672ffd9e117ee04c73",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-a6e38edffafea614c72b3d6e",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.066324,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "336ddfbd3a10fced6d3450f05a0de8e9a72767c370261a672ffd9e117ee04c73",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-79988652c9f2d5fadeb1c9d8",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.066622,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "336ddfbd3a10fced6d3450f05a0de8e9a72767c370261a672ffd9e117ee04c73",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-147148549fa357a1768a4f17",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.068012,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "336ddfbd3a10fced6d3450f05a0de8e9a72767c370261a672ffd9e117ee04c73",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-5a57ee48e9dd3d365a4d548b",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.071736,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "336ddfbd3a10fced6d3450f05a0de8e9a72767c370261a672ffd9e117ee04c73",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-207bb3def383eb2305cf9b3a",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.068258,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "336ddfbd3a10fced6d3450f05a0de8e9a72767c370261a672ffd9e117ee04c73",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-bf1318c1356736fff07cbbba",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.108364,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "336ddfbd3a10fced6d3450f05a0de8e9a72767c370261a672ffd9e117ee04c73",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-78cc344f62d7a653e0ae3d8a",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.107912,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "336ddfbd3a10fced6d3450f05a0de8e9a72767c370261a672ffd9e117ee04c73",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-f94131cce6064818c32c2fa6",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.109642,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "336ddfbd3a10fced6d3450f05a0de8e9a72767c370261a672ffd9e117ee04c73",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-3c675fb54d9727b26b8c2fed",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.121168,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "336ddfbd3a10fced6d3450f05a0de8e9a72767c370261a672ffd9e117ee04c73",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-49f0c63ed1bfa89a80363081",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.125824,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "336ddfbd3a10fced6d3450f05a0de8e9a72767c370261a672ffd9e117ee04c73",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-4717afe5376ef6dc6dc33f51",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.025202,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-f7a6481409c970d77daefcce",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.049728,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-d0d08b4117eb3e7fe5fb19b9",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.074542,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-64a217ff897bd9137fcdb51f",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.05504,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-3cace992691d4c5d5f6f592c",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.0543,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-aff64870af35430f063d93f5",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.054684,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-c395ae955172fa97cdb1c934",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.055732,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-a66467949cbe514dd530be87",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.056854,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-e5e7f92890c9b72913b6fb21",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.057962,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-e262236570a162203d8f8164",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.059266,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-3ec5400a87b47dc14ec3205e",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.059412,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-21609978f89cd0426681a1f3",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.060152,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-255e1097f0d7574a76a00126",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.060692,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-b17c20ecc7d140995f71ea38",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.061478,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-e04e4893662e19020bc12c67",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.062128,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-77dabda4dc80e50ce6ec1820",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.062648,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-537cc428d0b74e0cc4f409a6",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.06329,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-b7cf3e751f4d47e72b9b641e",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.06382,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-165b026125687c457a2baf86",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.064514,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-a3ba1e220ef19f55fb71e6a4",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.064852,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-cf5c8b8e594e951b76be442f",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.065222,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-9d5b6f6bac304359127020d1",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.065932,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-fbfe7a6b0e4730a4bc4031fc",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.067064,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-1dcffb6f6db464229d6cbe24",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.077926,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "a5a8f19a65377fdab54f52897d5f31d137e9cb9f86ed22c20105f32c21eea9a4",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-49fdf483d87dfe160e8f724d",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.072852,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "9bc2df38c18ade4f8f6915e76826653775699544b4b009cc658b128f42d45878",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-d536ad1c5d0d58911f8591f5",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.080706,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "9bc2df38c18ade4f8f6915e76826653775699544b4b009cc658b128f42d45878",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-156f9fd968b835a9115071ce",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.081118,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "9bc2df38c18ade4f8f6915e76826653775699544b4b009cc658b128f42d45878",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-4ef0c6308987bd775b26213e",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.081842,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "9bc2df38c18ade4f8f6915e76826653775699544b4b009cc658b128f42d45878",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-9d4dc4310cd3ad31e94c319f",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.083054,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "9bc2df38c18ade4f8f6915e76826653775699544b4b009cc658b128f42d45878",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-85fa048509efd52bd8df10ca",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.084204,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "9bc2df38c18ade4f8f6915e76826653775699544b4b009cc658b128f42d45878",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-06c3b084dbb84017134987ed",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.09029,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "9bc2df38c18ade4f8f6915e76826653775699544b4b009cc658b128f42d45878",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-3572983441b01912d867293e",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.089908,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "superseded_candidate",
+      "executedSourceDigest": "9bc2df38c18ade4f8f6915e76826653775699544b4b009cc658b128f42d45878",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-f38d8a0e87a5287f7a1aab46",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.088968,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-dc1ce52482203f2fba987f78",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.097652,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-3e0fdd1dfd6586704ab23d1a",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.098082,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-70259cb1dd774cc5d3866307",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.098612,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-b2d88065cf54641b4c5a2d9f",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.099102,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-dd9f860e2ca453b5d0b59dcd",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.099588,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-06654fae3655eea87c9ba52d",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.100086,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-06d284f258766a4bfb08c6f7",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.10941,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-6a13cf478f97c8da8022dbe3",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.102344,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-63413be65d097d13b9cdcd5f",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.111658,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-669ab3eefda2f9affdc95e11",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.114448,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-e8d8abb4ac4707e68928ce68",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.11241,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-b8852f8564851b5272169f51",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.124804,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-d31959fde1fdc001832f6247",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.128788,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-046c14e609cd1c9d7cf9e092",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.125492,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-441d6c783abbd7bf12555a68",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.139828,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-a41451cc5613a1a467f0b348",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.139868,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-380d6b0cb3e42e0aa961be68",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.15421,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-116fd68a6121e7e99fc287e4",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.154248,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-0ebe8415d0b8e7a664be368c",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.168984,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-7898e598ed3ed4792a17be0f",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.171254,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-e28956b510cdb2e17960840c",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.171772,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-1a4e3d24f2f56f42163b772a",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.187842,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-656b82c74f47c0a758e19f24",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.18788,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-149930cfc0118cd3bc84d5cb",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.204686,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-e1a7e6391638398383cb689a",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.205136,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-0659193424a5344034756ec4",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.213164,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-bb03a748c75822649b007760",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.209928,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-e9d65601f627ae3974e7056f",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.208128,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-4b945ff2793fd1f6965ccbaa",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.22533,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-2144c17ef5a0c528fc102d15",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.229184,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-33da3142dbb506aede3c3733",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.227478,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-86f9f9eb54bdf956250fc7fc",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.228256,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-7b87e6fd292b498ee3c95ac9",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.228996,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-48718c1c075ae4199f40ca87",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.22961,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-d4de212e139e66feef0e197a",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.230434,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-8e661c607ee345957c30af4b",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.231058,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-e7d031e0b77d6bb0073763fb",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.231658,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-f48e788c078437f9fe8a6409",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.232284,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-89d0cde14f3e1881899e7d46",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.232882,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-73919c5bbd5ba8b21b647de6",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.233558,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-b774cfb43838dfa2c637d602",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.233904,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-15fc182fe04939071bba9733",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.032506,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-fe8f66915a2b9ea5216ff2f4",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.235034,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-3d9d118f8508aba677deaef6",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.241156,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-685640b996c0a99211761529",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.234748,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-c091b5c996fdbb8a28966471",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.235828,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-6759b951f1078f4d0a891aac",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.238562,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-9a1cf47d3134720e223077aa",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.260184,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-bd5a520db72afb3069a70c55",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.26383,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-0bac57334b653c073b128f8f",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.01291,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-ad468133dd32a2424e6cc4d9",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.02691,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-5fbb5905086fec11348d2b69",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.036936,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-e0f9348cae7081bacc70cd59",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.030404,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-5a5d0433581de3a4fb283a80",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.0152,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-bbc308c2292cbe78a3eeb45a",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.010384,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-1cf6d84536b943ac8b43f71c",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.01048,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-d18b542bb2e7d2b67c3dc536",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.0109,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-3034ff28999d858b974b303b",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.011972,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-fb8263ac8abd599d86e46401",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.01234,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-898ac79998413aba3d91cff1",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.013448,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-e1a4ee2f077ff6e70a6834cf",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.012618,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-1ddd3d7e175a61ddde576163",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.013204,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-07faabe9e6783e0a4f3a167e",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.010262,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-d5f520b66fc40e89c728e138",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.028978,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-fdf59d4f4658d54ad5b96562",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.029036,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-1856f11c9bdbe3eda625445e",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.038006,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-fe8a02d46fe01681360cec1f",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.044644,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-681a28c518ab12f41a4b49db",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.262142,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-f72f6f8e77a0cdb196fb8240",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.088852,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-3943e5346671e089d7d9202d",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.068902,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-005d3fd604b4707871529287",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.082032,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-a42479a4741e401cff2c3e7f",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.08226,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-ae057e7a6fab141a9266d997",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.09055,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-17e0f934548844fb60cee587",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.099428,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-a7436d1970cc98f325b9feaa",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.115986,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-e9175a47516ff24782cbceeb",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.11872,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-9fec1c3ff97c830960259831",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.130392,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-7c23de7786e2be558a6a47b3",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.12227,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-97c85d87d8fe823956e183e1",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.122548,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-f500b8c1643a611d17f93778",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.124256,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-501b806312b63a25d3179289",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.123636,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-6e8d307a95583e56ab29e86b",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.13463,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-c8bbb38b56f97c44481b2b35",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.12544,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-42e4b4955a120797e1bfebcc",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.134558,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-7c083e2968116aa05f352427",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.14655,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-26d37025be1e8c8d3b136dd1",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.147026,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-76912263c8d627387e498e40",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.019442,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-2f4e79686a958fc8b556a21f",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.142214,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-509dfc192f2d1abb1cf87025",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.180296,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-6fb5a47fe0133b8beb18350c",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.19228,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-3069dfc9d7240233a8ddc88e",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.184114,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-316a28cb25d3967bcc5d486c",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.18438,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-44494e68f352c4a9b3f2029b",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.185432,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-6fe89c9ebbb8e44369816b82",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.223658,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-97317fccde9c1ffab2006b3d",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.22365,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-af8cf999757d649d4890cbf7",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.231516,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-a25c42a91863850614dddc52",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.234452,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-73554fc9261057898d1c3196",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.243498,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "chat-d8c3201f99f5ee6077a9ed50",
+      "kind": "chat",
+      "billing": "settled",
+      "costCNY": 0.256258,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known"
+    },
+    {
+      "id": "media-e1e6d59ea83ddddf3a9a0e19",
+      "kind": "media",
+      "billing": "settled",
+      "costCNY": 0.42,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known",
+      "taskId": "fbaba34f34558eb5c23e4a5e92447a1b"
+    },
+    {
+      "id": "media-fa95b1ed546419639d595eff",
+      "kind": "media",
+      "billing": "settled",
+      "costCNY": 0.42,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known",
+      "taskId": "5181b6147301e6d227b60330fedd0975"
+    },
+    {
+      "id": "media-b0ae01d896a12b4b22e5f8d2",
+      "kind": "media",
+      "billing": "settled",
+      "costCNY": 1.016144,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known",
+      "taskId": "6f090a240dd916ee0ca86b35ca29b47c"
+    },
+    {
+      "id": "media-a7d1ed5ae9ed2a4873f3b1f7",
+      "kind": "media",
+      "billing": "settled",
+      "costCNY": 0.96151,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known",
+      "taskId": "e4901eb2caf44a690696df0600831924"
+    },
+    {
+      "id": "media-c061c185910e62b33ba5697d",
+      "kind": "media",
+      "billing": "settled",
+      "costCNY": 0.96151,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known",
+      "taskId": "e41e8755f7c2caaeef82b8107a9702b6"
+    },
+    {
+      "id": "media-01d30bb99a87b3f516cbb111",
+      "kind": "media",
+      "billing": "settled",
+      "costCNY": 1.016144,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known",
+      "taskId": "7dc3b150b9fd35edd971f2fa46146e4b"
+    },
+    {
+      "id": "media-2eaf0a55daefebbea647c963",
+      "kind": "media",
+      "billing": "settled",
+      "costCNY": 0.42,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known",
+      "taskId": "16ca3591949a43f300220435e0557600"
+    },
+    {
+      "id": "media-67ebec220caffd9c06309d54",
+      "kind": "media",
+      "billing": "settled",
+      "costCNY": 0.42,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known",
+      "taskId": "31071e31b29368b70a22ba112a4d9e00"
+    },
+    {
+      "id": "media-72c781e46bc04d88b51e9265",
+      "kind": "media",
+      "billing": "settled",
+      "costCNY": 0.96151,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known",
+      "taskId": "46981b938f25465c47c1ce49ab439bbc"
+    },
+    {
+      "id": "media-cc099d82e6affbc959083116",
+      "kind": "media",
+      "billing": "settled",
+      "costCNY": 1.016144,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known",
+      "taskId": "8ec578a8773daba40b28f721929e6474"
+    },
+    {
+      "id": "media-af61e5ebae72ac81d7940a7a",
+      "kind": "media",
+      "billing": "settled",
+      "costCNY": 1.016144,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known",
+      "taskId": "8f57f2110f6c6ff14a0652c0c38e1509"
+    },
+    {
+      "id": "media-945393f9fdc889df059c3d14",
+      "kind": "media",
+      "billing": "settled",
+      "costCNY": 0.96151,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "current",
+      "executedSourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+      "executionSourceStatus": "known",
+      "taskId": "2e5c10370873d76027e91ee9a70c5f71"
+    },
+    {
+      "id": "other-1b669b4ba4ebff20a91c0e33",
+      "kind": "other",
+      "billing": "settled",
+      "costCNY": 0.16736441,
+      "evidence": [
+        "docs/release-evidence/v1.7.14-targeted.md#billing"
+      ],
+      "phase": "historical",
+      "executedSourceDigest": null,
+      "executionSourceStatus": "not_app_execution",
+      "reviewedSourceDigest": null,
+      "reviewedSourceVersion": null,
+      "reviewedVersionStatus": "unknown_dirty_VERSION_not_captured",
+      "conservativelyIncludedInV14Budget": true
+    }
+  ],
+  "review": {
+    "result": "approved",
+    "independent": true,
+    "reviewer": "pi_upgrade",
+    "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+    "evidence": [
+      "docs/release-evidence/v1.7.14-targeted.md"
+    ]
+  },
+  "upgrade": {
+    "preservedData": true,
+    "generationVerified": true,
+    "sourceDigest": "a36a2f966b5172ff4af2bb50948f0683a1d12e97b03574a8170ed8616bbed1c2",
+    "evidence": [
+      "docs/release-evidence/v1.7.14-targeted.md"
+    ],
+    "nativeProfileReadback": {
+      "existingCanvasCount": 3,
+      "existingResourceCount": 86,
+      "existingNodesConnectionsUnchanged": true,
+      "existingSessionsPinsUnchanged": true,
+      "currentSourceGenerationCases": 12
+    },
+    "limitations": "Windows final published archive upgrade and rollback pending release workflow; pinned historical baselines v1.6.23/v1.7.1/v1.7.2"
+  },
+  "packages": {
+    "status": "pending_release_workflow",
+    "archives": null,
+    "platforms": [
+      "darwin-arm64",
+      "darwin-amd64",
+      "windows-amd64"
+    ],
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "signedManifestBeforePublish": true,
+    "publicReadbackAfterPublish": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml",
+      "docs/release-evidence/v1.7.14-targeted.md"
+    ]
+  },
+  "financialContext": {
+    "userCumulativeAuthorizedBudgetCNY": 100,
+    "userCumulativeSettledCNY": 91.114628,
+    "userPendingCNY": 0,
+    "knownV14AppAllCandidatesCNY": 27.307728,
+    "reviewedVersionUnknownButSettledReviewIncludedCNY": 0.16736441,
+    "unknownReviewBillingStatus": "settled",
+    "unknownReviewSourceVersion": null,
+    "explanation": "Actual independent-review job terminal cost and originalledger status are settled. Unknown is only reviewed dirty source VERSION; no invented reviewed source or app execution. Conservatively counted in v1.7.14 budget."
+  },
+  "receiptPhase": "preflight_before_release_workflow"
+}

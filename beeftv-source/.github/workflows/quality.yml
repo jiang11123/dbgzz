@@ -1,0 +1,241 @@
+name: Quality checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: quality-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+# Core behavior checks run on every change. Formatting stays a local command.
+# Browser coverage lives in director-e2e.yml and runs for web changes or on demand.
+jobs:
+  windows-storage:
+    name: Windows storage migration
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - name: Verify migration with real Windows file locks
+        working-directory: backend
+        run: go test ./internal/environment ./internal/desktopstorage -count=1 -v
+      - uses: msys2/setup-msys2@v2
+        id: storage-msys2
+        with:
+          msystem: UCRT64
+          update: false
+          install: mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-binutils
+      - name: Select supported Windows compiler
+        env:
+          MSYSTEM_PREFIX: ${{ steps.storage-msys2.outputs.msys2-location }}\ucrt64
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\assert-windows-dwarf5-cgo.ps1
+      - name: Verify open desktop migration and rollback
+        working-directory: backend
+        run: go test ./cmd/desktop -run 'TestWindowsOpenDesktopMigratesWithBusyScratch|TestNativeMigration' -count=1 -v
+      - name: Verify diagnostic persistence and offline analysis on Windows
+        working-directory: backend
+        run: |
+          go test ./internal/supporttrace ./internal/diagnostics ./internal/assistantdiagnostics -count=1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          go test ./cmd/beeftv -run '^TestOfflineDiagnostics' -count=1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+  released-windows-upgrades:
+    if: github.event_name == 'workflow_dispatch'
+    name: Published Windows upgrade and rollback
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download known final package
+        shell: pwsh
+        run: |
+          curl.exe -fLsS --retry 2 https://github.com/glanderness/BeefTV/releases/download/v1.7.2/BeefTV-v1.7.2-windows-amd64.zip -o candidate.zip
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ((Get-FileHash candidate.zip -Algorithm SHA256).Hash.ToLower() -ne 'bb2cb4e152c7b2eb1d54adb7553c69d59aef755b242d2cbf0c14e7472a8b4f65') { throw 'Candidate hash mismatch' }
+      - name: Real released helpers, backend startup, SQLite and rollback
+        run: python scripts/test-windows-published-upgrade.py --archive candidate.zip --version v1.7.2 --output upgrade-evidence/results.json
+      - name: Preserve acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: released-windows-upgrade-evidence
+          path: upgrade-evidence/
+
+  release-publisher:
+    name: Release publisher checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test immutable publication and activation
+        run: |
+          node --test scripts/image-preparation-release-contract.test.mjs
+          node --test scripts/music3-release-contract.test.mjs
+          node --test scripts/v201-release-contract.test.mjs scripts/v202-release-contract.test.mjs
+          python3 -m unittest discover -s scripts -p 'test_publish_desktop_r2.py'
+          node --test scripts/distribution-notices.test.mjs
+          python3 -m unittest discover -s scripts -p 'test_package_macos_media_source.py'
+          python3 -m unittest discover -s scripts -p 'test_package_wasm_sources.py'
+          python3 -m unittest discover -s scripts -p 'test_desktop_cos_store.py'
+          python3 -m unittest discover -s scripts -p 'test_smoke_desktop_installer.py'
+
+  backend:
+    name: Backend checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache: true
+          cache-dependency-path: backend/go.sum
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - name: Install agent host dependencies
+        working-directory: agent-host
+        run: bun install --frozen-lockfile
+      - name: Install native media test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fontconfig fonts-noto-cjk
+          fc-cache -f
+          fc-match ':lang=zh-cn'
+          ffmpeg -version
+          ffprobe -version
+      - name: Build official protocol packages
+        run: sh ../plugin-packages/build-packages.sh
+      - name: Run Go tests
+        run: go test ./...
+      - name: Verify real production timing report
+        working-directory: agent-host/eval
+        run: python3 -m unittest report_production_test.py
+
+  web:
+    name: Web checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.9
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Install native media test dependencies
+        run: |
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends ffmpeg
+          fi
+          ffmpeg -version
+          ffprobe -version
+      - name: Lint retired Ant Design APIs
+        run: bun run lint
+      - name: Typecheck
+        run: bun run typecheck
+      - name: Run tests
+        # Component browser tests use the Playwright version pinned by bun.lock.
+        # Install its matching browser instead of relying on a runner cache.
+        run: |
+          bunx playwright install --with-deps chromium
+          bun run test
+      - name: Preserve environment check screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: environment-check-screenshots-${{ github.sha }}
+          path: output/environment-check/*.png
+          if-no-files-found: warn
+
+  database-platforms:
+    if: github.event_name == 'workflow_dispatch'
+    name: SQLite and runtime (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+        working-directory: backend
+    env:
+      CGO_ENABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - name: Select runner C compiler on Windows
+        if: runner.os == 'Windows'
+        run: echo 'C:/msys64/mingw64/bin' >> "$GITHUB_PATH"
+      - name: Record actual platform and SQLite driver
+        run: |
+          mkdir -p matrix-evidence
+          go version | tee matrix-evidence/platform.txt
+          go env GOOS GOARCH CGO_ENABLED CC | tee -a matrix-evidence/platform.txt
+          gcc --version | head -1 | tee -a matrix-evidence/platform.txt
+          go list -m gorm.io/driver/sqlite github.com/mattn/go-sqlite3 | tee -a matrix-evidence/platform.txt
+      - name: Build official protocol packages
+        if: runner.os != 'Windows'
+        run: sh ../plugin-packages/build-packages.sh
+      - name: Build official protocol packages with runner Python on Windows
+        if: runner.os == 'Windows'
+        run: |
+          node ../plugin-packages/embed-documentation.mjs
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile, ZIP_DEFLATED
+          root = Path('../plugin-packages')
+          for manifest in sorted(root.glob('*/manifest.json')):
+              package = manifest.parent
+              files = []
+              for name in ['manifest.json', 'README.md', 'docs', 'assets', 'web', 'backend', 'LICENSE']:
+                  source = package / name
+                  files.extend([source] if source.is_file() else [item for item in source.rglob('*') if item.is_file()])
+              with ZipFile(root / (package.name + '.beeftv-plugin'), 'w', ZIP_DEFLATED) as archive:
+                  for source in sorted(files):
+                      archive.write(source, source.relative_to(package).as_posix())
+          PY
+      - name: Historical SQLite, schema repair and interrupted migration
+        run: go test ./internal/database -count=1 -json | tee matrix-evidence/database.jsonl
+      - name: Native updater replacement, recovery, cleanup and install locks
+        run: go test ./internal/desktopupdate -count=1 -json | tee matrix-evidence/desktopupdate.jsonl
+      - name: Local provider task persistence and restart matrix
+        run: go test ./internal/app -run '^TestDBRuntime' -count=1 -json | tee matrix-evidence/runtime.jsonl
+      - name: Actual CLI, MCP startup and native process lifecycle
+        run: go test ./cmd/beeftv ./internal/runtimeinfo ./internal/assistantruntime -count=1 -json | tee matrix-evidence/cli-mcp.jsonl
+      - name: Preserve per-test results and platform evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-matrix-${{ runner.os }}-${{ github.sha }}
+          path: backend/matrix-evidence/

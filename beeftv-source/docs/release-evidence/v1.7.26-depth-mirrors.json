@@ -1,0 +1,28 @@
+{
+  "releaseURL": "https://github.com/glanderness/BeefTV/releases/tag/depth-runtime-mirrors-v1",
+  "componentBytesChanged": false,
+  "windowsExistingSigningKeyVerified": true,
+  "githubDraftAssetsReadBackBeforePublication": true,
+  "manifests": [
+    {
+      "name": "depth-runtime-manifest.json",
+      "size": 1033,
+      "sha256": "7b77ab681ac19a56d02ab1c6be1fc18bb4117537c0f2679c58ac76a7f88de201",
+      "identicalPublicSources": ["COS", "Cloudflare R2", "GitHub"]
+    },
+    {
+      "name": "depth-runtime-manifest.v2.json",
+      "size": 3645,
+      "sha256": "1f027f6d34dc22ae3b80898c9adcd306f22eb2e729f31b994932e0287caef381",
+      "identicalPublicSources": ["COS", "Cloudflare R2", "GitHub"]
+    }
+  ],
+  "priorComponentReadback": {
+    "owningPR": 182,
+    "filesPerSource": 6,
+    "bytesPerSource": 4974507574,
+    "sources": ["COS public", "R2 origin", "R2 public"],
+    "completeSHA256AndRangeResumeVerified": true
+  },
+  "result": "passed"
+}

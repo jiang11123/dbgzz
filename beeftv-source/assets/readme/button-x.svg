@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="28" viewBox="0 0 180 28" role="img" aria-labelledby="title desc">
+  <title id="title">Follow @beefnoode on X</title>
+  <desc id="desc">Follow the BeefTV creator on X</desc>
+  <rect width="180" height="28" fill="#050505"/>
+  <g transform="translate(9 6) scale(.68)" fill="#FFFFFF">
+    <path d="M18.901 2H22l-6.77 7.737L23.196 22h-6.238l-4.886-7.434L5.567 22H2.465l7.241-8.277L1.804 2h6.396l4.417 6.743L18.901 2Zm-1.087 18h1.716L7.266 3.895H5.425L17.814 20Z"/>
+  </g>
+  <text x="32" y="18" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="10.5" font-weight="800" letter-spacing="1.2">FOLLOW @BEEFNOODE</text>
+</svg>

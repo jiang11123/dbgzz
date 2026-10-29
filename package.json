@@ -1,8 +1,8 @@
 {
   "name": "doubao-video-workspace",
-  "version": "2.0.3",
+  "version": "3.0.0",
   "private": true,
-  "description": "Local multi-account video workspace for Doubao",
+  "description": "豆奶画布：本地 AI 创作画布与豆包多账号工作站",
   "author": "jiang11123",
   "main": "dist/main/main/main.js",
   "scripts": {
@@ -12,15 +12,19 @@
     "build:renderer-tests": "node scripts/build-renderer-tests.mjs",
     "start": "electron .",
     "rebuild": "electron-rebuild -f -w better-sqlite3",
-    "package:win": "npm run build && electron-builder --win --x64",
+    "package:win": "npm run build:beeftv && npm run build && electron-builder --win --x64 --publish never",
+    "build:beeftv": "node scripts/build-beeftv.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.main.json && tsc --noEmit -p tsconfig.renderer.json",
     "test": "npm run build:main && npm run build:renderer-tests && node --test \"dist/main/main/**/*.test.js\" \"dist/main/renderer-tests/**/*.test.js\"",
-    "test:dola:integration": "npm run build && electron scripts/verify-dola-2.0.js",
-    "build:icons": "electron scripts/build-icons.cjs"
+    "build:icons": "electron scripts/build-icons.cjs",
+    "local": "node scripts/run-local.mjs",
+    "local:restart": "node scripts/run-local.mjs --restart",
+    "local:full": "node scripts/run-local.mjs --full"
   },
   "dependencies": {
     "better-sqlite3": "^12.4.1",
     "chokidar": "^4.0.3",
+    "electron-updater": "6.8.12",
     "lucide-react": "^0.468.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

@@ -1,0 +1,8 @@
+{
+  "name": "beeftv-skills",
+  "version": "0.1.0",
+  "description": "查询 BeefTV 技能并协助作者整理投稿。",
+  "author": { "name": "BeefTV", "url": "https://beeftv.app" },
+  "homepage": "https://beeftv.app",
+  "mcpServers": "./mcp.claude.json"
+}

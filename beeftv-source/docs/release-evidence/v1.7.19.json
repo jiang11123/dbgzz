@@ -1,0 +1,136 @@
+{
+  "version": "v1.7.19",
+  "sourceDigest": "3e9391939981e1d9e04b2a3ae450a72def13bf28100b4557212580574b871b85",
+  "ownerException": {
+    "scope": "late-merged-installer-ui-20261013",
+    "approvedBy": "Ender",
+    "instruction": "继续打包有两项pr晚于这次打包但是合了",
+    "evidence": [
+      "docs/release-evidence/v1.7.19-targeted.md"
+    ]
+  },
+  "releaseAuthorization": {
+    "additionalHumanReplyRequired": false,
+    "scope": "v1.7.19 only"
+  },
+  "baseRelease": "v1.7.18",
+  "baseCommit": "3df73e4da93e30b4fdf394e6ed317ed7d90dcdd0",
+  "includedPullRequests": [
+    136,
+    137,
+    135
+  ],
+  "paidSubmissionPathChanged": false,
+  "paidSubmissionLimit": 0,
+  "newBudgetCNY": 0,
+  "newSpentCNY": 0,
+  "newPendingCNY": 0,
+  "cases": [],
+  "billingAttempts": [],
+  "budgetCNY": null,
+  "spentCNY": null,
+  "pendingCNY": null,
+  "liveMatrixStatus": "not_run_owner_waived",
+  "agentAcceptanceStatus": "not_run_owner_waived",
+  "acceptanceComplete": false,
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.18",
+    "pendingCNY": null,
+    "evidence": [
+      "docs/release-evidence/v1.7.18.json",
+      "docs/release-evidence/v1.7.19-targeted.md"
+    ]
+  },
+  "review": {
+    "result": "approved",
+    "independent": true,
+    "reviewer": "Claude independent review 400c7ecd-1619-410f-b003-d0296b2d5a9a",
+    "sourceDigest": "3e9391939981e1d9e04b2a3ae450a72def13bf28100b4557212580574b871b85",
+    "evidence": [
+      "docs/release-evidence/v1.7.19-review.md#独立复核"
+    ]
+  },
+  "upgrade": {
+    "preservedData": true,
+    "sourceDigest": "3e9391939981e1d9e04b2a3ae450a72def13bf28100b4557212580574b871b85",
+    "evidence": [
+      "docs/release-evidence/v1.7.19-review.md#数据保留"
+    ]
+  },
+  "verification": {
+    "singleExtractProgress": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "3e9391939981e1d9e04b2a3ae450a72def13bf28100b4557212580574b871b85",
+      "evidence": [
+        "docs/release-evidence/v1.7.19-review.md"
+      ]
+    },
+    "reducedMotionModelMenu": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "3e9391939981e1d9e04b2a3ae450a72def13bf28100b4557212580574b871b85",
+      "evidence": [
+        "docs/release-evidence/v1.7.19-review.md#当前源码上的检查",
+        "https://github.com/glanderness/BeefTV/actions/runs/38400084685"
+      ]
+    },
+    "installSaveAndRetry": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "3e9391939981e1d9e04b2a3ae450a72def13bf28100b4557212580574b871b85",
+      "evidence": [
+        "docs/release-evidence/v1.7.19-review.md#数据保留",
+        "https://github.com/glanderness/BeefTV/actions/runs/38393464047"
+      ]
+    },
+    "noNewPaidGeneration": {
+      "status": "passed",
+      "method": "source-diff",
+      "sourceDigest": "3e9391939981e1d9e04b2a3ae450a72def13bf28100b4557212580574b871b85",
+      "evidence": [
+        "docs/release-evidence/v1.7.19-review.md"
+      ]
+    },
+    "localReleaseGate": {
+      "status": "passed",
+      "method": "local-script",
+      "sourceDigest": "3e9391939981e1d9e04b2a3ae450a72def13bf28100b4557212580574b871b85",
+      "evidence": [
+        "docs/release-evidence/v1.7.19-review.md"
+      ]
+    },
+    "ci": {
+      "status": "passed",
+      "method": "github-actions",
+      "sourceDigest": "3e9391939981e1d9e04b2a3ae450a72def13bf28100b4557212580574b871b85",
+      "evidence": [
+        "https://github.com/glanderness/BeefTV/actions/runs/38400084685",
+        "https://github.com/glanderness/BeefTV/actions/runs/38400084682",
+        "https://github.com/glanderness/BeefTV/actions/runs/38400084581"
+      ]
+    }
+  },
+  "packages": {
+    "platforms": [
+      "darwin-arm64",
+      "darwin-amd64",
+      "windows-amd64",
+      "linux-amd64"
+    ],
+    "status": "pending_release_workflow",
+    "archives": null,
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "linuxNativeWindowBeforeUpload": true,
+    "signedManifestBeforePublish": true,
+    "publicReadbackAfterPublish": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml",
+      "docs/release-evidence/v1.7.19-review.md#发布边界"
+    ]
+  },
+  "releasePublished": false,
+  "releaseComplete": false
+}

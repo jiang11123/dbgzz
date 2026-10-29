@@ -1,0 +1,25 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "beeftv-skills",
+  "version": "0.1.0",
+  "description": "查找适用的 BeefTV 技能、读取固定版本，并协助整理和投稿创作方法。",
+  "author": { "name": "BeefTV", "url": "https://beeftv.app" },
+  "homepage": "https://beeftv.app",
+  "repository": "https://github.com/glanderness/BeefTV",
+  "license": "MIT",
+  "keywords": ["skills", "video", "storyboard", "创作"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "BeefTV Skills",
+        "shortDescription": "查找技能，分享创作方法",
+        "longDescription": "查询已审核技能的用途、版本、来源和能力要求；帮助作者准备投稿并查看审核状态。",
+        "developerName": "BeefTV",
+        "category": "Productivity",
+        "websiteURL": "https://beeftv.app",
+        "capabilities": ["Read"],
+        "defaultPrompt": ["找一个适合把剧本拆成分镜的技能。", "帮我把这个创作方法整理成技能并准备投稿。"]
+      }
+    }
+  }
+}

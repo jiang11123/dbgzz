@@ -1,0 +1,124 @@
+{
+  "version": "v1.7.23",
+  "sourceDigest": "f4b0564a6d75bc1003fa873ac70693432aeee051889c46fddc2a779db1ec0008",
+  "ownerException": {
+    "scope": "late-merged-installer-canvas-bind-20261015",
+    "approvedBy": "Ender",
+    "instruction": "把那两个lucas没review的群里在提醒一遍lucas 然后发版吧 发版后告诉lucas这版更新了什么",
+    "evidence": [
+      "docs/release-evidence/v1.7.23-targeted.md"
+    ]
+  },
+  "releaseAuthorization": {
+    "additionalHumanReplyRequired": false,
+    "scope": "v1.7.23 only"
+  },
+  "baseRelease": "v1.7.22",
+  "baseCommit": "a99c0c41c0bbb71a4b2b2479e5e5c14f14c3151a",
+  "includedPullRequests": [
+    151
+  ],
+  "paidSubmissionPathChanged": false,
+  "paidSubmissionLimit": 0,
+  "newBudgetCNY": 0,
+  "newSpentCNY": 0,
+  "newPendingCNY": 0,
+  "cases": [],
+  "billingAttempts": [],
+  "budgetCNY": null,
+  "spentCNY": null,
+  "pendingCNY": null,
+  "liveMatrixStatus": "not_run_owner_waived",
+  "agentAcceptanceStatus": "not_run_owner_waived",
+  "acceptanceComplete": false,
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.22",
+    "pendingCNY": null,
+    "evidence": [
+      "docs/release-evidence/v1.7.22.json",
+      "docs/release-evidence/v1.7.23-targeted.md"
+    ]
+  },
+  "review": {
+    "result": "approved",
+    "independent": true,
+    "reviewer": "Grok independent review 84bdb27b-4077-4928-9b9c-ac1df11a7eaf (20261015-001042-review-4df51c6b) + independent installer review f5d3668c-a68f-477c-8751-c0df636500f6",
+    "sourceDigest": "f4b0564a6d75bc1003fa873ac70693432aeee051889c46fddc2a779db1ec0008",
+    "evidence": [
+      "docs/release-evidence/v1.7.23-review.md#独立复核"
+    ]
+  },
+  "upgrade": {
+    "preservedData": true,
+    "sourceDigest": "f4b0564a6d75bc1003fa873ac70693432aeee051889c46fddc2a779db1ec0008",
+    "evidence": [
+      "docs/release-evidence/v1.7.23-review.md#数据保留"
+    ]
+  },
+  "verification": {
+    "windowsInstallerUX": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "f4b0564a6d75bc1003fa873ac70693432aeee051889c46fddc2a779db1ec0008",
+      "evidence": [
+        "docs/release-evidence/v1.7.23-review.md#当前源码上的检查",
+        "https://github.com/glanderness/BeefTV/actions/runs/38591897391"
+      ]
+    },
+    "canvasMediaBindAndRetry": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "f4b0564a6d75bc1003fa873ac70693432aeee051889c46fddc2a779db1ec0008",
+      "evidence": [
+        "docs/release-evidence/v1.7.23-review.md#当前源码上的检查"
+      ]
+    },
+    "noNewPaidGeneration": {
+      "status": "passed",
+      "method": "source-diff",
+      "sourceDigest": "f4b0564a6d75bc1003fa873ac70693432aeee051889c46fddc2a779db1ec0008",
+      "evidence": [
+        "docs/release-evidence/v1.7.23-review.md#独立复核"
+      ]
+    },
+    "localReleaseGate": {
+      "status": "passed",
+      "method": "local-script",
+      "sourceDigest": "f4b0564a6d75bc1003fa873ac70693432aeee051889c46fddc2a779db1ec0008",
+      "evidence": [
+        "docs/release-evidence/v1.7.23-review.md#当前源码上的检查"
+      ]
+    },
+    "ci": {
+      "status": "passed",
+      "method": "github-actions",
+      "sourceDigest": "f4b0564a6d75bc1003fa873ac70693432aeee051889c46fddc2a779db1ec0008",
+      "evidence": [
+        "https://github.com/glanderness/BeefTV/actions/runs/38591897391",
+        "https://github.com/glanderness/BeefTV/actions/runs/38596361843"
+      ]
+    }
+  },
+  "packages": {
+    "platforms": [
+      "darwin-arm64",
+      "darwin-amd64",
+      "windows-amd64",
+      "linux-amd64"
+    ],
+    "status": "pending_release_workflow",
+    "archives": null,
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "linuxNativeWindowBeforeUpload": true,
+    "signedManifestBeforePublish": true,
+    "publicReadbackAfterPublish": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml",
+      "docs/release-evidence/v1.7.23-review.md#发布边界"
+    ]
+  },
+  "releasePublished": false,
+  "releaseComplete": false
+}

@@ -1,0 +1,1524 @@
+{
+  "version": "v1.6.23",
+  "contractVersion": 2,
+  "state": "accepted_for_release_with_owner_financial_evidence_exception",
+  "releaseComplete": false,
+  "generatedAt": "2026-10-02T13:17:30.709478+00:00",
+  "sourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+  "sourceCommit": "d77231870dc3258a770e44fbe04788899a0e0e95",
+  "sourceEquivalence": {
+    "testedCommit": "2a7e2ba",
+    "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+    "releaseCandidateCommit": "d77231870dc3258a770e44fbe04788899a0e0e95",
+    "releaseSourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+    "difference": "Test fixture alias compatibility change plus exact v1.6.23 owner-authorized financial-evidence gate and its tests. Shipped application/backend/agent runtime and dependencies unchanged. Release build toolchain Bun aligned from 1.3.9 to the native-tested 1.4.2 to read locked dependency format v2. This is build-toolchain equivalence, not a test-only change; all three packaging contracts and canonical builds must pass before publication.",
+    "changedFiles": [
+      "web/test/fixtures/canvas-lifecycle-restart-harness.tsx",
+      "scripts/verify-real-generation-release.mjs",
+      "scripts/verify-real-generation-release.test.mjs",
+      ".github/workflows/release-desktop.yml"
+    ],
+    "productionDiffEmpty": true,
+    "originalNativeReceiptsPreserved": true,
+    "independentReview": "independent-codex-review.md"
+  },
+  "budgetCNY": 100,
+  "spentCNY": 43.74479,
+  "pendingCNY": null,
+  "financialSnapshot": {
+    "evidence": [
+      "ledger.json",
+      "acceptance-working.json",
+      "video-task-submission-ledger-exact-join.json",
+      "failed-usage-financial-audit.json"
+    ],
+    "ledgerSHA256": "34b5f1c27d8a2653a6856783cd1193133bd02e043ed1af52c2b0ae14e9b1fcaf",
+    "ledgerEndTime": 1790946870,
+    "currentAcceptanceSpentCNY": 14.82037,
+    "priorSettledAcceptanceSpentCNY": 28.92442,
+    "noAdditionalChargeMadeByAssembler": true,
+    "groups": [
+      {
+        "id": "r1-image-billing",
+        "round": 1,
+        "kind": "image",
+        "association": "batch_time_window_model; individual ledger request not directly linked to provider request",
+        "rows": [
+          {
+            "id": "usage_2004523",
+            "request_id": "202610021241568662669248268d9d6rKsxtdkP",
+            "created_at": 1790944949,
+            "model": "gpt-image-2.5-flare",
+            "billing_status": "settled",
+            "amount": "0.490000",
+            "reserved_amount": null,
+            "refunded_amount": null
+          },
+          {
+            "id": "usage_2004522",
+            "request_id": "202610021241556854123338268d9d6R8aryqnk",
+            "created_at": 1790944945,
+            "model": "gpt-image-2.5-flare",
+            "billing_status": "settled",
+            "amount": "0.490000",
+            "reserved_amount": null,
+            "refunded_amount": null
+          }
+        ],
+        "settledCNY": 0.98,
+        "perCaseLedgerRequestIdAssigned": false
+      },
+      {
+        "id": "r1-video-billing",
+        "round": 1,
+        "kind": "video",
+        "association": "Individual requests exactly linked by video-task-submission-ledger-exact-join.json",
+        "rows": [
+          {
+            "id": "usage_2004585",
+            "request_id": "20261002125557113713968268d9d6cBl1MbOX",
+            "created_at": 1790945759,
+            "model": "seedance-2.0-fast",
+            "billing_status": "settled",
+            "amount": "1.361582",
+            "reserved_amount": "2.853414",
+            "refunded_amount": "1.491832"
+          },
+          {
+            "id": "usage_2004580",
+            "request_id": "202610021255391898862188268d9d6XKZyAaTI",
+            "created_at": 1790945742,
+            "model": "seedance-2.0-fast",
+            "billing_status": "settled",
+            "amount": "1.361582",
+            "reserved_amount": "2.853414",
+            "refunded_amount": "1.491832"
+          },
+          {
+            "id": "usage_2004579",
+            "request_id": "202610021255376443646788268d9d6ffDhsJKq",
+            "created_at": 1790945737,
+            "model": "seedance-2.0-fast",
+            "billing_status": "settled",
+            "amount": "1.089000",
+            "reserved_amount": "1.196348",
+            "refunded_amount": "0.107348"
+          },
+          {
+            "id": "usage_2004577",
+            "request_id": "202610021255296337089208268d9d6jjxBesuE",
+            "created_at": 1790945729,
+            "model": "seedance-2.0-fast",
+            "billing_status": "settled",
+            "amount": "1.139354",
+            "reserved_amount": "1.196348",
+            "refunded_amount": "0.056994"
+          }
+        ],
+        "settledCNY": 4.951518,
+        "perCaseLedgerRequestIdAssigned": false
+      },
+      {
+        "id": "r2-image-billing",
+        "round": 2,
+        "kind": "image",
+        "association": "batch_time_window_model; individual ledger request not directly linked to provider request",
+        "rows": [
+          {
+            "id": "usage_2004643",
+            "request_id": "202610021305112500428548268d9d6J25m1Sas",
+            "created_at": 1790946347,
+            "model": "gpt-image-2.5-flare",
+            "billing_status": "settled",
+            "amount": "0.490000",
+            "reserved_amount": null,
+            "refunded_amount": null
+          },
+          {
+            "id": "usage_2004641",
+            "request_id": "202610021304549644602538268d9d6DSlsYwJn",
+            "created_at": 1790946338,
+            "model": "gpt-image-2.5-flare",
+            "billing_status": "settled",
+            "amount": "0.490000",
+            "reserved_amount": null,
+            "refunded_amount": null
+          }
+        ],
+        "settledCNY": 0.98,
+        "perCaseLedgerRequestIdAssigned": false
+      },
+      {
+        "id": "r2-video-billing",
+        "round": 2,
+        "kind": "video",
+        "association": "Individual requests exactly linked by video-task-submission-ledger-exact-join.json",
+        "rows": [
+          {
+            "id": "usage_2004666",
+            "request_id": "202610021309155366084108268d9d63M3lTJDt",
+            "created_at": 1790946558,
+            "model": "seedance-2.0-fast",
+            "billing_status": "settled",
+            "amount": "1.361582",
+            "reserved_amount": "2.853414",
+            "refunded_amount": "1.491832"
+          },
+          {
+            "id": "usage_2004664",
+            "request_id": "202610021309065457447398268d9d6b5JpWFzd",
+            "created_at": 1790946546,
+            "model": "seedance-2.0-fast",
+            "billing_status": "settled",
+            "amount": "1.089000",
+            "reserved_amount": "1.196348",
+            "refunded_amount": "0.107348"
+          },
+          {
+            "id": "usage_2004663",
+            "request_id": "202610021309035125308308268d9d6gxtELlot",
+            "created_at": 1790946546,
+            "model": "seedance-2.0-fast",
+            "billing_status": "settled",
+            "amount": "1.361582",
+            "reserved_amount": "2.853414",
+            "refunded_amount": "1.491832"
+          },
+          {
+            "id": "usage_2004660",
+            "request_id": "202610021308537015162328268d9d63SvQJn5T",
+            "created_at": 1790946533,
+            "model": "seedance-2.0-fast",
+            "billing_status": "settled",
+            "amount": "1.139354",
+            "reserved_amount": "1.196348",
+            "refunded_amount": "0.056994"
+          }
+        ],
+        "settledCNY": 4.951518,
+        "perCaseLedgerRequestIdAssigned": false
+      }
+    ]
+  },
+  "scenario": {
+    "id": "national-day-autumn-travel-20261002",
+    "title": "国庆秋日旅行：金色湖畔露营车",
+    "source": "https://wlj.wuhan.gov.cn/zwgk_27/zwdt/xydt/202609/t20260916_2848583.shtml",
+    "queryDate": "2026-10-02",
+    "fixtures": {
+      "image-1.png": "cf6d3960fff77be5e9ea36f07b294ea387eb29b954c703ad89bf573b28184216",
+      "image-2.png": "ce9f2258001c2f02ee04a4b185f5e6d6ec2e379642e25378cc55984e7a47b9a2",
+      "reference.mp4": "42a5e4ec187a7676415b6bf5777be5b9d6daf18d828667e546b7b846eb0b96f8"
+    }
+  },
+  "agentChecks": {
+    "canvas_read": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+      "testedCommit": "2a7e2ba",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "sourceBinding": "explicit_runtime_and_build_toolchain_equivalence",
+      "evidence": [
+        "native-cancel-2a7e2ba-receipt.json",
+        "candidate-equivalence-2a7e2ba-f6e23ba.json",
+        "independent-codex-review.md"
+      ],
+      "turnId": "8c532d57777ba34367fa1b7c",
+      "operation": "canvas.get",
+      "limitation": "Read operation succeeded before model response was cancelled; no media cancellation claim."
+    },
+    "asset_reference": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+      "testedCommit": "2a7e2ba",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "sourceBinding": "explicit_runtime_and_build_toolchain_equivalence",
+      "evidence": [
+        "native-asset-reference-2a7e2ba-receipt.json",
+        "candidate-equivalence-2a7e2ba-f6e23ba.json",
+        "independent-codex-review.md"
+      ],
+      "turnId": "607c30e39a2e946f918cb0bf"
+    },
+    "canvas_mutation": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+      "testedCommit": "2a7e2ba",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "sourceBinding": "explicit_runtime_and_build_toolchain_equivalence",
+      "evidence": [
+        "native-concurrent-mutation-2a7e2ba-receipt.json",
+        "candidate-equivalence-2a7e2ba-f6e23ba.json",
+        "independent-codex-review.md"
+      ],
+      "turnId": "1b416a6dc93b9fd97c4b78a9",
+      "limitation": "First update failed, later update succeeded inside all four R1 video-running intervals; final renamed title and six edges retained."
+    },
+    "multi_turn": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+      "testedCommit": "2a7e2ba",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "sourceBinding": "explicit_runtime_and_build_toolchain_equivalence",
+      "evidence": [
+        "native-concurrent-mutation-2a7e2ba-receipt.json",
+        "r2-images-proposal.json",
+        "r2-videos-proposal.json",
+        "native-session-history-2a7e2ba-receipt.json",
+        "candidate-equivalence-2a7e2ba-f6e23ba.json",
+        "independent-codex-review.md"
+      ],
+      "sessionId": "01a0fc98-0d9c-729a-a225-cf17c78346c4",
+      "turnIds": [
+        "1b416a6dc93b9fd97c4b78a9",
+        "ef959f57704a3da0d78b5873",
+        "c3c3476182832a4fb78819f2"
+      ]
+    },
+    "proposal_decline": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+      "testedCommit": "2a7e2ba",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "sourceBinding": "explicit_runtime_and_build_toolchain_equivalence",
+      "evidence": [
+        "native-proposal-decline-2a7e2ba-receipt.json",
+        "proposal-declined-2a7e2ba.json",
+        "proposal-declined-2a7e2ba.png",
+        "candidate-equivalence-2a7e2ba-f6e23ba.json",
+        "independent-codex-review.md"
+      ],
+      "turnId": "182e8778cfc863c19a708d5f",
+      "limitation": "Task count89 and canvas revision118 retained; chat usage is separate."
+    },
+    "proposal_stale": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+      "testedCommit": "2a7e2ba",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "sourceBinding": "explicit_runtime_and_build_toolchain_equivalence",
+      "evidence": [
+        "native-proposal-stale-2a7e2ba-receipt.json",
+        "candidate-equivalence-2a7e2ba-f6e23ba.json",
+        "independent-codex-review.md"
+      ],
+      "limitations": "No task for this stale proposal at readback; unrelated tasks may finish concurrently. No claim that global task count stayed fixed.",
+      "sessionId": "01a0fc98-0d9c-729a-a225-cf17c78346c4",
+      "turnId": "da7f016de8cbeec0fb82a993"
+    },
+    "proposal_idempotency": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+      "testedCommit": "2a7e2ba",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "sourceBinding": "explicit_runtime_and_build_toolchain_equivalence",
+      "evidence": [
+        "native-proposal-idempotency-r2-2a7e2ba-receipt.json",
+        "candidate-equivalence-2a7e2ba-f6e23ba.json",
+        "independent-codex-review.md"
+      ],
+      "limitations": "Automation action effect is unverifiable; native outcome and durable task readback establish this UI scenario. Does not prove two identical backend submit HTTP requests occurred. R1 partial receipt remains partial and unmodified.",
+      "sessionId": "01a0fc98-0d9c-729a-a225-cf17c78346c4",
+      "turnId": "ef959f57704a3da0d78b5873"
+    },
+    "session_history": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+      "testedCommit": "2a7e2ba",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "sourceBinding": "explicit_runtime_and_build_toolchain_equivalence",
+      "evidence": [
+        "native-session-history-2a7e2ba-receipt.json",
+        "candidate-equivalence-2a7e2ba-f6e23ba.json",
+        "independent-codex-review.md"
+      ],
+      "limitations": "Checks the displayed historical slice and current conversation; does not assert every historical message was visually inspected.",
+      "sessionId": "01a0fc98-0d9c-729a-a225-cf17c78346c4",
+      "turnId": null
+    },
+    "cancel": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+      "testedCommit": "2a7e2ba",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "sourceBinding": "explicit_runtime_and_build_toolchain_equivalence",
+      "evidence": [
+        "native-cancel-2a7e2ba-receipt.json",
+        "candidate-equivalence-2a7e2ba-f6e23ba.json",
+        "independent-codex-review.md"
+      ],
+      "limitations": "Stops model response only; does not claim cancellation/refund of already-admitted media tasks; chat billing requires separate reconciliation.",
+      "sessionId": "01a0fc98-0d9c-729a-a225-cf17c78346c4",
+      "turnId": "8c532d57777ba34367fa1b7c"
+    },
+    "session_restart": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+      "testedCommit": "2a7e2ba",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "sourceBinding": "explicit_runtime_and_build_toolchain_equivalence",
+      "evidence": [
+        "native-edge-restart-2a7e2ba-receipt.json",
+        "six-edges-before-restart-2a7e2ba.json",
+        "six-edges-after-restart-2a7e2ba.json",
+        "native-session-history-2a7e2ba-receipt.json",
+        "candidate-equivalence-2a7e2ba-f6e23ba.json",
+        "independent-codex-review.md",
+        "final-restart-before.json",
+        "final-restart-after.json",
+        "final-restart-after-native.json"
+      ],
+      "limitation": "Same-package native restart retained original conversation AX and revision118 graph; subsequent history switch/read verified separately. Not the old fe8 image-history recovery."
+    },
+    "conflict_undo": {
+      "status": "passed",
+      "method": "deterministic",
+      "sourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+      "evidence": [
+        "deterministic-agent-f6e23ba/receipt.json",
+        "deterministic-agent-f6e23ba/conflict_undo-later-edits.log",
+        "deterministic-agent-f6e23ba/conflict_undo-interleaved-and-later.log",
+        "deterministic-agent-f6e23ba/conflict_undo-stale-revision.log",
+        "deterministic-agent-f6e23ba/conflict_undo-failed-stale-write.log",
+        "deterministic-agent-f6e23ba/conflict-binding-effects.log",
+        "deterministic-agent-f6e23ba/binding-replay.log"
+      ],
+      "commands": [
+        {
+          "command": "go test -count=1 -v -run \\^\\(TestLaterEditsNotLostOnUndo\\)\\$ ./internal/assistantturns",
+          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002/backend",
+          "exitCode": 0,
+          "log": "conflict_undo-later-edits.log",
+          "sha256": "e8c7c664de88b03b0a112b8b6810ac7e3c3cd0addfaccd621de06bc3fda7c2a1",
+          "startedAt": "2026-10-02T12:36:29Z"
+        },
+        {
+          "command": "go test -count=1 -v -run \\^\\(TestUndoAssistantTurnRejectsLaterCanvasChanges\\|TestUndoAssistantTurnPreservesExternalWriteDuringTurn\\|TestUndoAssistantTurnRejectsSameNodeExternalEdit\\)\\$ ./internal/app",
+          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002/backend",
+          "exitCode": 0,
+          "log": "conflict_undo-interleaved-and-later.log",
+          "sha256": "1e64470514135976a05a67eefba676e17248a952fa0c5532a740bf051858d36e",
+          "startedAt": "2026-10-02T12:36:33Z"
+        },
+        {
+          "command": "go test -count=1 -v -run \\^\\(TestLocalUpdateKeepsNonTargetDataAndBlocksStaleRevision\\)\\$ ./internal/agentops",
+          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002/backend",
+          "exitCode": 0,
+          "log": "conflict_undo-stale-revision.log",
+          "sha256": "1b9d0836891ac5d651d710c80a2a9455b4b3c9558e5735d469029170a889cdfa",
+          "startedAt": "2026-10-02T12:36:38Z"
+        },
+        {
+          "command": "go test -count=1 -v -run \\^\\(TestFailedWriteDoesNotLeaveReceipt\\)\\$ ./internal/operations",
+          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002/backend",
+          "exitCode": 0,
+          "log": "conflict_undo-failed-stale-write.log",
+          "sha256": "d828f1a8354835fe70e5aa63aa1ef3c0bca8f00627aebb1f969f49678171dd1b",
+          "startedAt": "2026-10-02T12:36:41Z"
+        },
+        {
+          "command": "go test -count=1 ./internal/assistantturns",
+          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002/backend",
+          "exitCode": 0,
+          "log": "conflict-binding-effects.log",
+          "sha256": "9f79d9040162bfeb436af56852ee1a7689c8644379f813a017b3019a07e0f02f",
+          "startedAt": "2026-10-02T12:39:37Z"
+        },
+        {
+          "command": "bun test agent-host/operation-bridge.test.mjs agent-host/canvas-turn.test.mjs",
+          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002",
+          "exitCode": 0,
+          "log": "binding-replay.log",
+          "sha256": "61b78a8f11c80187a80fc5be73017c1a3a55e79f03776ee194cbae3d89b3f5ba",
+          "startedAt": "2026-10-02T12:39:36Z"
+        }
+      ],
+      "covered": [
+        "Later and interleaved manual/external edits prevent unsafe undo; stale revision conflicts retain data and do not create replay receipts.",
+        "Full assistantturns package and operation-bridge/canvas-turn tests cover current binding replay effects."
+      ],
+      "limitations": [
+        "Not native undo-button or simultaneous multi-window UI verification; not paid-media cancellation/refund."
+      ],
+      "sourceBinding": "explicit_runtime_and_build_toolchain_equivalence"
+    },
+    "host_recovery": {
+      "status": "passed",
+      "method": "deterministic",
+      "sourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+      "evidence": [
+        "deterministic-agent-f6e23ba/receipt.json",
+        "deterministic-agent-f6e23ba/host_recovery-sigkill.log"
+      ],
+      "commands": [
+        {
+          "command": "bun test agent-host/interrupted-host.test.mjs -t SIGKILL\\ after\\ a\\ tool\\ receipt",
+          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002",
+          "exitCode": 0,
+          "log": "host_recovery-sigkill.log",
+          "sha256": "7b7a379d1148941b20598bfff5158d1a0c470216517a3c35391e4acc7de908c5",
+          "startedAt": "2026-10-02T12:36:43Z"
+        }
+      ],
+      "covered": [
+        "Real host is SIGKILLed after a synthetic tool write receipt; restart retains original user turn as interrupted; history reads do not replay writes."
+      ],
+      "limitations": [
+        "Not OS-killed packaged desktop supervisor recovery, real-provider timeout, or billing verification."
+      ],
+      "sourceBinding": "explicit_runtime_and_build_toolchain_equivalence"
+    },
+    "scope_isolation": {
+      "status": "passed",
+      "method": "deterministic",
+      "sourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+      "evidence": [
+        "deterministic-agent-f6e23ba/receipt.json",
+        "deterministic-agent-f6e23ba/scope_isolation-allows.log",
+        "deterministic-agent-f6e23ba/scope_isolation-execute.log",
+        "deterministic-agent-f6e23ba/scope_and_budget-host-probe.log"
+      ],
+      "commands": [
+        {
+          "command": "go test -count=1 -v -run \\^\\(TestAssistantScopeAllowsOnlyVerifiedResources\\|TestEmptyAssistantScopeDeniesExecution\\)\\$ ./internal/agentops",
+          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002/backend",
+          "exitCode": 0,
+          "log": "scope_isolation-allows.log",
+          "sha256": "a0726d420b58cf408979e00d7a55f7c1de63233511309adbba0736efe16eed5e",
+          "startedAt": "2026-10-02T12:36:46Z"
+        },
+        {
+          "command": "go test -count=1 -v -run \\^\\(TestAuthorizationHappensBeforeReplay\\|TestAssistantCannotUseWorkspaceWideOps\\|TestAssistantWithoutScopeFailsClosed\\)\\$ ./internal/operations",
+          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002/backend",
+          "exitCode": 0,
+          "log": "scope_isolation-execute.log",
+          "sha256": "f5fb5b2471edb84747448b4f86ad2b32bb018e0c70ed140f0d006d51a5e58197",
+          "startedAt": "2026-10-02T12:36:47Z"
+        },
+        {
+          "command": "/Users/sunny/.nvm/versions/node/v24.15.0/bin/node agent-host/test-support/host-runtime-probe.mjs /Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002 /Volumes/ExternalWork/Scratch/beeftv-full-refactor-20261002/release-v1.6.23/deterministic-agent-f6e23ba/host-runtime-probe.json",
+          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002",
+          "exitCode": 0,
+          "log": "scope_and_budget-host-probe.log",
+          "sha256": "cf54ff6d07c20d7b178d810af54004b9277e3454adabd7571333b8baaf511e46",
+          "startedAt": "2026-10-02T12:36:51Z"
+        }
+      ],
+      "covered": [
+        "Temporary SQLite and operation registry enforce explicit resource scope, deny unknown/cross-scope operations before replay.",
+        "Real host with synthetic loopback model/ops forwards assetId without unknown canvasId and permits explicitly referenced canvas read to reach the backend guard."
+      ],
+      "limitations": [
+        "Host probe operation endpoint is synthetic; Go guard tests are separate, not one end-to-end desktop account flow."
+      ],
+      "sourceBinding": "explicit_runtime_and_build_toolchain_equivalence"
+    },
+    "budget": {
+      "status": "passed",
+      "method": "deterministic",
+      "sourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+      "evidence": [
+        "deterministic-agent-f6e23ba/receipt.json",
+        "deterministic-agent-f6e23ba/scope_and_budget-host-probe.log",
+        "deterministic-agent-f6e23ba/budget-counters.log",
+        "deterministic-agent-f6e23ba/budget-durable-probe.log"
+      ],
+      "commands": [
+        {
+          "command": "/Users/sunny/.nvm/versions/node/v24.15.0/bin/node agent-host/test-support/host-runtime-probe.mjs /Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002 /Volumes/ExternalWork/Scratch/beeftv-full-refactor-20261002/release-v1.6.23/deterministic-agent-f6e23ba/host-runtime-probe.json",
+          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002",
+          "exitCode": 0,
+          "log": "scope_and_budget-host-probe.log",
+          "sha256": "cf54ff6d07c20d7b178d810af54004b9277e3454adabd7571333b8baaf511e46",
+          "startedAt": "2026-10-02T12:36:51Z"
+        },
+        {
+          "command": "bun test agent-host/request-budget.test.mjs",
+          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002",
+          "exitCode": 0,
+          "log": "budget-counters.log",
+          "sha256": "0fec6d27cb6b65acd370308415d11cdbbfce910b3dcfe43eba1a131fbbbba9a3",
+          "startedAt": "2026-10-02T12:37:37Z"
+        },
+        {
+          "command": "/Users/sunny/.nvm/versions/node/v24.15.0/bin/node agent-host/test-support/durable-budget-probe.mjs /Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002",
+          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002",
+          "exitCode": 0,
+          "log": "budget-durable-probe.log",
+          "sha256": "d1089dd19ed06b2054ded032fb64399a574a56efc32526767445d5b0595aa761",
+          "startedAt": "2026-10-02T12:37:37Z"
+        }
+      ],
+      "covered": [
+        "Per-turn request/tool counters and new turn reset; real host exhausts request budget without sending the rejected request.",
+        "SIGKILL after dispatch preserves durable reservation across restart.",
+        "Five malformed budget-file forms deny without resetting stored data.",
+        "Atomic replacement failure fails closed, cleans temporary files and remains closed for that process.",
+        "Disabled budget ignores unreadable/unwritable budget storage.",
+        "Three concurrent canvases share total cap two; exactly two synthetic requests succeed and one is denied; later turns and restart cannot reset total."
+      ],
+      "limitations": [
+        "No real provider requests, billing, or refunds. Tool-step exhaustion is counter-level; host probe exhausts the request limit first. Concurrent case is multiple canvases in one host, not multiple simultaneous host processes."
+      ],
+      "sourceBinding": "explicit_runtime_and_build_toolchain_equivalence"
+    },
+    "cli_mcp": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+      "testedCommit": "606ec96",
+      "testedSourceDigest": "63b029ccc8953dd9e7f1e7d314fdf174d06854e4f6cfd73cf35dfebb88f1b109",
+      "sourceBinding": "explicit_runtime_and_build_toolchain_equivalence",
+      "evidence": [
+        "external-agent-receipt.json",
+        "independent-codex-review.md"
+      ],
+      "covered": [
+        "readonly_read",
+        "readonly_write_denied",
+        "mcp_initialize",
+        "mcp_readonly_tools",
+        "cli_write",
+        "cli_replay",
+        "cli_payload_conflict",
+        "mcp_write",
+        "mcp_replay",
+        "mcp_readback",
+        "readonly_revoked",
+        "readwrite_revoked"
+      ],
+      "limitations": "Only original12 registered-client/CLI/MCP behaviors carried forward by unchanged call-chain review; no claim of new-package native rerun or internal assistant bridge coverage."
+    }
+  },
+  "cases": [
+    {
+      "round": 1,
+      "path": "text-image",
+      "sessionId": "01a0fc98-0d9c-729a-a225-cf17c78346c4",
+      "turnId": "ee673394e2c46e732bffcd82",
+      "proposalId": "gp-df0e94d9b93b1c3b",
+      "operationId": "proposal:gp-df0e94d9b93b1c3b:node-dlu9vguqu26g-b8d7e41694",
+      "taskId": "6971c25bbe1e57a492c23bb8f0aaeb5c",
+      "providerRequestId": "evt-ZZIMUEPGGBVR",
+      "model": "beefapi::gpt-image-2.5-flare",
+      "status": "succeeded",
+      "nodeId": "node-dlu9vguqu26g-b8d7e41694",
+      "resourceIds": [
+        "a6f80ad1769ba8476eb47b1663e13605"
+      ],
+      "nodeBinding": {
+        "nodeExists": true,
+        "taskIdMatches": true,
+        "operationIdMatches": true,
+        "artifactResourceMatches": true,
+        "nodeStatus": "success",
+        "taskStatus": "succeeded"
+      },
+      "createdAt": "2026-10-02 20:41:54.788602+08:00",
+      "completedAt": "2026-10-02 20:42:29.080323+08:00",
+      "mediaDecoded": true,
+      "clientVersion": "v1.6.23",
+      "platform": "macOS",
+      "fixtureDigest": "5936973fdac1f86899c9fdf03e5c41f0550d02b0e1ed5ec9581618bf59029dc8",
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "artifactSHA256": "d0bd4e67dec4d3b315629c15306751321e61d1a33cefa6a5326251896131af33",
+      "sourceDigest": "17556c4a19641c656e4963b49221d4efa3ad8ecbc663255ed7b809eec690a556",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "testedCommit": "2a7e2ba",
+      "sourceEquivalence": "candidate-equivalence-2a7e2ba-f6e23ba.json",
+      "evidence": [
+        "formal-media-20261002T130241615401Z.json",
+        "r1-text-image-opened.json",
+        "r1-text-image-opened.png",
+        "native-r1-media-opened-2a7e2ba-receipt.json",
+        "r1-images-confirmed-native.json"
+      ],
+      "billing": "settled",
+      "billingGroup": "r1-image-billing",
+      "costCNY": 0.49,
+      "billingRequestId": null,
+      "billingAssociation": "Equal-price image batch supports unit amount; ledger request ID not assigned.",
+      "parameters": {
+        "model": "beefapi::gpt-image-2.5-flare",
+        "quality": "low",
+        "size": "1:1"
+      },
+      "billingAttribution": "Equal-price closed group: two confirmed image tasks and two settled0.49ledger rows for this round; no invented one-to-one request ID."
+    },
+    {
+      "round": 1,
+      "path": "image-image",
+      "sessionId": "01a0fc98-0d9c-729a-a225-cf17c78346c4",
+      "turnId": "ee673394e2c46e732bffcd82",
+      "proposalId": "gp-df0e94d9b93b1c3b",
+      "operationId": "proposal:gp-df0e94d9b93b1c3b:node-dlu9vguqu59k-5e3e974b74",
+      "taskId": "473c3cd02920ea970d368db1f89202a9",
+      "providerRequestId": "evt-ASJLYKCMAJSF",
+      "model": "beefapi::gpt-image-2.5-flare",
+      "status": "succeeded",
+      "nodeId": "node-dlu9vguqu59k-5e3e974b74",
+      "resourceIds": [
+        "ab6dc7c4196aa637da479f4d4c083c18"
+      ],
+      "nodeBinding": {
+        "nodeExists": true,
+        "taskIdMatches": true,
+        "operationIdMatches": true,
+        "artifactResourceMatches": true,
+        "nodeStatus": "success",
+        "taskStatus": "succeeded"
+      },
+      "createdAt": "2026-10-02 20:41:54.895778+08:00",
+      "completedAt": "2026-10-02 20:42:30.163419+08:00",
+      "mediaDecoded": true,
+      "clientVersion": "v1.6.23",
+      "platform": "macOS",
+      "fixtureDigest": "5936973fdac1f86899c9fdf03e5c41f0550d02b0e1ed5ec9581618bf59029dc8",
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "artifactSHA256": "a3a5f8b15b03af175b14b5bc4aa02cae11ce3f483201dae36118b07c885a5887",
+      "sourceDigest": "17556c4a19641c656e4963b49221d4efa3ad8ecbc663255ed7b809eec690a556",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "testedCommit": "2a7e2ba",
+      "sourceEquivalence": "candidate-equivalence-2a7e2ba-f6e23ba.json",
+      "evidence": [
+        "formal-media-20261002T130241615401Z.json",
+        "r1-image-image-opened.json",
+        "r1-image-image-opened.png",
+        "native-r1-media-opened-2a7e2ba-receipt.json",
+        "r1-images-confirmed-native.json"
+      ],
+      "billing": "settled",
+      "billingGroup": "r1-image-billing",
+      "costCNY": 0.49,
+      "billingRequestId": null,
+      "billingAssociation": "Equal-price image batch supports unit amount; ledger request ID not assigned.",
+      "parameters": {
+        "model": "beefapi::gpt-image-2.5-flare",
+        "quality": "low",
+        "size": "1:1"
+      },
+      "billingAttribution": "Equal-price closed group: two confirmed image tasks and two settled0.49ledger rows for this round; no invented one-to-one request ID."
+    },
+    {
+      "round": 1,
+      "path": "image-video",
+      "sessionId": "01a0fc98-0d9c-729a-a225-cf17c78346c4",
+      "turnId": "550da2eb43d7a771d92bcf60",
+      "proposalId": "gp-5f355004625b9321",
+      "operationId": "proposal:gp-5f355004625b9321:node-dlu9vguqu8co-7e2940ccc4",
+      "taskId": "8c6882cccf9f321234f364e5d528c728",
+      "providerRequestId": "task_xTdeBw37iVjrDJSCvcWSo6UTKZlcYE1f",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "nodeId": "node-dlu9vguqu8co-7e2940ccc4",
+      "resourceIds": [
+        "0b867bd0e0ba6834a41dc5bebb7e2112"
+      ],
+      "nodeBinding": {
+        "nodeExists": true,
+        "taskIdMatches": true,
+        "operationIdMatches": true,
+        "artifactResourceMatches": true,
+        "nodeStatus": "success",
+        "taskStatus": "succeeded"
+      },
+      "createdAt": "2026-10-02 20:55:27.877016+08:00",
+      "completedAt": "2026-10-02 21:00:12.063009+08:00",
+      "mediaDecoded": true,
+      "clientVersion": "v1.6.23",
+      "platform": "macOS",
+      "fixtureDigest": "5936973fdac1f86899c9fdf03e5c41f0550d02b0e1ed5ec9581618bf59029dc8",
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "artifactSHA256": "70b7c82ace9c3689405736fe2f7bb636e9860b043eb1732c394a6784145b338c",
+      "sourceDigest": "17556c4a19641c656e4963b49221d4efa3ad8ecbc663255ed7b809eec690a556",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "testedCommit": "2a7e2ba",
+      "sourceEquivalence": "candidate-equivalence-2a7e2ba-f6e23ba.json",
+      "evidence": [
+        "formal-media-20261002T130241615401Z.json",
+        "r1-image-video-opened.json",
+        "r1-image-video-opened.png",
+        "native-r1-media-opened-2a7e2ba-receipt.json",
+        "r1-videos-pixel-confirm-native.json"
+      ],
+      "billing": "settled",
+      "billingGroup": "r1-video-billing",
+      "costCNY": 1.089,
+      "billingRequestId": "202610021255376443646788268d9d6ffDhsJKq",
+      "billingAssociation": "Exact provider task -> submission -> ledger request_id; amount, reserve and refund independently matched.",
+      "parameters": {
+        "generateAudio": "false",
+        "model": "beefapi::seedance-2.0-fast"
+      },
+      "persistedRequest": {
+        "taskId": "8c6882cccf9f321234f364e5d528c728",
+        "operationId": "proposal:gp-5f355004625b9321:node-dlu9vguqu8co-7e2940ccc4",
+        "prompt": "保持参考图中的露营车与湖畔环境，镜头缓慢向前推进，树叶轻轻摇动，湖面涟漪，写实，无人物，无字幕",
+        "videoParameters": {
+          "affectedChannel": true,
+          "audioCount": 0,
+          "imageCount": 1,
+          "model": "seedance-2.0-fast",
+          "size": "16:9",
+          "videoCount": 0
+        }
+      },
+      "parameterEvidence": [
+        "formal-video-request-parameters.json",
+        "matrix-configuration-05d612b.json",
+        "formal-media-20261002T130241615401Z.json"
+      ],
+      "billingAttribution": "Exact task->video_submission->ledger request_id join",
+      "billingEvidence": "video-task-submission-ledger-exact-join.json"
+    },
+    {
+      "round": 1,
+      "path": "text-video",
+      "sessionId": "01a0fc98-0d9c-729a-a225-cf17c78346c4",
+      "turnId": "550da2eb43d7a771d92bcf60",
+      "proposalId": "gp-5f355004625b9321",
+      "operationId": "proposal:gp-5f355004625b9321:node-dlu9vguqu9w8-9c17515536",
+      "taskId": "cbe321066b74cc1e0308a18c988d601a",
+      "providerRequestId": "task_GABCHqzLNaAHYKtMIlk20WzVB1vqOOVO",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "nodeId": "node-dlu9vguqu9w8-9c17515536",
+      "resourceIds": [
+        "d30d4a2c126b9758dd30a0182366a85b"
+      ],
+      "nodeBinding": {
+        "nodeExists": true,
+        "taskIdMatches": true,
+        "operationIdMatches": true,
+        "artifactResourceMatches": true,
+        "nodeStatus": "success",
+        "taskStatus": "succeeded"
+      },
+      "createdAt": "2026-10-02 20:55:27.759083+08:00",
+      "completedAt": "2026-10-02 21:00:07.768189+08:00",
+      "mediaDecoded": true,
+      "clientVersion": "v1.6.23",
+      "platform": "macOS",
+      "fixtureDigest": "5936973fdac1f86899c9fdf03e5c41f0550d02b0e1ed5ec9581618bf59029dc8",
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "artifactSHA256": "e513144f9745bcc93f1470e86944694e3bc4ba9d2ca68cdbefc125d4f4cd7552",
+      "sourceDigest": "17556c4a19641c656e4963b49221d4efa3ad8ecbc663255ed7b809eec690a556",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "testedCommit": "2a7e2ba",
+      "sourceEquivalence": "candidate-equivalence-2a7e2ba-f6e23ba.json",
+      "evidence": [
+        "formal-media-20261002T130241615401Z.json",
+        "r1-text-video-opened.json",
+        "r1-text-video-opened.png",
+        "native-r1-media-opened-2a7e2ba-receipt.json",
+        "r1-videos-pixel-confirm-native.json"
+      ],
+      "billing": "settled",
+      "billingGroup": "r1-video-billing",
+      "costCNY": 1.139354,
+      "billingRequestId": "202610021255296337089208268d9d6jjxBesuE",
+      "billingAssociation": "Exact provider task -> submission -> ledger request_id; amount, reserve and refund independently matched.",
+      "parameters": {
+        "generateAudio": "false",
+        "model": "beefapi::seedance-2.0-fast"
+      },
+      "persistedRequest": {
+        "taskId": "cbe321066b74cc1e0308a18c988d601a",
+        "operationId": "proposal:gp-5f355004625b9321:node-dlu9vguqu9w8-9c17515536",
+        "prompt": "国庆秋日旅行，奶油白复古露营车停在金色湖畔，镜头缓慢向前推进，银杏叶轻轻摇动，暖阳晨雾，写实，无人物，无字幕，湖面有轻微涟漪",
+        "videoParameters": {
+          "affectedChannel": true,
+          "audioCount": 0,
+          "imageCount": 0,
+          "model": "seedance-2.0-fast",
+          "size": "16:9",
+          "videoCount": 0
+        }
+      },
+      "parameterEvidence": [
+        "formal-video-request-parameters.json",
+        "matrix-configuration-05d612b.json",
+        "formal-media-20261002T130241615401Z.json"
+      ],
+      "billingAttribution": "Exact task->video_submission->ledger request_id join",
+      "billingEvidence": "video-task-submission-ledger-exact-join.json"
+    },
+    {
+      "round": 1,
+      "path": "video-video",
+      "sessionId": "01a0fc98-0d9c-729a-a225-cf17c78346c4",
+      "turnId": "550da2eb43d7a771d92bcf60",
+      "proposalId": "gp-5f355004625b9321",
+      "operationId": "proposal:gp-5f355004625b9321:node-dlu9vguqubfs-036e61ff91",
+      "taskId": "7b80d1f7b319b09b9b7c00d36c3db2f7",
+      "providerRequestId": "task_hZo9mMqIjinypk55AoOIztHBNnUKwGEh",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "nodeId": "node-dlu9vguqubfs-036e61ff91",
+      "resourceIds": [
+        "6e748575d17f09bde37d6ab4555276c9"
+      ],
+      "nodeBinding": {
+        "nodeExists": true,
+        "taskIdMatches": true,
+        "operationIdMatches": true,
+        "artifactResourceMatches": true,
+        "nodeStatus": "success",
+        "taskStatus": "succeeded"
+      },
+      "createdAt": "2026-10-02 20:55:27.763381+08:00",
+      "completedAt": "2026-10-02 21:00:11.52566+08:00",
+      "mediaDecoded": true,
+      "clientVersion": "v1.6.23",
+      "platform": "macOS",
+      "fixtureDigest": "5936973fdac1f86899c9fdf03e5c41f0550d02b0e1ed5ec9581618bf59029dc8",
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "artifactSHA256": "43582104ecd2d49c450ddf95a9dfacc72ba25f12ac37ee264c3096aa5c50f292",
+      "sourceDigest": "17556c4a19641c656e4963b49221d4efa3ad8ecbc663255ed7b809eec690a556",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "testedCommit": "2a7e2ba",
+      "sourceEquivalence": "candidate-equivalence-2a7e2ba-f6e23ba.json",
+      "evidence": [
+        "formal-media-20261002T130241615401Z.json",
+        "r1-video-video-opened.json",
+        "r1-video-video-opened.png",
+        "native-r1-media-opened-2a7e2ba-receipt.json",
+        "r1-videos-pixel-confirm-native.json"
+      ],
+      "billing": "settled",
+      "billingGroup": "r1-video-billing",
+      "costCNY": 1.361582,
+      "billingRequestId": "202610021255391898862188268d9d6XKZyAaTI",
+      "billingAssociation": "Exact provider task -> submission -> ledger request_id; amount, reserve and refund independently matched.",
+      "parameters": {
+        "generateAudio": "false",
+        "model": "beefapi::seedance-2.0-fast"
+      },
+      "persistedRequest": {
+        "taskId": "7b80d1f7b319b09b9b7c00d36c3db2f7",
+        "operationId": "proposal:gp-5f355004625b9321:node-dlu9vguqubfs-036e61ff91",
+        "prompt": "参考视频的湖畔露营场景与镜头运动节奏，将光线改成温暖夕阳，保留奶油白露营车与金色银杏，无人物，无字幕",
+        "videoParameters": {
+          "affectedChannel": true,
+          "audioCount": 0,
+          "imageCount": 0,
+          "model": "seedance-2.0-fast",
+          "size": "16:9",
+          "videoCount": 1
+        }
+      },
+      "parameterEvidence": [
+        "formal-video-request-parameters.json",
+        "matrix-configuration-05d612b.json",
+        "formal-media-20261002T130241615401Z.json"
+      ],
+      "billingAttribution": "Exact task->video_submission->ledger request_id join",
+      "billingEvidence": "video-task-submission-ledger-exact-join.json"
+    },
+    {
+      "round": 1,
+      "path": "multi-video",
+      "sessionId": "01a0fc98-0d9c-729a-a225-cf17c78346c4",
+      "turnId": "550da2eb43d7a771d92bcf60",
+      "proposalId": "gp-5f355004625b9321",
+      "operationId": "proposal:gp-5f355004625b9321:node-dlu9vguquhm0-dda4e327ca",
+      "taskId": "15049bc44c6a5d3aabe307fd1e672aaa",
+      "providerRequestId": "task_zcFPKgwH5X7bHZclwy4fAzTfaqJ59gUb",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "nodeId": "node-dlu9vguquhm0-dda4e327ca",
+      "resourceIds": [
+        "8035c53dc7560bcc2bcde33935f51ff2"
+      ],
+      "nodeBinding": {
+        "nodeExists": true,
+        "taskIdMatches": true,
+        "operationIdMatches": true,
+        "artifactResourceMatches": true,
+        "nodeStatus": "success",
+        "taskStatus": "succeeded"
+      },
+      "createdAt": "2026-10-02 20:55:27.880082+08:00",
+      "completedAt": "2026-10-02 21:00:11.787896+08:00",
+      "mediaDecoded": true,
+      "clientVersion": "v1.6.23",
+      "platform": "macOS",
+      "fixtureDigest": "5936973fdac1f86899c9fdf03e5c41f0550d02b0e1ed5ec9581618bf59029dc8",
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "artifactSHA256": "f1e517626c7dcccc10ad0e409769ca71eb469ae43d9c7cc6bef7a11ec986cd98",
+      "sourceDigest": "17556c4a19641c656e4963b49221d4efa3ad8ecbc663255ed7b809eec690a556",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "testedCommit": "2a7e2ba",
+      "sourceEquivalence": "candidate-equivalence-2a7e2ba-f6e23ba.json",
+      "evidence": [
+        "formal-media-20261002T130241615401Z.json",
+        "r1-multi-video-opened.json",
+        "r1-multi-video-opened.png",
+        "native-r1-media-opened-2a7e2ba-receipt.json",
+        "r1-videos-pixel-confirm-native.json"
+      ],
+      "billing": "settled",
+      "billingGroup": "r1-video-billing",
+      "costCNY": 1.361582,
+      "billingRequestId": "20261002125557113713968268d9d6cBl1MbOX",
+      "billingAssociation": "Exact provider task -> submission -> ledger request_id; amount, reserve and refund independently matched.",
+      "parameters": {
+        "generateAudio": "false",
+        "model": "beefapi::seedance-2.0-fast"
+      },
+      "persistedRequest": {
+        "taskId": "15049bc44c6a5d3aabe307fd1e672aaa",
+        "operationId": "proposal:gp-5f355004625b9321:node-dlu9vguquhm0-dda4e327ca",
+        "prompt": "结合两张参考图的湖畔露营车与露营桌，参考视频的平稳运动节奏，镜头从橙色搪瓷杯缓慢移向湖泊和露营车，金色秋日暖阳，写实，无人物，无字幕",
+        "videoParameters": {
+          "affectedChannel": true,
+          "audioCount": 0,
+          "imageCount": 2,
+          "model": "seedance-2.0-fast",
+          "size": "16:9",
+          "videoCount": 1
+        }
+      },
+      "parameterEvidence": [
+        "formal-video-request-parameters.json",
+        "matrix-configuration-05d612b.json",
+        "formal-media-20261002T130241615401Z.json"
+      ],
+      "billingAttribution": "Exact task->video_submission->ledger request_id join",
+      "billingEvidence": "video-task-submission-ledger-exact-join.json"
+    },
+    {
+      "round": 2,
+      "path": "text-image",
+      "sessionId": "01a0fc98-0d9c-729a-a225-cf17c78346c4",
+      "turnId": "ef959f57704a3da0d78b5873",
+      "proposalId": "gp-c367450203057fc9",
+      "operationId": "proposal:gp-c367450203057fc9:node-dlu9vguqu26g-b8d7e41694",
+      "taskId": "a5c3c9d5cc8820b7f016a2e8ed35ac68",
+      "providerRequestId": "evt-QTSDFSCLKAHI",
+      "model": "beefapi::gpt-image-2.5-flare",
+      "status": "succeeded",
+      "nodeId": "node-dlu9vguqu26g-b8d7e41694",
+      "resourceIds": [
+        "923e48b9617a1f67f9167ef454b72052"
+      ],
+      "nodeBinding": {
+        "nodeExists": true,
+        "taskIdMatches": true,
+        "operationIdMatches": true,
+        "artifactResourceMatches": true,
+        "nodeStatus": "success",
+        "taskStatus": "succeeded"
+      },
+      "createdAt": "2026-10-02 21:05:09.410662+08:00",
+      "completedAt": "2026-10-02 21:07:00.757062+08:00",
+      "mediaDecoded": true,
+      "clientVersion": "v1.6.23",
+      "platform": "macOS",
+      "fixtureDigest": "5936973fdac1f86899c9fdf03e5c41f0550d02b0e1ed5ec9581618bf59029dc8",
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "artifactSHA256": "8fbdf4c7c4d5a5bce0bedeb8aa1c419636924dc74e904ab27065186baeb26b24",
+      "sourceDigest": "17556c4a19641c656e4963b49221d4efa3ad8ecbc663255ed7b809eec690a556",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "testedCommit": "2a7e2ba",
+      "sourceEquivalence": "candidate-equivalence-2a7e2ba-f6e23ba.json",
+      "evidence": [
+        "formal-media-20261002T131333881950Z.json",
+        "r2-text-image-opened.json",
+        "r2-text-image-opened.png",
+        "r2-images-confirmed-native.json"
+      ],
+      "billing": "settled",
+      "billingGroup": "r2-image-billing",
+      "costCNY": 0.49,
+      "billingRequestId": null,
+      "billingAssociation": "Equal-price image batch supports unit amount; ledger request ID not assigned.",
+      "parameters": {
+        "model": "beefapi::gpt-image-2.5-flare",
+        "quality": "low",
+        "size": "1:1"
+      },
+      "billingAttribution": "Equal-price closed group: two confirmed image tasks and two settled0.49ledger rows for this round; no invented one-to-one request ID."
+    },
+    {
+      "round": 2,
+      "path": "image-image",
+      "sessionId": "01a0fc98-0d9c-729a-a225-cf17c78346c4",
+      "turnId": "ef959f57704a3da0d78b5873",
+      "proposalId": "gp-c367450203057fc9",
+      "operationId": "proposal:gp-c367450203057fc9:node-dlu9vguqu59k-5e3e974b74",
+      "taskId": "0aeb0d4fa995b687ff31ec109004731a",
+      "providerRequestId": "evt-AUBADXBBSBAI",
+      "model": "beefapi::gpt-image-2.5-flare",
+      "status": "succeeded",
+      "nodeId": "node-dlu9vguqu59k-5e3e974b74",
+      "resourceIds": [
+        "c173bc81e499f71728d194e06cc238eb"
+      ],
+      "nodeBinding": {
+        "nodeExists": true,
+        "taskIdMatches": true,
+        "operationIdMatches": true,
+        "artifactResourceMatches": true,
+        "nodeStatus": "success",
+        "taskStatus": "succeeded"
+      },
+      "createdAt": "2026-10-02 21:04:48.418528+08:00",
+      "completedAt": "2026-10-02 21:07:00.547317+08:00",
+      "mediaDecoded": true,
+      "clientVersion": "v1.6.23",
+      "platform": "macOS",
+      "fixtureDigest": "5936973fdac1f86899c9fdf03e5c41f0550d02b0e1ed5ec9581618bf59029dc8",
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "artifactSHA256": "95f3f9cbd7707835454dc6565da0e408f999a120463df92c1159bb6cfb7bc5ec",
+      "sourceDigest": "17556c4a19641c656e4963b49221d4efa3ad8ecbc663255ed7b809eec690a556",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "testedCommit": "2a7e2ba",
+      "sourceEquivalence": "candidate-equivalence-2a7e2ba-f6e23ba.json",
+      "evidence": [
+        "formal-media-20261002T131333881950Z.json",
+        "r2-image-image-opened.json",
+        "r2-image-image-opened.png",
+        "r2-images-confirmed-native.json"
+      ],
+      "billing": "settled",
+      "billingGroup": "r2-image-billing",
+      "costCNY": 0.49,
+      "billingRequestId": null,
+      "billingAssociation": "Equal-price image batch supports unit amount; ledger request ID not assigned.",
+      "parameters": {
+        "model": "beefapi::gpt-image-2.5-flare",
+        "quality": "low",
+        "size": "1:1"
+      },
+      "billingAttribution": "Equal-price closed group: two confirmed image tasks and two settled0.49ledger rows for this round; no invented one-to-one request ID."
+    },
+    {
+      "round": 2,
+      "path": "image-video",
+      "sessionId": "01a0fc98-0d9c-729a-a225-cf17c78346c4",
+      "turnId": "c3c3476182832a4fb78819f2",
+      "proposalId": "gp-6a49ba9358caf255",
+      "operationId": "proposal:gp-6a49ba9358caf255:node-dlu9vguqu8co-7e2940ccc4",
+      "taskId": "1d654b525f4b15845045d726e97adf33",
+      "providerRequestId": "task_6DzpXSjhTIQwSlRrRJ1T5zXQNWOE71Dv",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "nodeId": "node-dlu9vguqu8co-7e2940ccc4",
+      "resourceIds": [
+        "c1eaa53e4b5ae765fd20fa269384947f"
+      ],
+      "nodeBinding": {
+        "nodeExists": true,
+        "taskIdMatches": true,
+        "operationIdMatches": true,
+        "artifactResourceMatches": true,
+        "nodeStatus": "success",
+        "taskStatus": "succeeded"
+      },
+      "createdAt": "2026-10-02 21:08:52.120416+08:00",
+      "completedAt": "2026-10-02 21:11:42.674765+08:00",
+      "mediaDecoded": true,
+      "clientVersion": "v1.6.23",
+      "platform": "macOS",
+      "fixtureDigest": "5936973fdac1f86899c9fdf03e5c41f0550d02b0e1ed5ec9581618bf59029dc8",
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "artifactSHA256": "066662ada0cd83aada163e7943d6c136bc9a14afe127355a38d6cb79ed517c12",
+      "sourceDigest": "17556c4a19641c656e4963b49221d4efa3ad8ecbc663255ed7b809eec690a556",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "testedCommit": "2a7e2ba",
+      "sourceEquivalence": "candidate-equivalence-2a7e2ba-f6e23ba.json",
+      "evidence": [
+        "formal-media-20261002T131333881950Z.json",
+        "r2-image-video-opened.json",
+        "r2-image-video-opened.png",
+        "r2-videos-confirmed-native.json"
+      ],
+      "billing": "settled",
+      "billingGroup": "r2-video-billing",
+      "costCNY": 1.089,
+      "billingRequestId": "202610021309065457447398268d9d6b5JpWFzd",
+      "billingAssociation": "Exact provider task -> submission -> ledger request_id; amount, reserve and refund independently matched.",
+      "parameters": {
+        "generateAudio": "false",
+        "model": "beefapi::seedance-2.0-fast"
+      },
+      "persistedRequest": {
+        "taskId": "1d654b525f4b15845045d726e97adf33",
+        "operationId": "proposal:gp-6a49ba9358caf255:node-dlu9vguqu8co-7e2940ccc4",
+        "prompt": "保持参考图中的露营车与湖畔环境，镜头缓慢向前推进，树叶轻轻摇动，湖面涟漪，写实，无人物，无字幕",
+        "videoParameters": {
+          "affectedChannel": true,
+          "audioCount": 0,
+          "imageCount": 1,
+          "model": "seedance-2.0-fast",
+          "size": "16:9",
+          "videoCount": 0
+        }
+      },
+      "parameterEvidence": [
+        "formal-video-request-parameters.json",
+        "matrix-configuration-05d612b.json",
+        "formal-media-20261002T131333881950Z.json"
+      ],
+      "billingAttribution": "Exact task->video_submission->ledger request_id join",
+      "billingEvidence": "video-task-submission-ledger-exact-join.json"
+    },
+    {
+      "round": 2,
+      "path": "text-video",
+      "sessionId": "01a0fc98-0d9c-729a-a225-cf17c78346c4",
+      "turnId": "c3c3476182832a4fb78819f2",
+      "proposalId": "gp-6a49ba9358caf255",
+      "operationId": "proposal:gp-6a49ba9358caf255:node-dlu9vguqu9w8-9c17515536",
+      "taskId": "fafe77532bc2d76cacbdbfdaa168bd25",
+      "providerRequestId": "task_uMMCW9RVMp9AKvDBWgExbhgswosLQCuv",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "nodeId": "node-dlu9vguqu9w8-9c17515536",
+      "resourceIds": [
+        "d27400218693101af546702793680554"
+      ],
+      "nodeBinding": {
+        "nodeExists": true,
+        "taskIdMatches": true,
+        "operationIdMatches": true,
+        "artifactResourceMatches": true,
+        "nodeStatus": "success",
+        "taskStatus": "succeeded"
+      },
+      "createdAt": "2026-10-02 21:08:52.036155+08:00",
+      "completedAt": "2026-10-02 21:11:42.421497+08:00",
+      "mediaDecoded": true,
+      "clientVersion": "v1.6.23",
+      "platform": "macOS",
+      "fixtureDigest": "5936973fdac1f86899c9fdf03e5c41f0550d02b0e1ed5ec9581618bf59029dc8",
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "artifactSHA256": "d3e45c7adb1294dabb0574e74eff0427c9cf81418464624fd6ad5f85f3973026",
+      "sourceDigest": "17556c4a19641c656e4963b49221d4efa3ad8ecbc663255ed7b809eec690a556",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "testedCommit": "2a7e2ba",
+      "sourceEquivalence": "candidate-equivalence-2a7e2ba-f6e23ba.json",
+      "evidence": [
+        "formal-media-20261002T131333881950Z.json",
+        "r2-text-video-opened.json",
+        "r2-text-video-opened.png",
+        "r2-videos-confirmed-native.json"
+      ],
+      "billing": "settled",
+      "billingGroup": "r2-video-billing",
+      "costCNY": 1.139354,
+      "billingRequestId": "202610021308537015162328268d9d63SvQJn5T",
+      "billingAssociation": "Exact provider task -> submission -> ledger request_id; amount, reserve and refund independently matched.",
+      "parameters": {
+        "generateAudio": "false",
+        "model": "beefapi::seedance-2.0-fast"
+      },
+      "persistedRequest": {
+        "taskId": "fafe77532bc2d76cacbdbfdaa168bd25",
+        "operationId": "proposal:gp-6a49ba9358caf255:node-dlu9vguqu9w8-9c17515536",
+        "prompt": "国庆秋日旅行，奶油白复古露营车停在金色湖畔，镜头缓慢向前推进，银杏叶轻轻摇动，暖阳晨雾，写实，无人物，无字幕，湖面有轻微涟漪",
+        "videoParameters": {
+          "affectedChannel": true,
+          "audioCount": 0,
+          "imageCount": 0,
+          "model": "seedance-2.0-fast",
+          "size": "16:9",
+          "videoCount": 0
+        }
+      },
+      "parameterEvidence": [
+        "formal-video-request-parameters.json",
+        "matrix-configuration-05d612b.json",
+        "formal-media-20261002T131333881950Z.json"
+      ],
+      "billingAttribution": "Exact task->video_submission->ledger request_id join",
+      "billingEvidence": "video-task-submission-ledger-exact-join.json"
+    },
+    {
+      "round": 2,
+      "path": "video-video",
+      "sessionId": "01a0fc98-0d9c-729a-a225-cf17c78346c4",
+      "turnId": "c3c3476182832a4fb78819f2",
+      "proposalId": "gp-6a49ba9358caf255",
+      "operationId": "proposal:gp-6a49ba9358caf255:node-dlu9vguqubfs-036e61ff91",
+      "taskId": "131085390e108ccaf7428c12386f9ca1",
+      "providerRequestId": "task_3mZQHP1dvNhqPxwrxgEZ6O0adPB8yeov",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "nodeId": "node-dlu9vguqubfs-036e61ff91",
+      "resourceIds": [
+        "bd86199c3b8f1e01b3554be4876262df"
+      ],
+      "nodeBinding": {
+        "nodeExists": true,
+        "taskIdMatches": true,
+        "operationIdMatches": true,
+        "artifactResourceMatches": true,
+        "nodeStatus": "success",
+        "taskStatus": "succeeded"
+      },
+      "createdAt": "2026-10-02 21:08:52.040484+08:00",
+      "completedAt": "2026-10-02 21:11:42.233744+08:00",
+      "mediaDecoded": true,
+      "clientVersion": "v1.6.23",
+      "platform": "macOS",
+      "fixtureDigest": "5936973fdac1f86899c9fdf03e5c41f0550d02b0e1ed5ec9581618bf59029dc8",
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "artifactSHA256": "e0a0ea3676009ab3da27a801d65eb6449e4649d12c5e10085ac25b7ac24fe0fd",
+      "sourceDigest": "17556c4a19641c656e4963b49221d4efa3ad8ecbc663255ed7b809eec690a556",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "testedCommit": "2a7e2ba",
+      "sourceEquivalence": "candidate-equivalence-2a7e2ba-f6e23ba.json",
+      "evidence": [
+        "formal-media-20261002T131333881950Z.json",
+        "r2-video-video-opened.json",
+        "r2-video-video-opened.png",
+        "r2-videos-confirmed-native.json"
+      ],
+      "billing": "settled",
+      "billingGroup": "r2-video-billing",
+      "costCNY": 1.361582,
+      "billingRequestId": "202610021309035125308308268d9d6gxtELlot",
+      "billingAssociation": "Exact provider task -> submission -> ledger request_id; amount, reserve and refund independently matched.",
+      "parameters": {
+        "generateAudio": "false",
+        "model": "beefapi::seedance-2.0-fast"
+      },
+      "persistedRequest": {
+        "taskId": "131085390e108ccaf7428c12386f9ca1",
+        "operationId": "proposal:gp-6a49ba9358caf255:node-dlu9vguqubfs-036e61ff91",
+        "prompt": "参考视频的湖畔露营场景与镜头运动节奏，将光线改成温暖夕阳，保留奶油白露营车与金色银杏，无人物，无字幕",
+        "videoParameters": {
+          "affectedChannel": true,
+          "audioCount": 0,
+          "imageCount": 0,
+          "model": "seedance-2.0-fast",
+          "size": "16:9",
+          "videoCount": 1
+        }
+      },
+      "parameterEvidence": [
+        "formal-video-request-parameters.json",
+        "matrix-configuration-05d612b.json",
+        "formal-media-20261002T131333881950Z.json"
+      ],
+      "billingAttribution": "Exact task->video_submission->ledger request_id join",
+      "billingEvidence": "video-task-submission-ledger-exact-join.json"
+    },
+    {
+      "round": 2,
+      "path": "multi-video",
+      "sessionId": "01a0fc98-0d9c-729a-a225-cf17c78346c4",
+      "turnId": "c3c3476182832a4fb78819f2",
+      "proposalId": "gp-6a49ba9358caf255",
+      "operationId": "proposal:gp-6a49ba9358caf255:node-dlu9vguquhm0-dda4e327ca",
+      "taskId": "14b35a2eeb2ead1614185a5c66f3c699",
+      "providerRequestId": "task_KjbIBdorXJo2aPbFEzKpiM0Ir8903wYM",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "nodeId": "node-dlu9vguquhm0-dda4e327ca",
+      "resourceIds": [
+        "b089e1b8a26b64ede7b9127478c79f84"
+      ],
+      "nodeBinding": {
+        "nodeExists": true,
+        "taskIdMatches": true,
+        "operationIdMatches": true,
+        "artifactResourceMatches": true,
+        "nodeStatus": "success",
+        "taskStatus": "succeeded"
+      },
+      "createdAt": "2026-10-02 21:08:52.123552+08:00",
+      "completedAt": "2026-10-02 21:11:52.15639+08:00",
+      "mediaDecoded": true,
+      "clientVersion": "v1.6.23",
+      "platform": "macOS",
+      "fixtureDigest": "5936973fdac1f86899c9fdf03e5c41f0550d02b0e1ed5ec9581618bf59029dc8",
+      "entrypoint": "assistant",
+      "confirmed": true,
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "artifactSHA256": "416b23f42b1e33f9d06711ad9c328defdb4bbdae6097493f998f059840e02a3e",
+      "sourceDigest": "17556c4a19641c656e4963b49221d4efa3ad8ecbc663255ed7b809eec690a556",
+      "testedSourceDigest": "676007a92f0c04b7af1468d4ecc4dede721e4f1c76f4e7c9c4e3fc05ee3136e3",
+      "testedCommit": "2a7e2ba",
+      "sourceEquivalence": "candidate-equivalence-2a7e2ba-f6e23ba.json",
+      "evidence": [
+        "formal-media-20261002T131333881950Z.json",
+        "r2-multi-video-opened.json",
+        "r2-multi-video-opened.png",
+        "r2-videos-confirmed-native.json"
+      ],
+      "billing": "settled",
+      "billingGroup": "r2-video-billing",
+      "costCNY": 1.361582,
+      "billingRequestId": "202610021309155366084108268d9d63M3lTJDt",
+      "billingAssociation": "Exact provider task -> submission -> ledger request_id; amount, reserve and refund independently matched.",
+      "parameters": {
+        "generateAudio": "false",
+        "model": "beefapi::seedance-2.0-fast"
+      },
+      "persistedRequest": {
+        "taskId": "14b35a2eeb2ead1614185a5c66f3c699",
+        "operationId": "proposal:gp-6a49ba9358caf255:node-dlu9vguquhm0-dda4e327ca",
+        "prompt": "结合两张参考图的湖畔露营车与露营桌，参考视频的平稳运动节奏，镜头从橙色搪瓷杯缓慢移向湖泊和露营车，金色秋日暖阳，写实，无人物，无字幕",
+        "videoParameters": {
+          "affectedChannel": true,
+          "audioCount": 0,
+          "imageCount": 2,
+          "model": "seedance-2.0-fast",
+          "size": "16:9",
+          "videoCount": 1
+        }
+      },
+      "parameterEvidence": [
+        "formal-video-request-parameters.json",
+        "matrix-configuration-05d612b.json",
+        "formal-media-20261002T131333881950Z.json"
+      ],
+      "billingAttribution": "Exact task->video_submission->ledger request_id join",
+      "billingEvidence": "video-task-submission-ledger-exact-join.json"
+    }
+  ],
+  "review": {
+    "result": "approved",
+    "sourceDigest": "eae6d0b614be9fb3aa3909e060d58320d4bb48fbbf176ed5a8cd7285afa96b31",
+    "reviewer": "independent Codex /root/release_review",
+    "evidence": [
+      "docs/release-evidence/v1.6.23-review.md",
+      "independent-codex-review.md"
+    ],
+    "note": "Approved with disclosed Owner exception for the two failed-chat financial evidence gaps only; original unknown financial facts retained."
+  },
+  "upgrade": {
+    "preservedData": true,
+    "generationVerified": true,
+    "evidence": [
+      "native-edge-restart-2a7e2ba-receipt.json",
+      "windows-native-continuation/RECEIPT-2a7e2ba.md",
+      "formal-media-20261002T130241615401Z.json",
+      "formal-media-20261002T131333881950Z.json",
+      "native-final-restart-2a7e2ba-receipt.json"
+    ],
+    "finalRestartStatus": "passed",
+    "limitation": "Final native restart retained10nodes/6edges/101tasks, task bindings and current Agent session. Full document changed only timestamps and expected automatic square-image dimensions420->520; reviewed explicitly.",
+    "finalRestart": {
+      "evidence": [
+        "final-restart-before.json",
+        "final-restart-after.json",
+        "final-restart-after-native.json",
+        "final-restart-after-native.png",
+        "final-restart-before.db",
+        "final-restart-after.db"
+      ],
+      "nodes": 10,
+      "connections": 6,
+      "taskCount": 101,
+      "sameNodeBindings": true,
+      "sessionLastProposalVisible": true,
+      "sameFullPayload": false,
+      "payloadDifference": "Only timestamps and nodes[4] width/height420→520; independent reviewer accepted existing fitToImage/fitNodeSize normalization without media/parameters/edges/task-binding loss."
+    }
+  },
+  "verification": {
+    "windowsNativeRegression": "passed_scoped",
+    "windowsEvidence": "windows-native-continuation/RECEIPT-2a7e2ba.md",
+    "ci": "passed",
+    "noTestsOrPaidCallsRepeated": true,
+    "ciEvidence": "ci-f6e23ba.json",
+    "releaseToolchainRepair": {
+      "failedRun": "https://github.com/glanderness/BeefTV/actions/runs/37015889815",
+      "reason": "Bun 1.3.9 cannot parse agent-host lockfileVersion 2",
+      "bunVersion": "1.4.2",
+      "runtimeAndDependencyLocksUnchanged": true,
+      "localPackagingTests": "3 passed, 0 failed, 20 assertions",
+      "localEvidence": "bun142-packaging-test.log",
+      "requiresThreePlatformPackagingAndArtifactReadback": true
+    }
+  },
+  "pending": [],
+  "knownPendingCNY": 0,
+  "financialUncertainty": {
+    "status": "unresolved",
+    "evidence": "failed-usage-financial-audit.json",
+    "failedRequestIds": [
+      "202610021242434383740578268d9d6BAoXA1u1",
+      "202610020816334239151708268d9d6eZ5lRPwt"
+    ],
+    "knownFailedReservationCNY": 0.010722,
+    "note": "Owner accepted this release evidence gap. Both failed text records remain unresolved; all12formal media cases settled."
+  },
+  "financialEvidenceException": {
+    "version": "v1.6.23",
+    "approvedBy": "Ender",
+    "instruction": "上线吧",
+    "approvedDate": "2026-10-02",
+    "scope": "two-failed-chat-refund-evidence-only",
+    "requestIds": [
+      "202610021242434383740578268d9d6BAoXA1u1",
+      "202610020816334239151708268d9d6eZ5lRPwt"
+    ],
+    "evidence": [
+      "failed-usage-financial-audit.json",
+      "Owner release authorization in this conversation after explicit financial-exception question"
+    ],
+    "limitations": "Unknown refunds remain unresolved; authorization permits release only and is not proof of refund or exact total pending."
+  },
+  "evidenceRoot": "/Volumes/ExternalWork/Scratch/beeftv-full-refactor-20261002/release-v1.6.23"
+}

@@ -1,0 +1,166 @@
+{
+  "budgetCNY": 0,
+  "spentCNY": 0,
+  "newSpentCNY": 0,
+  "pendingCNY": 0,
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.2",
+    "pendingCNY": null,
+    "failedRequestIds": [
+      "202610020816334239151708268d9d6eZ5lRPwt",
+      "202610021242434383740578268d9d6BAoXA1u1"
+    ],
+    "evidence": [
+      "docs/release-evidence/v1.7.2.json"
+    ]
+  },
+  "liveMatrixStatus": "not_run_owner_waived",
+  "cases": [],
+  "version": "v1.7.5",
+  "sourceDigest": "d7b2ab1073318f40eeaf726d85cffbfaa713ee3026c845d9b8aa750c1548b192",
+  "releaseComplete": true,
+  "liveTestWaiver": {
+    "approvedBy": "Ender",
+    "instruction": "合了一起发布吧",
+    "scope": "byok-download-resume-targeted-acceptance"
+  },
+  "review": {
+    "result": "approved",
+    "independent": true,
+    "reviewer": "Grok Companion independent review and follow-up",
+    "sourceDigest": "d7b2ab1073318f40eeaf726d85cffbfaa713ee3026c845d9b8aa750c1548b192",
+    "evidence": [
+      "docs/release-evidence/v1.7.5-targeted.md#独立复审"
+    ]
+  },
+  "upgrade": {
+    "preservedData": true,
+    "sourceDigest": "d7b2ab1073318f40eeaf726d85cffbfaa713ee3026c845d9b8aa750c1548b192",
+    "evidence": [
+      "docs/release-evidence/v1.7.5-targeted.md#专项范围与证据"
+    ]
+  },
+  "verification": {
+    "modelServiceFlow": {
+      "status": "passed",
+      "sourceDigest": "d7b2ab1073318f40eeaf726d85cffbfaa713ee3026c845d9b8aa750c1548b192",
+      "evidence": [
+        "docs/release-evidence/v1.7.5-targeted.md#专项范围与证据"
+      ]
+    },
+    "credentialPersistence": {
+      "status": "passed",
+      "sourceDigest": "d7b2ab1073318f40eeaf726d85cffbfaa713ee3026c845d9b8aa750c1548b192",
+      "evidence": [
+        "docs/release-evidence/v1.7.5-targeted.md#专项范围与证据"
+      ]
+    },
+    "saveBarrier": {
+      "status": "passed",
+      "sourceDigest": "d7b2ab1073318f40eeaf726d85cffbfaa713ee3026c845d9b8aa750c1548b192",
+      "evidence": [
+        "docs/release-evidence/v1.7.5-targeted.md#专项范围与证据"
+      ]
+    },
+    "localReleaseGate": {
+      "status": "passed",
+      "sourceDigest": "d7b2ab1073318f40eeaf726d85cffbfaa713ee3026c845d9b8aa750c1548b192",
+      "evidence": [
+        "docs/release-evidence/v1.7.5-targeted.md#专项范围与证据"
+      ]
+    },
+    "fullReferenceContract": {
+      "status": "passed",
+      "sourceDigest": "d7b2ab1073318f40eeaf726d85cffbfaa713ee3026c845d9b8aa750c1548b192",
+      "evidence": [
+        "docs/release-evidence/v1.7.5-targeted.md#专项范围与证据"
+      ]
+    },
+    "relativeDownload": {
+      "status": "passed",
+      "sourceDigest": "d7b2ab1073318f40eeaf726d85cffbfaa713ee3026c845d9b8aa750c1548b192",
+      "evidence": [
+        "docs/release-evidence/v1.7.5-targeted.md#专项范围与证据"
+      ]
+    },
+    "nativePlaybackAndSave": {
+      "status": "passed",
+      "sourceDigest": "d7b2ab1073318f40eeaf726d85cffbfaa713ee3026c845d9b8aa750c1548b192",
+      "evidence": [
+        "docs/release-evidence/v1.7.5-targeted.md#专项范围与证据"
+      ],
+      "method": "native"
+    },
+    "updaterResume": {
+      "status": "passed",
+      "sourceDigest": "d7b2ab1073318f40eeaf726d85cffbfaa713ee3026c845d9b8aa750c1548b192",
+      "evidence": [
+        "docs/release-evidence/v1.7.5-targeted.md#专项范围与证据"
+      ]
+    },
+    "privacyScan": {
+      "status": "passed",
+      "sourceDigest": "d7b2ab1073318f40eeaf726d85cffbfaa713ee3026c845d9b8aa750c1548b192",
+      "evidence": [
+        "docs/release-evidence/v1.7.5-targeted.md#专项范围与证据"
+      ]
+    },
+    "ci": {
+      "status": "passed",
+      "sourceDigest": "d7b2ab1073318f40eeaf726d85cffbfaa713ee3026c845d9b8aa750c1548b192",
+      "evidence": [
+        "https://github.com/glanderness/BeefTV/actions/runs/37205069995",
+        "https://github.com/glanderness/BeefTV/actions/runs/37205069985"
+      ]
+    }
+  },
+  "packages": {
+    "status": "passed",
+    "finalArchiveSmokeBeforeUpload": true,
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml",
+      "https://github.com/glanderness/BeefTV/actions/runs/37205672112"
+    ],
+    "archives": {
+      "darwin-amd64": {
+        "sourceDigest": "d7b2ab1073318f40eeaf726d85cffbfaa713ee3026c845d9b8aa750c1548b192",
+        "sha256": "e641310b3546eadef1a220f859b800abe3fb213f4624c97c81f2efed24e12caa",
+        "size": 158381842,
+        "evidence": [
+          "https://updates.beefapi.com/beeftv/v1.7.5/BeefTV-v1.7.5-darwin-amd64.zip",
+          "https://github.com/glanderness/BeefTV/actions/runs/37205672112"
+        ]
+      },
+      "darwin-arm64": {
+        "sourceDigest": "d7b2ab1073318f40eeaf726d85cffbfaa713ee3026c845d9b8aa750c1548b192",
+        "sha256": "b2bdf1ddea27b729dc62e1895cac1724dd25fa1bd45380d11ccc076de3ee4173",
+        "size": 154012452,
+        "evidence": [
+          "https://updates.beefapi.com/beeftv/v1.7.5/BeefTV-v1.7.5-darwin-arm64.zip",
+          "https://github.com/glanderness/BeefTV/actions/runs/37205672112"
+        ]
+      },
+      "windows-amd64": {
+        "sourceDigest": "d7b2ab1073318f40eeaf726d85cffbfaa713ee3026c845d9b8aa750c1548b192",
+        "sha256": "2b2363d6881ae7f8944dda32c3df79b40e0805b2a97a81d2226afcd6134b2d14",
+        "size": 145140034,
+        "evidence": [
+          "https://updates.beefapi.com/beeftv/v1.7.5/BeefTV-v1.7.5-windows-amd64.zip",
+          "https://github.com/glanderness/BeefTV/actions/runs/37205672112"
+        ]
+      }
+    }
+  },
+  "publishedCommit": "572ebd641a4c0618f5502047eb66f8a1018bbb53",
+  "publication": {
+    "status": "passed",
+    "release": "https://github.com/glanderness/BeefTV/releases/tag/v1.7.5",
+    "feed": "https://updates.beefapi.com/beeftv/desktop-update.json",
+    "signatureVerified": true,
+    "allPublicArchivesDownloadedAndHashVerified": true,
+    "githubAndPublicFeedIdentical": true,
+    "binaryPrivacyScan": "passed"
+  }
+}

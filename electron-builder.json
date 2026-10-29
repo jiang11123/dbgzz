@@ -1,6 +1,7 @@
 {
   "appId": "com.dbgzz.doubao.workspace",
-  "productName": "豆包工作站",
+  "productName": "豆奶画布",
+  "afterPack": "scripts/after-pack.cjs",
   "directories": {
     "output": "release"
   },
@@ -10,6 +11,7 @@
     "package.json"
   ],
   "asar": true,
+  "publish": [{ "provider": "github", "owner": "jiang11123", "repo": "dbgzz", "releaseType": "draft" }],
   "asarUnpack": [
     "**/*.node"
   ],
@@ -25,18 +27,51 @@
     "icon": "build/icon.ico"
   },
   "nsis": {
+    "include": "scripts/installer-custom.nsh",
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
+    "deleteAppDataOnUninstall": false,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "artifactName": "dbgzz-Setup-${version}-${arch}.${ext}",
+    "artifactName": "dounai-canvas-Setup-${version}-${arch}.${ext}",
     "installerIcon": "build/icon.ico",
     "uninstallerIcon": "build/icon.ico"
   },
   "extraResources": [
+    { "from": "beeftv-source/LICENSE", "to": "licenses/beeftv/LICENSE" },
+    { "from": "beeftv-source/NOTICE", "to": "licenses/beeftv/NOTICE" },
+    { "from": "beeftv-source/THIRD_PARTY_NOTICES.md", "to": "licenses/beeftv/THIRD_PARTY_NOTICES.md" },
+    { "from": "NOTICE.md", "to": "licenses/NOTICE.md" },
     {
       "from": "build/icon.png",
       "to": "icon.png"
+    },
+    {
+      "from": "build/beeftv-backend.exe",
+      "to": "beeftv-backend.exe"
+    },
+    {
+      "from": "build/cli/beeftv.exe",
+      "to": "cli/beeftv.exe"
+    },
+    {
+      "from": "build/agent-host",
+      "to": "agent-host",
+      "filter": ["**/*"]
+    },
+    {
+      "from": "build/agent-host-node_modules.zip",
+      "to": "agent-host-node_modules.zip"
+    },
+    {
+      "from": "build/beeftv-plugins",
+      "to": "beeftv-plugins",
+      "filter": ["*.beeftv-plugin"]
+    },
+    {
+      "from": "build/beeftv-web",
+      "to": "beeftv-web",
+      "filter": ["**/*"]
     }
   ]
 }

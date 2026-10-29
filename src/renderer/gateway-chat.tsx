@@ -216,7 +216,7 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
   const [videoModel, setVideoModel] = useState('Seedance 2.0 Fast');
   // 指定账号发送：消息固定发到所选账号。
   const [pinnedAccountId, setPinnedAccountId] = useState<number | null>(null);
-  const [accounts, setAccounts] = useState<{ id: number; name: string; platform?: string }[]>([]);
+  const [accounts, setAccounts] = useState<{ id: number; name: string }[]>([]);
   const [dragActive, setDragActive] = useState(false);
   // Staged images live in App so the quick-preview bar can feed this composer too.
   const setStagedImages = (update: StagedAttachment[] | ((current: StagedAttachment[]) => StagedAttachment[])) => {
@@ -226,7 +226,6 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
   const scroller = useRef<HTMLDivElement | null>(null);
 
   const active = useMemo(() => threads.find(thread => thread.id === activeId) ?? null, [threads, activeId]);
-  const dolaSelected = accounts.find(account => account.id === (pinnedAccountId ?? active?.accountId))?.platform === 'dola';
   // Only this thread's own in-flight turn changes the composer; other threads keep sending.
   const busy = useMemo(() => (activeId ? busyThreads.includes(activeId) : false), [busyThreads, activeId]);
   const accountNames = useMemo(() => {
@@ -251,8 +250,8 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
   useEffect(() => {
     // The account list powers both the 账号N 回复 labels and the pinned-account picker.
     void window.workspace.load().then(data => {
-      const list = (data.accounts ?? []).filter((a: { platform?: string }) => ['doubao', 'dola'].includes(a.platform ?? 'doubao'));
-      setAccounts(list.map((a: { id: number; name: string; platform?: string }) => ({ id: a.id, platform: a.platform, name: a.platform === 'dola' ? `${a.name} · Dola` : a.name })));
+      const list = (data.accounts ?? []).filter((a: { platform?: string }) => (a.platform ?? 'doubao') === 'doubao');
+      setAccounts(list.map((a: { id: number; name: string }) => ({ id: a.id, name: a.name })));
       setPinnedAccountId(current => current ?? null);
     }).catch(() => undefined);
   }, []);
@@ -423,7 +422,7 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
       } else if (composerMode === 'video') {
         await window.workspace.chatVideos({ threadId, prompt, ratio: videoRatio, duration: videoDuration, model: videoModel, accountId: pinnedAccountId, attachments });
       } else {
-          await window.workspace.chatSend({ threadId, prompt, deepThink: deepThink && !dolaSelected, accountId: pinnedAccountId, attachments });
+        await window.workspace.chatSend({ threadId, prompt, deepThink, accountId: pinnedAccountId, attachments });
       }
       await refreshThreads();
       if (activeIdRef.current === threadId) await loadMessages(threadId);
@@ -515,7 +514,7 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
       <div className="chat-scroll" ref={scroller}>
         {!messages.length && !streaming && <div className="chat-empty">
           <Sparkles size={22} />
-          <h2>与豆包或 Dola 对话</h2>
+          <h2>通过网关和豆包对话</h2>
           <p>消息由已登录的账号池发出，支持文字、图片与视频结果。</p>
         </div>}
         {messages.filter(message => !(streaming && message.role === 'assistant' && (message.status === 'pending' || message.status === 'streaming'))).map(message => <MessageBubble key={message.id} message={message} accountName={accountNames[message.accountId ?? -1]} streamed="" onDownload={item => void downloadMedia(item, message.accountId, message.threadId)} downloadingId={downloadingId} onDownloadLastFrame={item => void downloadLastFrame(item)} extractingLastFrameId={extractingLastFrameId} onConfirm={!streaming && busy && !forwarding && message.id === messages[messages.length - 1]?.id ? handleConfirm : undefined} />)}
@@ -563,7 +562,7 @@ export function GatewayChat({ mode, onModeChange, stagedImages = [], onStagedCha
         </div>
         {composerMode === 'text'
           ? <label className="chat-toggle" title="开启后启用豆包深度思考">
-              <input type="checkbox" checked={deepThink && !dolaSelected} disabled={dolaSelected} onChange={event => setDeepThink(event.target.checked)} />深度思考
+              <input type="checkbox" checked={deepThink} onChange={event => setDeepThink(event.target.checked)} />深度思考
             </label>
           : <UpwardSelect label={composerMode === 'image' ? '图片比例' : '视频比例'}
               value={composerMode === 'image' ? imageRatio : videoRatio}
@@ -610,9 +609,9 @@ function MessageBubble({ message, streamed, accountName, onDownload, downloading
   const pending = message.status === 'streaming' || message.status === 'pending';
   const text = streamed || message.content;
   // Assistant replies are labelled with the account that produced them.
-  const label = message.role === 'user' ? '我' : (accountName || '助手');
+  const label = message.role === 'user' ? '我' : (accountName ? `${accountName} (豆包)` : '豆包');
   return <article className={`chat-msg ${message.role}`}>
-    <div className="chat-msg-role" title={label}>{label}</div>
+    <div className="chat-msg-role">{label}</div>
     <div className="chat-msg-body">
       {text ? <div className="chat-msg-md">{renderMarkdown(text)}</div> : pending ? <p className="muted"><Loader2 size={13} className="spin" /> 正在生成...</p> : null}
       {message.role === 'assistant' && /视频生成参数确认|请先确认.*参数|确认后我再开始|确认后.*(?:开始|生成)|请确认/i.test(text) && onConfirm && <div className="chat-confirm-action" style={{ marginTop: '10px' }}><button type="button" className="primary" style={{ padding: '6px 14px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }} onClick={() => onConfirm('确认生成，直接开始')}>发送确认</button></div>}

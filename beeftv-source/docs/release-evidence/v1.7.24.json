@@ -1,0 +1,138 @@
+{
+  "version": "v1.7.24",
+  "sourceDigest": "1985912acf7b8b579b07138a63b70c0cd27d2677fb3e59df20ac676426e66a10",
+  "ownerException": {
+    "scope": "cross-reviewed-prs-and-byteplus-tls-20261015",
+    "approvedBy": "Ender",
+    "instruction": "把已 commit 的 codex/byteplus-compat 和 fix/tls-submission-20261015 合进 main 后一起发 v1.7.24（未 commit 的 4 个工作区留下一版）",
+    "evidence": [
+      "docs/release-evidence/v1.7.24-targeted.md"
+    ]
+  },
+  "releaseAuthorization": {
+    "additionalHumanReplyRequired": false,
+    "scope": "v1.7.24 only"
+  },
+  "baseRelease": "v1.7.23",
+  "baseCommit": "cabdbdd116530feaac04bb93d940162d586413d4",
+  "includedPullRequests": [
+    147,
+    154,
+    157,
+    153,
+    155,
+    156,
+    158,
+    159
+  ],
+  "paidSubmissionPathChanged": false,
+  "paidSubmissionLimit": 0,
+  "newBudgetCNY": 0,
+  "newSpentCNY": 0,
+  "newPendingCNY": 0,
+  "cases": [],
+  "billingAttempts": [],
+  "budgetCNY": null,
+  "spentCNY": null,
+  "pendingCNY": null,
+  "liveMatrixStatus": "not_run_owner_waived",
+  "agentAcceptanceStatus": "not_run_owner_waived",
+  "acceptanceComplete": false,
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.23",
+    "pendingCNY": null,
+    "evidence": [
+      "docs/release-evidence/v1.7.23.json",
+      "docs/release-evidence/v1.7.24-targeted.md"
+    ]
+  },
+  "review": {
+    "result": "approved",
+    "independent": true,
+    "reviewer": "Independent subagent review 2e73aa01-351b-46cd-a905-b410c55b68d4 + cross-agent PR reviews (#147, #153, #154, #155, #156, #157, #158, #159) + Lucas approval in oc_39374a8935053e4bc5180877b8b693ba",
+    "sourceDigest": "1985912acf7b8b579b07138a63b70c0cd27d2677fb3e59df20ac676426e66a10",
+    "evidence": [
+      "docs/release-evidence/v1.7.24-review.md#独立复核"
+    ]
+  },
+  "upgrade": {
+    "preservedData": true,
+    "sourceDigest": "1985912acf7b8b579b07138a63b70c0cd27d2677fb3e59df20ac676426e66a10",
+    "evidence": [
+      "docs/release-evidence/v1.7.24-review.md#数据保留"
+    ]
+  },
+  "verification": {
+    "canvasAndWebviewFixes": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "1985912acf7b8b579b07138a63b70c0cd27d2677fb3e59df20ac676426e66a10",
+      "evidence": [
+        "docs/release-evidence/v1.7.24-review.md#当前源码上的检查"
+      ]
+    },
+    "externalVideoAndBytePlus": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "1985912acf7b8b579b07138a63b70c0cd27d2677fb3e59df20ac676426e66a10",
+      "evidence": [
+        "docs/release-evidence/v1.7.24-review.md#当前源码上的检查"
+      ]
+    },
+    "updaterAndSubmissionDiagnostics": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "1985912acf7b8b579b07138a63b70c0cd27d2677fb3e59df20ac676426e66a10",
+      "evidence": [
+        "docs/release-evidence/v1.7.24-review.md#当前源码上的检查"
+      ]
+    },
+    "noNewPaidGeneration": {
+      "status": "passed",
+      "method": "source-diff",
+      "sourceDigest": "1985912acf7b8b579b07138a63b70c0cd27d2677fb3e59df20ac676426e66a10",
+      "evidence": [
+        "docs/release-evidence/v1.7.24-review.md#独立复核"
+      ]
+    },
+    "localReleaseGate": {
+      "status": "passed",
+      "method": "local-script",
+      "sourceDigest": "1985912acf7b8b579b07138a63b70c0cd27d2677fb3e59df20ac676426e66a10",
+      "evidence": [
+        "docs/release-evidence/v1.7.24-review.md#当前源码上的检查"
+      ]
+    },
+    "ci": {
+      "status": "passed",
+      "method": "github-actions",
+      "sourceDigest": "1985912acf7b8b579b07138a63b70c0cd27d2677fb3e59df20ac676426e66a10",
+      "evidence": [
+        "https://github.com/glanderness/BeefTV/actions/runs/38603981264",
+        "docs/release-evidence/v1.7.24-review.md#CI"
+      ]
+    }
+  },
+  "packages": {
+    "platforms": [
+      "darwin-arm64",
+      "darwin-amd64",
+      "windows-amd64",
+      "linux-amd64"
+    ],
+    "status": "pending_release_workflow",
+    "archives": null,
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "linuxNativeWindowBeforeUpload": true,
+    "signedManifestBeforePublish": true,
+    "publicReadbackAfterPublish": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml",
+      "docs/release-evidence/v1.7.24-review.md#发布边界"
+    ]
+  },
+  "releasePublished": false,
+  "releaseComplete": false
+}

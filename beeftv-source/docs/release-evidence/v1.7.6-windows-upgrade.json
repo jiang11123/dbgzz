@@ -1,0 +1,50 @@
+[
+  {
+    "source": "v1.6.23",
+    "replaced": true,
+    "backendReady": true,
+    "productRowsPreserved": true,
+    "completeFileTree": true,
+    "version": "v1.7.6",
+    "boundary": "actual old desktop shutdown and helper replacement; backend and product rows; no canvas UI or paid-generation acceptance"
+  },
+  {
+    "source": "v1.6.23",
+    "rollback": true,
+    "oldInstallRestored": true,
+    "oldBackendReady": true,
+    "productRowsPreserved": true
+  },
+  {
+    "source": "v1.7.1",
+    "replaced": true,
+    "backendReady": true,
+    "productRowsPreserved": true,
+    "completeFileTree": true,
+    "version": "v1.7.6",
+    "boundary": "actual old desktop shutdown and helper replacement; backend and product rows; no canvas UI or paid-generation acceptance"
+  },
+  {
+    "source": "v1.7.1",
+    "rollback": true,
+    "oldInstallRestored": true,
+    "oldBackendReady": true,
+    "productRowsPreserved": true
+  },
+  {
+    "source": "v1.7.2",
+    "replaced": true,
+    "backendReady": true,
+    "productRowsPreserved": true,
+    "completeFileTree": true,
+    "version": "v1.7.6",
+    "boundary": "actual old desktop shutdown and helper replacement; backend and product rows; no canvas UI or paid-generation acceptance"
+  },
+  {
+    "source": "v1.7.2",
+    "rollback": true,
+    "oldInstallRestored": true,
+    "oldBackendReady": true,
+    "productRowsPreserved": true
+  }
+]

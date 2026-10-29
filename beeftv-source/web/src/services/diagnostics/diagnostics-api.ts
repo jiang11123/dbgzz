@@ -1,0 +1,116 @@
+import { http, ApiError } from "@/services/api/request";
+import type { ClientDiagnosticEvent, ClientDiagnosticCoverage } from "./client-diagnostics";
+import { saveOwnedOrBrowserBlob } from "@/services/desktop-media-save";
+
+export type DiagnosticExportInput = {
+    from: string;
+    to: string;
+    taskId?: string;
+    projectId?: string;
+    description?: string;
+    runtime: {
+        appVersion?: string;
+        buildCommit?: string;
+        browser?: string;
+        os?: string;
+        timezone?: string;
+        capabilities?: { secureRandom: boolean; randomUUID: boolean; structuredClone: boolean; indexedDB: boolean; storageWritable?: boolean; storageTimedOut?: boolean; webGL: boolean; h264: boolean; hevc: boolean };
+    };
+    clientEvents: ClientDiagnosticEvent[];
+    clientCoverage?: ClientDiagnosticCoverage;
+};
+
+export type DiagnosticPreview = {
+    canvasBindingCount?: number;
+	updateLog?: { status: "available" | "missing" | "unreadable"; lines: number; truncated: boolean };
+    clientEventLimit: number;
+    taskCount: number;
+    taskLogCount: number;
+    apiCallCount: number;
+    estimatedBytes: number;
+    willTruncate: boolean;
+    assistantTurnCount?: number;
+    assistantEvidenceCount?: number;
+    backendEventCount?: number;
+    resourcesCount?: number;
+    collectors?: Record<string, { status: "complete" | "partial" | "unavailable" | "failed" | "truncated"; records: number; omittedAtLeast?: number; limit?: number; from?: string; to?: string; scope?: string; reason?: string }>;
+};
+
+export type DiagnosticDownload = {
+    blob: Blob;
+    bundleId: string;
+    fileName: string;
+};
+
+export function previewDiagnosticBundle(input: DiagnosticExportInput) {
+    return http.post<DiagnosticPreview>("/diagnostics/preview", input);
+}
+
+export async function exportDiagnosticBundle(input: DiagnosticExportInput): Promise<DiagnosticDownload> {
+    try {
+        const response = await http.raw<Blob>({ method: "post", url: "/diagnostics/export", data: input, responseType: "blob" });
+        return {
+            blob: response.data,
+            bundleId: readHeader(response.headers, "x-diagnostic-bundle-id") || "",
+            fileName: parseFileName(readHeader(response.headers, "content-disposition")) || "beeftv-diagnostics.zip",
+        };
+    } catch (error) {
+        if (error instanceof ApiError) {
+            const status = error.status;
+            const raw = await readErrorBody(responseDataFromCause(error));
+            try {
+                const payload = raw ? (JSON.parse(raw) as { code?: number; msg?: string }) : null;
+                if (payload) {
+                    const message = status === 404 ? "诊断接口未部署，请重启或重新构建后端" : payload.msg || "导出诊断包失败";
+                    throw new ApiError(message, { status, code: payload.code, cause: error });
+                }
+            } catch (parseError) {
+                if (parseError instanceof ApiError) throw parseError;
+            }
+            if (status === 404) {
+                throw new ApiError("诊断接口未部署，请重启或重新构建后端", { status, cause: error });
+            }
+            if (status === 502 || status === 503 || status === 504) {
+                throw new ApiError("后端服务暂时不可用，请重启后端后重试", { status, cause: error });
+            }
+        }
+        throw error;
+    }
+}
+
+function responseDataFromCause(error: ApiError): unknown {
+    const cause = error.cause;
+    if (cause && typeof cause === "object" && "response" in cause) {
+        return (cause as { response?: { data?: unknown } }).response?.data;
+    }
+    return undefined;
+}
+
+async function readErrorBody(data: unknown) {
+    if (data instanceof Blob) return data.text();
+    return typeof data === "string" ? data : "";
+}
+
+export function downloadDiagnosticBundle(download: DiagnosticDownload) {
+    return saveOwnedOrBrowserBlob(download.fileName, download.blob);
+}
+
+function readHeader(headers: unknown, name: string) {
+    if (!headers || typeof headers !== "object") return "";
+    const value = headers as { get?: (key: string) => string | null; [key: string]: unknown };
+    if (typeof value.get === "function") return value.get(name) || "";
+    const direct = value[name] ?? value[name.toLowerCase()];
+    return typeof direct === "string" ? direct : "";
+}
+
+function parseFileName(contentDisposition: string) {
+    const encoded = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
+    if (encoded) {
+        try {
+            return decodeURIComponent(encoded.replace(/^"|"$/g, ""));
+        } catch {
+            return encoded;
+        }
+    }
+    return contentDisposition.match(/filename="?([^";]+)"?/i)?.[1] || "";
+}

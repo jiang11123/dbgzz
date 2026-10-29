@@ -1,0 +1,16 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "BeefTV",
+  "outputfilename": "BeefTV",
+  "info": { "protocols": [{ "scheme": "beeftv", "description": "BeefTV skill link", "role": "Viewer" }] },
+  "frontend:dir": "../../../web",
+  "frontend:install": "bun install --frozen-lockfile",
+  "frontend:build": "bun run build:desktop",
+  "frontend:dev:watcher": "",
+  "frontend:dev:serverUrl": "http://127.0.0.1:3000",
+  "assetdir": "frontend/dist",
+  "wailsjsdir": "frontend/wailsjs",
+  "author": {
+    "name": "BeefTV Contributors"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "sourceDigest": "cdac6cf5be9aa6fb342553275b8b1a009fd55621c1991edaed8748fb75e2da51",
+  "testedHead": "bd6e401d014e656e35bb027e773c2b41ddf7c956",
+  "testedMerge": "3fda723f3ddb3403f54ce0e084a14fed1af2e721",
+  "reviewedSourceHead": "652da132efd52c6c64e9108561c9ade07209fac3",
+  "method": "completed-job-logs-and-identical-source-tree",
+  "observedGitHubAggregateStatus": "queued",
+  "webMainTests": {
+    "passed": 3023,
+    "failed": 0,
+    "skipped": 1
+  },
+  "jobs": [
+    {
+      "name": "publisher",
+      "url": "https://github.com/glanderness/BeefTV/actions/runs/39279435179/job/118150795953",
+      "logSHA256": "2b2c0d6cdb82c21319fce271e77b37d815d98240120f62b5e1df4ed7fce5b5da",
+      "terminalCleanupPresent": true,
+      "errorMarkers": 0,
+      "lastLogTimestamp": "2026-10-19T15:37:57.5479161Z"
+    },
+    {
+      "name": "backend",
+      "url": "https://github.com/glanderness/BeefTV/actions/runs/39279435179/job/118150795507",
+      "logSHA256": "169a4d1df502247e6a14e236854280c10aba06a8c4b9971c1479fa71b93cf17a",
+      "terminalCleanupPresent": true,
+      "errorMarkers": 0,
+      "lastLogTimestamp": "2026-10-19T15:41:30.6017440Z"
+    },
+    {
+      "name": "web",
+      "url": "https://github.com/glanderness/BeefTV/actions/runs/39279435179/job/118150795891",
+      "logSHA256": "4e6be89367756a3a3fc1e7153db7c31775c5ca9a350ce0c06f0ed7ff3ba7a669",
+      "terminalCleanupPresent": true,
+      "errorMarkers": 0,
+      "lastLogTimestamp": "2026-10-19T15:46:15.8935718Z"
+    },
+    {
+      "name": "windows",
+      "url": "https://github.com/glanderness/BeefTV/actions/runs/39279435179/job/118150795775",
+      "logSHA256": "b17880827c69d47a0704709c5d3f6c031b3c20e9500b7b8e592261f47dfc56d7",
+      "terminalCleanupPresent": true,
+      "errorMarkers": 0,
+      "lastLogTimestamp": "2026-10-19T15:39:42.6281905Z"
+    },
+    {
+      "name": "linux",
+      "url": "https://github.com/glanderness/BeefTV/actions/runs/39279435210/job/118150796044",
+      "logSHA256": "44ff7fa44a5498ed099bd957b4209b53f8efcc72997729bdede3197d52ad2f34",
+      "terminalCleanupPresent": true,
+      "errorMarkers": 0,
+      "lastLogTimestamp": "2026-10-19T15:42:01.1792831Z"
+    },
+    {
+      "name": "browser",
+      "url": "https://github.com/glanderness/BeefTV/actions/runs/39279435276/job/118150795849",
+      "logSHA256": "48a31ec5900e1af0e2d6e69cca095d90626c8c6bd5a7c58243887488275877e9",
+      "terminalCleanupPresent": true,
+      "errorMarkers": 0,
+      "lastLogTimestamp": "2026-10-19T15:40:25.9325475Z"
+    }
+  ],
+  "independentEvidenceReview": {
+    "reviewer": "Codex music3_review",
+    "result": "passed",
+    "verifiedCommands": [
+      "publisher Node 26/26 and 29/29; Python suites OK",
+      "backend 60 packages passed, 2 without tests",
+      "web 3023 pass, 1 skip, 0 fail; all isolated suites zero failures",
+      "Windows migration PASS",
+      "Linux archive CLI and native window PASS",
+      "Director browser 83/83 assertions passed"
+    ],
+    "gitTree": "97c316a98986687dbf3e334564a1fcced8700661"
+  }
+}

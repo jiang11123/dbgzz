@@ -1,0 +1,62 @@
+.canvas-task-confirmation .ant-modal-container,
+.canvas-task-confirmation .ant-modal-content {
+    padding: 24px !important;
+    border: 0 !important;
+    border-radius: 16px !important;
+    background: var(--popover) !important;
+    color: var(--foreground);
+    box-shadow: 0 20px 64px rgb(0 0 0 / 28%) !important;
+}
+
+.canvas-task-confirmation .ant-modal-body {
+    padding: 0 !important;
+}
+
+.canvas-task-confirmation .ant-modal-confirm-paragraph {
+    max-width: 100%;
+    row-gap: 10px;
+}
+
+.canvas-task-confirmation .ant-modal-confirm-title {
+    color: var(--foreground) !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    line-height: 24px !important;
+}
+
+.canvas-task-confirmation .ant-modal-confirm-content {
+    margin-inline-start: 0 !important;
+    color: var(--muted-foreground) !important;
+    font-size: var(--fs-body) !important;
+    line-height: 22px !important;
+}
+
+.canvas-task-confirmation .ant-modal-confirm-btns {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 24px !important;
+}
+
+.canvas-task-confirmation .ant-modal-confirm-btns .ant-btn {
+    height: 36px;
+    padding-inline: 16px;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 8px;
+    background: var(--muted) !important;
+    color: var(--muted-foreground) !important;
+    font-size: var(--fs-body);
+    font-weight: 500;
+    box-shadow: none !important;
+}
+
+.canvas-task-confirmation .ant-modal-confirm-btns .ant-btn-primary {
+    background: var(--secondary) !important;
+    color: var(--foreground) !important;
+}
+
+.canvas-task-confirmation .ant-modal-confirm-btns .ant-btn:hover {
+    background: var(--accent) !important;
+    color: var(--foreground) !important;
+}

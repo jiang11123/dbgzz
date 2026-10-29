@@ -1,0 +1,668 @@
+{
+  "version": "v1.6.17",
+  "sourceCommit": "c39d2b24aa905748424b5ecb152bd4a81bae4ed9",
+  "sourceDigest": "9e0f4c610cbcb8a622c39408e1164512bff1d3afbc4f92ac748b6d01446bbab8",
+  "budgetCNY": 50,
+  "spentCNY": 21.995034,
+  "pendingCNY": 0,
+  "testedAt": "2026-10-01T03:17:38.033476+00:00",
+  "fixtureSet": {
+    "name": "Big Buck Bunny 60s/63s fixtures",
+    "source": "https://peach.blender.org/download/",
+    "license": "CC BY 3.0",
+    "attribution": "(c) 2008 Blender Foundation / www.bigbuckbunny.org",
+    "sha256": {
+      "image-1.jpg": "93701f45cf50d48de5ba452cd26eeafeba40a2fceef2e50fb98940ccb919250f",
+      "image-2.jpg": "5946874132e3e82d7c1ed74db2a97e39b08f58ba7dc3fa9129adffcdd714af84",
+      "reference.mp4": "282ef9563a8dbad86470368bef7afa9fcfd1df7791cf38f4f5e803c9d535da60"
+    },
+    "digestEncoding": "SHA256 of UTF-8 JSON with sorted keys and compact separators"
+  },
+  "upgrade": {
+    "preservedData": true,
+    "generationVerified": true,
+    "tasks": {
+      "before": 3,
+      "after": 23,
+      "allPriorIDsRetained": true
+    },
+    "canvas_projects": {
+      "before": 5,
+      "after": 6,
+      "allPriorIDsRetained": true
+    },
+    "hasFailureDiagnostics": true,
+    "backupCaveat": "before-upgrade.db was taken after first local rebuild had repaired the column; missing-column baseline is the earlier read-only audit and isolated v3/v6 regression tests."
+  },
+  "cases": [
+    {
+      "round": 1,
+      "path": "text-image",
+      "taskId": "28df23acebd8f9851aeac66f2743889a",
+      "providerRequestId": "evt-GJNSSVNVDBAA",
+      "clientVersion": "v1.6.17",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "gpt-image-2.5-sunburst",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 0.56,
+      "artifactSHA256": "3b7396a9fcc85cb1541ee95fafec093a722eb243c37319e575d62fb832b1461d",
+      "params": {
+        "quality": "low",
+        "size": "1:1"
+      },
+      "references": {
+        "referenceImages": 0,
+        "referenceVideos": 0,
+        "referenceAudios": 0
+      },
+      "ledger": {
+        "logId": 1993878,
+        "requestId": "202610010252424078995598268d9d6OOsFAsLO",
+        "correlation": "Unique account/model request start within 15 seconds of native task creation; aggregate usage reconciled."
+      },
+      "streams": [
+        {
+          "codec_name": "png",
+          "codec_type": "video",
+          "width": 1254,
+          "height": 1254,
+          "duration": null,
+          "nb_frames": null
+        }
+      ],
+      "clientEvidenceSHA256": "fa62fd772ea1939170768c2275b31fec4c2c817ea1edec9f6360216b8cadcaf1",
+      "createdAt": "2026-10-01 10:52:39.682513+08:00",
+      "completedAt": "2026-10-01 10:53:08.903141+08:00"
+    },
+    {
+      "round": 1,
+      "path": "image-image",
+      "taskId": "046405cb5c634dd47e0272477de15f42",
+      "providerRequestId": "evt-LORHRHDQVKBY",
+      "clientVersion": "v1.6.17",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "gpt-image-2.5-sunburst",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 0.56,
+      "artifactSHA256": "c5065a8411c5e00d9f1cf4158e5bce9ad0f8cea8ec1ba1243d02d737b3f448e7",
+      "params": {
+        "quality": "low",
+        "size": "1:1"
+      },
+      "references": {
+        "referenceImages": 1,
+        "referenceVideos": 0,
+        "referenceAudios": 0
+      },
+      "ledger": {
+        "logId": 1993882,
+        "requestId": "202610010253061357508098268d9d6d0eSUC2u",
+        "correlation": "Unique account/model request start within 15 seconds of native task creation; aggregate usage reconciled."
+      },
+      "streams": [
+        {
+          "codec_name": "png",
+          "codec_type": "video",
+          "width": 1254,
+          "height": 1254,
+          "duration": null,
+          "nb_frames": null
+        }
+      ],
+      "clientEvidenceSHA256": "5d5a064d36d18bd7bc846c7056205d8476a2d20bbb79ce98476036e809e7f13c",
+      "createdAt": "2026-10-01 10:53:03.372744+08:00",
+      "completedAt": "2026-10-01 10:53:36.14096+08:00"
+    },
+    {
+      "round": 1,
+      "path": "text-video",
+      "taskId": "a5c52191fb673c54c3f5ffcd52087df4",
+      "providerRequestId": "task_4NEMbtdsGB3dJQ9dMbyhyE9X1TvjDFVF",
+      "clientVersion": "v1.6.17",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "seedance-2.0-fast",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.139354,
+      "artifactSHA256": "073d1092f248f3ef080d72da30d34d1ab2a37849f722c8408d1cffb41d620654",
+      "params": {
+        "videoSeconds": "5",
+        "vquality": "480",
+        "size": "16:9",
+        "videoGenerateAudio": "false"
+      },
+      "references": {
+        "referenceImages": 0,
+        "referenceVideos": 0,
+        "referenceAudios": 0
+      },
+      "ledger": {
+        "taskId": "task_4NEMbtdsGB3dJQ9dMbyhyE9X1TvjDFVF",
+        "upstreamTaskId": "cgt-20261001105320-pz6rk"
+      },
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 864,
+          "height": 496,
+          "duration": "5.041667",
+          "nb_frames": "121"
+        }
+      ],
+      "clientEvidenceSHA256": "550f959b71ffc92e0a7169a863e0b4f2101167917e708896196f5c14c65a6517",
+      "createdAt": "2026-10-01 10:53:18.917537+08:00",
+      "completedAt": "2026-10-01 10:55:23.110089+08:00"
+    },
+    {
+      "round": 1,
+      "path": "image-video",
+      "taskId": "70889f43b47a3875de2983481133270a",
+      "providerRequestId": "task_mUiWhg1D6QNc5uTbGmJ4bYeteS8o4NGe",
+      "clientVersion": "v1.6.17",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "seedance-2.0-fast",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.139354,
+      "artifactSHA256": "993a0fb5d39b89215443260a9dc4e009b6b972eeb3e7e71967ab6d0e3961b34e",
+      "params": {
+        "videoSeconds": "5",
+        "vquality": "480",
+        "size": "16:9",
+        "videoGenerateAudio": "false"
+      },
+      "references": {
+        "referenceImages": 1,
+        "referenceVideos": 0,
+        "referenceAudios": 0
+      },
+      "ledger": {
+        "taskId": "task_mUiWhg1D6QNc5uTbGmJ4bYeteS8o4NGe",
+        "upstreamTaskId": "cgt-20261001105352-jmv8q"
+      },
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 864,
+          "height": 496,
+          "duration": "5.041667",
+          "nb_frames": "121"
+        }
+      ],
+      "clientEvidenceSHA256": "b185d0c0090e1c5b04817d327ddc258ecb9ca849b97150f4afcdef75ba0ca23c",
+      "createdAt": "2026-10-01 10:53:50.868087+08:00",
+      "completedAt": "2026-10-01 10:55:54.206988+08:00"
+    },
+    {
+      "round": 1,
+      "path": "video-video",
+      "taskId": "06a2bd433036ec888f10592788363f60",
+      "providerRequestId": "task_2f7vBUTOwUdAZt4xHKLYw3FEAo0SB0ET",
+      "clientVersion": "v1.6.17",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "seedance-2.0-fast",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.225988,
+      "artifactSHA256": "47a3b25d80cf608525ec1383196b9909366fbef156fe109988ec534e70a6604f",
+      "params": {
+        "videoSeconds": "5",
+        "vquality": "480",
+        "size": "16:9",
+        "videoGenerateAudio": "false"
+      },
+      "references": {
+        "referenceImages": 0,
+        "referenceVideos": 1,
+        "referenceAudios": 0
+      },
+      "ledger": {
+        "taskId": "task_2f7vBUTOwUdAZt4xHKLYw3FEAo0SB0ET",
+        "upstreamTaskId": "cgt-20261001105605-bhw4s"
+      },
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 864,
+          "height": 496,
+          "duration": "5.041667",
+          "nb_frames": "121"
+        }
+      ],
+      "clientEvidenceSHA256": "1934b3c2c1a6608bba01506ec21c45d1aed13f26539e120cea8270561943003b",
+      "createdAt": "2026-10-01 10:55:56.360913+08:00",
+      "completedAt": "2026-10-01 10:58:02.657369+08:00"
+    },
+    {
+      "round": 1,
+      "path": "multi-video",
+      "taskId": "893bd51762ce2e981bf5c4dbde3503d9",
+      "providerRequestId": "task_WFNDmgYh3BcDlS7mRti9FWiCEbhv8Kyw",
+      "clientVersion": "v1.6.17",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "seedance-2.0-fast",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.225988,
+      "artifactSHA256": "ef3351bc3320512032aedded6997f0b3b3a5ba4dc1849aed42c9e5be3c127a18",
+      "params": {
+        "videoSeconds": "5",
+        "vquality": "480",
+        "size": "16:9",
+        "videoGenerateAudio": "false"
+      },
+      "references": {
+        "referenceImages": 2,
+        "referenceVideos": 1,
+        "referenceAudios": 0
+      },
+      "ledger": {
+        "taskId": "task_WFNDmgYh3BcDlS7mRti9FWiCEbhv8Kyw",
+        "upstreamTaskId": "cgt-20261001105925-7sw5h"
+      },
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 864,
+          "height": 496,
+          "duration": "5.041667",
+          "nb_frames": "121"
+        }
+      ],
+      "clientEvidenceSHA256": "a6918e2a5ac4dd77f5ea1ea41d4bdef541ed2bc88fb0bbaca37e7b9491fe05ec",
+      "createdAt": "2026-10-01 10:59:16.008441+08:00",
+      "completedAt": "2026-10-01 11:01:29.877496+08:00"
+    },
+    {
+      "round": 2,
+      "path": "multi-video",
+      "taskId": "b934b81391f974f544106bdcdcd4a8cb",
+      "providerRequestId": "task_ivBnHuXKvQktDVrkccB08BViaJDNkCHa",
+      "clientVersion": "v1.6.17",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "seedance-2.0-fast",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.225988,
+      "artifactSHA256": "b034321635be962d3b02b2fb7f879a45fc09fd721d5988fb5bb2eb2ebea9e366",
+      "params": {
+        "videoSeconds": "5",
+        "vquality": "480",
+        "size": "16:9",
+        "videoGenerateAudio": "false"
+      },
+      "references": {
+        "referenceImages": 2,
+        "referenceVideos": 1,
+        "referenceAudios": 0
+      },
+      "ledger": {
+        "taskId": "task_ivBnHuXKvQktDVrkccB08BViaJDNkCHa",
+        "upstreamTaskId": "cgt-20261001110512-dbp8n"
+      },
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 864,
+          "height": 496,
+          "duration": "5.041667",
+          "nb_frames": "121"
+        }
+      ],
+      "clientEvidenceSHA256": "44bef975e311ef19a0cdcba71d3e4c098d280ae77d94d56fcde58a53e2982534",
+      "createdAt": "2026-10-01 11:05:08.818853+08:00",
+      "completedAt": "2026-10-01 11:07:26.089895+08:00"
+    },
+    {
+      "round": 2,
+      "path": "video-video",
+      "taskId": "042c2b8d30ba5ae4d545ee88e29da7d9",
+      "providerRequestId": "task_jWFnBHAIaC7icnhc5FUiOEfWnKEafsLU",
+      "clientVersion": "v1.6.17",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "seedance-2.0-fast",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.225988,
+      "artifactSHA256": "648536476d10c50edfed126359dbbadfcd140717c5d370787dbbf277e24061ab",
+      "params": {
+        "videoSeconds": "5",
+        "vquality": "480",
+        "size": "16:9",
+        "videoGenerateAudio": "false"
+      },
+      "references": {
+        "referenceImages": 0,
+        "referenceVideos": 1,
+        "referenceAudios": 0
+      },
+      "ledger": {
+        "taskId": "task_jWFnBHAIaC7icnhc5FUiOEfWnKEafsLU",
+        "upstreamTaskId": "cgt-20261001110539-bqh85"
+      },
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 864,
+          "height": 496,
+          "duration": "5.041667",
+          "nb_frames": "121"
+        }
+      ],
+      "clientEvidenceSHA256": "a7fd736735843af52e53a2e23173cf74c40d14ef20ba054ce9f5457775e3fe0b",
+      "createdAt": "2026-10-01 11:05:36.889794+08:00",
+      "completedAt": "2026-10-01 11:08:10.538726+08:00"
+    },
+    {
+      "round": 2,
+      "path": "image-video",
+      "taskId": "0f1a39c5573e57c082e92359d4a8b8b6",
+      "providerRequestId": "task_ECjZM6LqYdXV70AHSyXelScsrzcERDr0",
+      "clientVersion": "v1.6.17",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "seedance-2.0-fast",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.139354,
+      "artifactSHA256": "b81277ad0118cbf51149dfb8c869890a1b3a66e6dcec3f6584e2fe304346a685",
+      "params": {
+        "videoSeconds": "5",
+        "vquality": "480",
+        "size": "16:9",
+        "videoGenerateAudio": "false"
+      },
+      "references": {
+        "referenceImages": 1,
+        "referenceVideos": 0,
+        "referenceAudios": 0
+      },
+      "ledger": {
+        "taskId": "task_ECjZM6LqYdXV70AHSyXelScsrzcERDr0",
+        "upstreamTaskId": "cgt-20261001110558-p6h29"
+      },
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 864,
+          "height": 496,
+          "duration": "5.041667",
+          "nb_frames": "121"
+        }
+      ],
+      "clientEvidenceSHA256": "4c1c8001e67d196d2ad7abde4035b594b539383fed45002f1035dfa57dc25c0e",
+      "createdAt": "2026-10-01 11:05:56.380656+08:00",
+      "completedAt": "2026-10-01 11:07:59.707764+08:00"
+    },
+    {
+      "round": 2,
+      "path": "text-video",
+      "taskId": "d2ab112391bf4c2141f39b11b06bd8de",
+      "providerRequestId": "task_1jJJHPfbD4FjcewUf5k0EcvbCFAFDHNY",
+      "clientVersion": "v1.6.17",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "seedance-2.0-fast",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.139354,
+      "artifactSHA256": "8447c04b5d0c03e23d335c8faef044ed3740b89dcdf6f1a622f51f78b5aa8078",
+      "params": {
+        "videoSeconds": "5",
+        "vquality": "480",
+        "size": "16:9",
+        "videoGenerateAudio": "false"
+      },
+      "references": {
+        "referenceImages": 0,
+        "referenceVideos": 0,
+        "referenceAudios": 0
+      },
+      "ledger": {
+        "taskId": "task_1jJJHPfbD4FjcewUf5k0EcvbCFAFDHNY",
+        "upstreamTaskId": "cgt-20261001110624-kh2kg"
+      },
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 864,
+          "height": 496,
+          "duration": "5.041667",
+          "nb_frames": "121"
+        }
+      ],
+      "clientEvidenceSHA256": "6968bedba0148122264cb87573641376c7fba6b3bbd2b1b74c5c8ea6def8e447",
+      "createdAt": "2026-10-01 11:06:22.369487+08:00",
+      "completedAt": "2026-10-01 11:08:56.372656+08:00"
+    },
+    {
+      "round": 2,
+      "path": "image-image",
+      "taskId": "d94c94c8e6d71cb8ee35f8b50a10e4f2",
+      "providerRequestId": "evt-PQYKTSZNVHLC",
+      "clientVersion": "v1.6.17",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "gpt-image-2.5-sunburst",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 0.56,
+      "artifactSHA256": "b1e9a3257bf8c3cdbf79707f22c8bdeabc439aa9f94ba2dbdd0912b1c39ceff7",
+      "params": {
+        "quality": "low",
+        "size": "1:1"
+      },
+      "references": {
+        "referenceImages": 1,
+        "referenceVideos": 0,
+        "referenceAudios": 0
+      },
+      "ledger": {
+        "logId": 1993932,
+        "requestId": "202610010306538474444078268d9d6p0lm1DLo",
+        "correlation": "Unique account/model request start within 15 seconds of native task creation; aggregate usage reconciled."
+      },
+      "streams": [
+        {
+          "codec_name": "png",
+          "codec_type": "video",
+          "width": 1254,
+          "height": 1254,
+          "duration": null,
+          "nb_frames": null
+        }
+      ],
+      "clientEvidenceSHA256": "c5d007d8014d07208cafa95f46a51e7f4048e2ef5506f1c0313c45c05ee778b2",
+      "createdAt": "2026-10-01 11:06:52.217285+08:00",
+      "completedAt": "2026-10-01 11:07:26.560848+08:00"
+    },
+    {
+      "round": 2,
+      "path": "text-image",
+      "taskId": "90fadab9bde4100d437003ca340a8330",
+      "providerRequestId": "evt-EFMYTIILDLGD",
+      "clientVersion": "v1.6.17",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "gpt-image-2.5-sunburst",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 0.56,
+      "artifactSHA256": "848f7c9bf54252c553c1ef7baa82a4311a820e7b05464cd483d31b228158d6d5",
+      "params": {
+        "quality": "low",
+        "size": "1:1"
+      },
+      "references": {
+        "referenceImages": 0,
+        "referenceVideos": 0,
+        "referenceAudios": 0
+      },
+      "ledger": {
+        "logId": 1993937,
+        "requestId": "202610010307218367990378268d9d61J8XqAoI",
+        "correlation": "Unique account/model request start within 15 seconds of native task creation; aggregate usage reconciled."
+      },
+      "streams": [
+        {
+          "codec_name": "png",
+          "codec_type": "video",
+          "width": 1254,
+          "height": 1254,
+          "duration": null,
+          "nb_frames": null
+        }
+      ],
+      "clientEvidenceSHA256": "bac0f6ce873112b1e91b06aba8780dc6294250b6d8ac61a8ba97bbc3fc88fd7a",
+      "createdAt": "2026-10-01 11:07:19.532344+08:00",
+      "completedAt": "2026-10-01 11:07:45.415718+08:00"
+    }
+  ],
+  "additionalTests": [
+    {
+      "round": 0,
+      "path": "audio-video",
+      "taskId": "f0686dd03559c5f3a9613c0c511bde7f",
+      "providerRequestId": "task_Bg9ESkdfKRAu0CO23f3e7mRl5EUcmXqH",
+      "clientVersion": "v1.6.17",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "seedance-2.0-fast",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.139354,
+      "artifactSHA256": "a519a16416789371b64f0c85ed578c27adf07fd2ae6f29b90049a392aaa155f7",
+      "params": {
+        "videoSeconds": "5",
+        "vquality": "480",
+        "size": "16:9",
+        "videoGenerateAudio": "true"
+      },
+      "references": {
+        "referenceImages": 0,
+        "referenceVideos": 0,
+        "referenceAudios": 0
+      },
+      "ledger": {
+        "taskId": "task_Bg9ESkdfKRAu0CO23f3e7mRl5EUcmXqH",
+        "upstreamTaskId": "cgt-20261001111314-kd2k5"
+      },
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 864,
+          "height": 496,
+          "duration": "5.041667",
+          "nb_frames": "121"
+        },
+        {
+          "codec_name": "aac",
+          "codec_type": "audio",
+          "width": null,
+          "height": null,
+          "duration": "5.088000",
+          "nb_frames": "160"
+        }
+      ],
+      "clientEvidenceSHA256": "c2007a0d6b0d7193352974c50037b7cbd79ded233c41ef4175174502d8ea0987",
+      "createdAt": "2026-10-01 11:13:12.619675+08:00",
+      "completedAt": "2026-10-01 11:16:18.802015+08:00"
+    }
+  ],
+  "diagnosticAttempts": {
+    "apiOnly": 3,
+    "supersededNativeBuilds": 7,
+    "costCNY": 9.154312,
+    "failed": 1,
+    "failure": "Upstream output audio copyright review rejection; fully refunded; not a local storage or media input rejection."
+  },
+  "review": {
+    "reviewer": "Independent Grok companion",
+    "result": "No remaining code release blockers",
+    "jobId": "20261001-105001-continue-f737d879",
+    "sourceCommit": "c39d2b2"
+  },
+  "verification": {
+    "localReleaseGate": "passed",
+    "targetedWeb": "72 passed, 0 failed",
+    "goPackages": [
+      "internal/database",
+      "internal/handler",
+      "internal/app"
+    ],
+    "goResult": "passed",
+    "allSilentVideoAudioStreams": 0,
+    "measurementNote": "Requested 480p/5s produced H.264 864x496, 121 frames, 5.041667s; requested 1K image tier produced PNG 1254x1254. Record measured output rather than claiming exact nominal dimensions."
+  }
+}

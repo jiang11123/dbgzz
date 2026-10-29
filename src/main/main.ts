@@ -1,4 +1,4 @@
-import { app, BrowserView, BrowserWindow, clipboard, dialog, ipcMain, Menu, nativeImage, session, shell } from 'electron';
+import { app, BrowserView, BrowserWindow, dialog, ipcMain, Menu, Notification } from 'electron';
 import http from 'node:http';
 import https from 'node:https';
 import path from 'node:path';
@@ -12,33 +12,54 @@ import { setupAccountSend } from './account-send';
 import type { DownloadCandidate, GatewayAttachment } from '../shared/types';
 import { CanvasBridge, videoConversationForAccount } from './canvas-bridge';
 import { BackgroundPageHost } from './background-page-host';
-import { syncVideoTaskToChat, findVideoTaskForThread, recoverLegacyVideoLink, forwardVideoChatMessage } from './video-chat-sync';
+import { syncVideoTaskToChat, recoverLegacyVideoLink, forwardVideoChatMessage } from './video-chat-sync';
 import { DoubaoGateway } from './gateway';
-import { createGatewayChat } from './gateway-chat';
+import { createGatewayChat, extractMediaUrls } from './gateway-chat';
 import { resolveStagedAttachments } from './staged-attachments';
 import { generateImages } from './doubao-image';
 import { uploadImageToDoubao } from './doubao-upload';
-import { streamChat, waitForPageReady } from './doubao-api';
-import { streamDolaChat, prepareDolaConversation } from './dola-chat';
+import { waitForPageReady, streamChat } from './doubao-api';
 import { waitForComposer } from './page-composer';
 import { DownloadTracker } from './download-tracker';
 import { DoubaoShareService } from './doubao-share';
 import { attachVideoContextMenu, captureLatestVideo } from './video-context';
 import { platformConfig } from './account-platform';
-import { accountShortcut, normalizeAccountShortcut, shortcutFromKey } from '../shared/account-shortcuts';
+import { accountShortcut, shortcutFromKey } from '../shared/account-shortcuts';
 import type { DownloadStatus } from '../shared/types';
+import { syncAccountsToBeefTv, launchNativeBeefTv, hostedModelConfigNeedsCleanup } from './beeftv-sync';
+import { BeefTvHost } from './beeftv-host';
+import { beeftvWebDist, beeftvBackendExe, beeftvPluginDir } from './beeftv-paths';
+import { createPanelWindows } from './panel-windows';
+import { registerImageAssetsIpc } from './ipc-image-assets';
+import { registerFilesIpc } from './ipc-files';
+import { registerWorkspaceIpc } from './ipc-workspace';
+import { broadcast } from './broadcast';
+import { autoUpdater } from 'electron-updater';
+import { AppUpdateService } from './app-update';
+
+// Prevent GPU crashes on machines with conflicting GPU drivers
+app.disableHardwareAcceleration();
+
+// 主进程全局兜底：单点异步异常（如任务执行中账号视图恰好被销毁导致 capturePage reject）
+// 不允许打崩整个应用——崩溃时 beeftv-backend 子进程无人回收，还会留下端口占用连锁故障。
+process.on('uncaughtException', (error) => { console.error('[main] uncaughtException:', error); });
+process.on('unhandledRejection', (reason) => { console.error('[main] unhandledRejection:', reason); });
+
+// 豆包 3.0：固定 userData 为 doubao-video-workspace（与开发版一致）。
+// 打包版 productName 会把 userData 指到中文目录，导致已登录账号、
+// 会话分区（persist:doubao_XX）与 BeefTV 数据全部"丢失"——这里显式继承。
+if (app.name !== 'doubao-video-workspace' && !process.env.DBGZZ_KEEP_USERDATA) {
+  try {
+    app.setPath('userData', path.join(app.getPath('appData'), 'doubao-video-workspace'));
+  } catch { /* 保持默认 */ }
+}
 
 const workspaceIcon = app.isPackaged
   ? path.join(process.resourcesPath, 'icon.png')
   : path.join(app.getAppPath(), 'build/icon.png');
 
-// A repair build can be verified alongside an installed newer version without sharing its database.
-if (process.env.DOUBAO_USER_DATA_DIR) app.setPath('userData', path.resolve(process.env.DOUBAO_USER_DATA_DIR));
-
 let windowRef: BrowserWindow | null = null;
-let settingsWindow: BrowserWindow | null = null;
-let assetsWindow: BrowserWindow | null = null;
-let donationWindow: BrowserWindow | null = null;
+let appUpdates: AppUpdateService;
 let imageAssets: ImageAssetStore;
 let assetUploading = false;
 const stagedImageAssets = new Map<number, string[]>();
@@ -54,7 +75,6 @@ let watchedDirectory = '';
 const pendingDownloads = new Set<string>();
 let canvasBridge: CanvasBridge | null = null;
 let gateway: DoubaoGateway | null = null;
-let gatewayWindow: BrowserWindow | null = null;
 // Gateway-mode chat service; wired after the database exists.
 let gatewayChat: ReturnType<typeof createGatewayChat>;
 let canvasDownloadPoll: NodeJS.Timeout | null = null;
@@ -67,6 +87,10 @@ let lastVideoAccountId: number | null = null;
 // task completes, the finished video is attached to the original chat message.
 const pendingChatVideos = new Map<string, number>();
 const accountViews = new Map<number, BrowserView>();
+// 豆包 3.0：BeefTV 宿主（静态服务 + /api 代理 + 后端子进程）；主窗口加载原生 BeefTV。
+let beeftvHost: BeefTvHost | null = null;
+let beeftvDataDir = '';
+const scanWindows = new Map<number, BrowserWindow>();
 const backgroundPages = new BackgroundPageHost(() => {
   // show:false alone stalls Doubao's animation/resize-driven editor initialization.
   // A transparent, non-focusable off-screen host renders without covering the chat.
@@ -87,7 +111,7 @@ function accountShortcuts(): Record<string, string> {
 }
 function attachAccountShortcuts(contents: Electron.WebContents) {
   contents.on('before-input-event', (event, input) => {
-    if (input.type !== 'keyDown' || input.isComposing || !windowRef || settingsWindow?.isVisible() || assetsWindow?.isVisible()) return;
+    if (input.type !== 'keyDown' || input.isComposing || !windowRef || panels.blocksAccountShortcuts()) return;
     if (contents !== windowRef.webContents && contents !== currentView?.webContents) return;
     const shortcut = shortcutFromKey(input);
     if (!shortcut) return;
@@ -102,10 +126,11 @@ function attachAccountShortcuts(contents: Electron.WebContents) {
 }
 
 function rendererUrl() { return process.env.VITE_DEV_SERVER_URL || pathToFileURL(path.join(__dirname, '../../renderer/index.html')).toString(); }
+const panels = createPanelWindows({ main: () => windowRef, icon: workspaceIcon, rendererUrl, preload: path.join(__dirname, '../preload/preload.js') });
 function browserBounds() {
   if (!windowRef) return { x: 760, y: 106, width: 600, height: 600 };
   const [width, height] = windowRef.getContentSize();
-  const top = accountBarHeight + imageBarHeight;
+  const top = accountBarHeight;
   return { x: 0, y: top, width, height: Math.max(1, height - top) };
 }
 function resizeBrowser() {
@@ -168,9 +193,99 @@ function attachCanvasDownloadHandler(accountId: number, view: BrowserView) {
     });
   });
 }
+/**
+ * 豆包 3.0：账号页面只在需要人工介入（扫码登录 / 人机验证）时以独立小窗呈现。
+ * 平时会话由后台隐身保活；主窗口始终是原生 BeefTV 画布。
+ */
+function hostAccountInScanWindow(account: { id: number; name: string; platform: string }, view: BrowserView, wasLoggedIn: boolean) {
+  // 从后台隐藏窗口彻底分离，避免双重宿主抢夺 view
+  backgroundPages.detach(view);
+  const existing = scanWindows.get(account.id);
+  if (existing && !existing.isDestroyed()) {
+    if (!existing.getBrowserViews().includes(view)) existing.addBrowserView(view);
+    fitScanView(existing, view);
+    if (existing.isMinimized()) existing.restore();
+    existing.show();
+    existing.focus();
+    return;
+  }
+  const win = new BrowserWindow({
+    icon: workspaceIcon,
+    width: 520,
+    height: 760,
+    minWidth: 400,
+    minHeight: 520,
+    title: `${account.name} · 豆包`,
+    autoHideMenuBar: true,
+    backgroundColor: '#ffffff',
+    useContentSize: true,
+    webPreferences: { contextIsolation: true },
+  });
+  scanWindows.set(account.id, win);
+  win.addBrowserView(view);
+  fitScanView(win, view);
+  win.on('resize', () => { if (!win.isDestroyed()) fitScanView(win, view); });
+  win.once('ready-to-show', () => { if (!win.isDestroyed()) fitScanView(win, view); });
+  setImmediate(() => { if (!win.isDestroyed()) fitScanView(win, view); });
+  // 扫码成功探测：出现会话 Cookie 即视为已登录 → 落库、同步 BeefTV、自动收起。
+  const cookieTimer = setInterval(() => {
+    if (win.isDestroyed() || !view.webContents || view.webContents.isDestroyed()) { clearInterval(cookieTimer); return; }
+    void view.webContents.session.cookies.get({ url: 'https://www.doubao.com' }).then(cookies => {
+      if (!cookies.some(item => item.name === 'sessionid' || item.name === 'sid_guard')) return;
+      clearInterval(cookieTimer);
+      db.updateAccount(account.id, { isLoggedIn: true });
+      windowRef?.webContents.send('workspace:changed');
+      void syncAccountsToBeefTv(db.accounts(), ensureGatewayApiKey(), { hostBaseUrl: beeftvHost?.url, gatewayBaseUrl: gateway?.url });
+      if (!wasLoggedIn) setTimeout(() => { if (!win.isDestroyed()) win.close(); }, 1500);
+    }).catch(() => undefined);
+  }, 2000);
+  win.on('closed', () => {
+    clearInterval(cookieTimer);
+    scanWindows.delete(account.id);
+    // 独立窗口关闭后，如果任务需要，重新挂回后台隐藏宿主继续执行
+    if (view?.webContents && !view.webContents.isDestroyed()) {
+      try { backgroundPages.attach(view); } catch { /* ignore */ }
+    }
+  });
+  win.show();
+  win.focus();
+}
+
+/** 触发人机安全验证时，自动把该账号的独立页面窗口弹到前台供用户手动拖动滑块完成验证。 */
+function popupAccountForCaptcha(accountId: number, _reason = '检测到人机验证，请手动完成验证') {
+  const account = db.accounts().find((a) => a.id === accountId);
+  if (!account) return;
+  const existingWin = scanWindows.get(accountId);
+  if (existingWin && !existingWin.isDestroyed() && existingWin.isVisible()) {
+    return;
+  }
+  const view = openAccountBrowser(accountId);
+  const win = scanWindows.get(accountId);
+  if (win && !win.isDestroyed()) {
+    win.setTitle(`⚠️ ${account.name || `账号${accountId}`} · 请完成人机安全验证`);
+    if (win.isMinimized()) win.restore();
+    win.show();
+    win.focus();
+    if (Notification.isSupported()) {
+      try {
+        new Notification({
+          title: `豆包账号【${account.name || `账号${accountId}`}】需要人机验证`,
+          body: '已为您自动弹出验证窗口，请在窗口中手动完成滑块验证。',
+        }).show();
+      } catch { /* ignore notification error */ }
+    }
+  }
+}
+
+function fitScanView(win: BrowserWindow, view: BrowserView) {
+  if (win.isDestroyed() || !view.webContents || view.webContents.isDestroyed()) return;
+  const [width, height] = win.getContentSize();
+  view.setAutoResize({ width: true, height: true });
+  view.setBounds({ x: 0, y: 0, width: Math.max(1, width), height: Math.max(1, height) });
+}
+
 function openAccountBrowser(accountId: number, background = false, preloadOnly = false) {
   const account = db.accounts().find((a) => a.id === accountId); if (!account || !windowRef) return;
-  const keepFullscreen = browserFullscreen;
   let view = accountViews.get(accountId);
   if (!view?.webContents || view.webContents.isDestroyed()) {
     view = new BrowserView({ webPreferences: { partition: account.sessionName, preload: path.join(__dirname, '../preload/video-context.js'), contextIsolation: true, sandbox: true, nodeIntegration: false, backgroundThrottling: false } });
@@ -231,62 +346,37 @@ function openAccountBrowser(accountId: number, background = false, preloadOnly =
         }
       });
     });
-    const accountCookies = view.webContents.session.cookies;
-    const refreshDolaLogin = async () => {
-      const cookies = await accountCookies.get({ url: 'https://www.dola.com/' });
-      if (!db.accounts().some(item => item.id === accountId)) return;
-      db.updateAccount(accountId, { isLoggedIn: cookies.some(cookie => /^(sessionid|sessionid_ss|sid_tt)$/.test(cookie.name) && Boolean(cookie.value)) });
-      windowRef?.webContents.send('workspace:changed');
-    };
     view.webContents.on('did-finish-load', () => {
       if (!db.accounts().some(item => item.id === accountId)) return;
-      if (account.platform === 'dola') {
-        // A loaded login/region-restricted page is not proof of an authenticated account.
-        void refreshDolaLogin().catch(() => undefined);
-      } else {
+      if (account.platform !== 'doubao') {
         db.updateAccount(accountId, { isLoggedIn: true });
         windowRef?.webContents.send('workspace:changed');
+        return;
       }
+      // 登录态以会话 Cookie 为准：被踢到登录页/会话过期时置 false，账号池才会把
+      // 失效账号摘出调度（旧实现无条件写 true，登录态检查形同虚设）。只在值变化
+      // 时写库+广播，避免登录页跳转频繁触发 IPC 风暴。
+      void view?.webContents.session.cookies.get({ url: 'https://www.doubao.com' }).then((cookies) => {
+        const loggedIn = cookies.some(item => item.name === 'sessionid' || item.name === 'sid_guard');
+        const current = db.accounts().find(item => item.id === accountId);
+        if (!current || current.isLoggedIn === loggedIn) return;
+        db.updateAccount(accountId, { isLoggedIn: loggedIn });
+        windowRef?.webContents.send('workspace:changed');
+      }).catch(() => undefined);
     });
-    if (account.platform === 'dola') {
-      const changed: Parameters<typeof accountCookies.on>[1] = (_event: Electron.Event, cookie: Electron.Cookie) => {
-        if (/^(sessionid|sessionid_ss|sid_tt)$/.test(cookie.name)) void refreshDolaLogin().catch(() => undefined);
-      };
-      accountCookies.on('changed', changed);
-      view.webContents.once('destroyed', () => accountCookies.removeListener('changed', changed));
-    }
     void view.webContents.loadURL(platformConfig(account.platform, account.id).homeUrl).catch((error) => {
       windowRef?.webContents.send('browser:error', `${account.name} 网页加载失败：${error.message}`);
     });
   }
   // Warm pages without changing the selected account or covering the workspace.
   if (preloadOnly) return view;
-  // Attach the replacement before detaching the previous view: failed creation must
-  // not leave the workspace without a visible account page.
   backgroundPages.detach(view);
-  if (background) {
-    if (windowRef && !windowRef.getBrowserViews().includes(view)) windowRef.addBrowserView(view);
-    view.setBounds(browserBounds());
-    if (currentView && !currentView.webContents.isDestroyed()) windowRef.setTopBrowserView(currentView);
-    return view;
-  }
-  const previousView = currentView;
-  windowRef.addBrowserView(view);
-  if (previousView?.webContents && previousView !== view && !previousView.webContents.isDestroyed()) windowRef.removeBrowserView(previousView);
+  // 豆包 3.0：不再把账号页叠加进主窗口（主窗口已是原生 BeefTV），
+  // 改由独立扫码小窗承载；后台会话继续由 accountViews 隐身保活。
   currentView = view;
   activeAccountId = accountId;
-  browserFullscreen = keepFullscreen;
-  resizeBrowser();
-  windowRef.setTopBrowserView(view);
-  if (!view.webContents.isLoading() && !view.webContents.getURL()) {
-    void view.webContents.loadURL(platformConfig(account.platform, account.id).homeUrl).catch((error) => windowRef?.webContents.send('browser:error', `${account.name} 网页加载失败：${error.message}`));
-  }
-  if (!background && !preloadOnly && currentAppMode() !== 'account') {
-    db.setSetting('appMode', 'account');
-    for (const win of BrowserWindow.getAllWindows()) if (!win.isDestroyed()) win.webContents.send('app:mode-changed', 'account');
-  }
-  windowRef.webContents.send('browser:fullscreen-changed', browserFullscreen);
-  windowRef.webContents.send('account:opened', accountId);
+  hostAccountInScanWindow(account, view, Boolean(account.isLoggedIn));
+  windowRef?.webContents.send('account:opened', accountId);
   return view;
 }
 /**
@@ -310,12 +400,6 @@ function ensureAccountView(accountId: number): BrowserView | null {
  * Ensures the account page is opened to a clean new chat session before initiating a new turn.
  */
 async function prepareAccountNewConversation(accountId: number): Promise<void> {
-  if (db.accounts().find(account => account.id === accountId)?.platform === 'dola') {
-    const dola = ensureVideoAccountView(accountId);
-    if (!dola) throw new Error('Dola 账号不存在');
-    await prepareDolaConversation(dola);
-    return;
-  }
   const view = ensureAccountView(accountId);
   if (!view?.webContents || view.webContents.isDestroyed()) {
     throw new Error('账号页面不可用，请确认该账号已登录');
@@ -358,8 +442,7 @@ async function syncAccountConversationPage(accountId: number, conversationId: st
   if (!view?.webContents || view.webContents.isDestroyed()) return;
   const currentUrl = view.webContents.getURL() || '';
   if (!currentUrl.includes(conversationId)) {
-    const platform = db.accounts().find(account => account.id === accountId)?.platform;
-    const targetUrl = `${platform === 'dola' ? 'https://www.dola.com' : 'https://www.doubao.com'}/chat/${encodeURIComponent(conversationId)}`;
+    const targetUrl = `https://www.doubao.com/chat/${conversationId}`;
     await view.webContents.loadURL(targetUrl).catch(() => undefined);
   }
 }
@@ -369,6 +452,11 @@ function ensureVideoAccountView(accountId: number): BrowserView | null {
   const view = ensureAccountView(accountId);
   if (!view) return null;
   if (windowRef?.getBrowserViews().includes(view)) return view;
+  // 如果该账号当前正在独立窗口（如人机验证弹窗或登录窗口）中向用户展示，不能偷回后台隐藏窗口
+  const scanWin = scanWindows.get(accountId);
+  if (scanWin && !scanWin.isDestroyed() && scanWin.getBrowserViews().includes(view)) {
+    return view;
+  }
   return backgroundPages.attach(view);
 }
 
@@ -469,6 +557,9 @@ function pickDoubaoAccount(): { id: number } | null {
   if (pool) {
     const picked = pool.pick(accounts, canvasBridge?.busyIds() ?? new Set<number>());
     if (picked) return { id: picked.id };
+    // 池里全员不可用（冷却/额度/验证码/未登录）时不再兜底取号：
+    // 绕过健康度会把失效账号反复锤醒，也让冷却机制对这条路径完全失效。
+    return null;
   }
   const fallback = accounts.find(account => account.isLoggedIn);
   return fallback ? { id: fallback.id } : null;
@@ -520,82 +611,6 @@ async function downloadRemoteMedia(url: string, kind: 'image' | 'video'): Promis
   return { id: randomUUID(), kind, url: pathToFileURL(file).toString(), name: path.basename(file), path: file };
 }
 
-function openGatewayWindow() {
-  if (!windowRef) return;
-  if (gatewayWindow && !gatewayWindow.isDestroyed()) { gatewayWindow.show(); gatewayWindow.focus(); return; }
-  gatewayWindow = new BrowserWindow({ icon: workspaceIcon, parent: windowRef, width: 900, height: 760, minWidth: 720, minHeight: 520,
-    title: 'API 网关', autoHideMenuBar: true, backgroundColor: '#f7f9fc',
-    webPreferences: { preload: path.join(__dirname, '../preload/preload.js'), contextIsolation: true, sandbox: true, nodeIntegration: false } });
-  const url = new URL(rendererUrl()); url.searchParams.set('panel', 'gateway');
-  void gatewayWindow.loadURL(url.toString());
-  gatewayWindow.on('closed', () => { gatewayWindow = null; });
-}
-
-function openDonationWindow() {
-  if (!windowRef) return;
-  if (donationWindow && !donationWindow.isDestroyed()) { donationWindow.show(); donationWindow.focus(); return; }
-  const panel = new BrowserWindow({ icon: workspaceIcon, parent: windowRef, modal: true, width: 420, height: 680,
-    resizable: false, title: '赞赏奶蛙老师', autoHideMenuBar: true, backgroundColor: '#ffffff', show: false,
-    webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false } });
-  donationWindow = panel;
-  const url = new URL(rendererUrl()); url.searchParams.set('panel', 'donation');
-  void panel.loadURL(url.toString());
-  panel.once('ready-to-show', () => { if (!panel.isDestroyed()) { panel.show(); panel.focus(); } });
-  panel.on('closed', () => { donationWindow = null; });
-}
-function openSettingsWindow() {
-  if (!windowRef) return;
-  if (settingsWindow && !settingsWindow.isDestroyed()) {
-    settingsWindow.show();
-    settingsWindow.focus();
-    settingsWindow.moveTop();
-    return;
-  }
-  const parent = windowRef;
-  settingsWindow = new BrowserWindow({ icon: workspaceIcon,
-    parent,
-    width: 860,
-    height: 700,
-    minWidth: 680,
-    minHeight: 480,
-    autoHideMenuBar: true,
-    backgroundColor: '#f7f9fc',
-    title: '设置',
-    show: false,
-    alwaysOnTop: true,
-    webPreferences: {
-      preload: path.join(__dirname, '../preload/preload.js'),
-      contextIsolation: true,
-      sandbox: true,
-      nodeIntegration: false,
-    },
-  });
-  settingsWindow.setMenuBarVisibility(false);
-  settingsWindow.setAlwaysOnTop(true, 'pop-up-menu');
-  const url = new URL(rendererUrl());
-  url.searchParams.set('panel', 'settings');
-  void settingsWindow.loadURL(url.toString());
-  settingsWindow.once('ready-to-show', () => {
-    if (!settingsWindow || settingsWindow.isDestroyed() || !windowRef) return;
-    const bounds = windowRef.getBounds();
-    const size = settingsWindow.getBounds();
-    settingsWindow.setPosition(Math.round(bounds.x + (bounds.width - size.width) / 2), Math.round(bounds.y + (bounds.height - size.height) / 2));
-    settingsWindow.show();
-    settingsWindow.moveTop();
-    settingsWindow.focus();
-  });
-  settingsWindow.on('closed', () => { settingsWindow = null; });
-}
-function openImageAssets() {
-  if (!windowRef) return;
-  if (assetsWindow && !assetsWindow.isDestroyed()) { assetsWindow.show(); assetsWindow.focus(); return; }
-  assetsWindow = new BrowserWindow({ icon: workspaceIcon, parent: windowRef, width: 900, height: 720, minWidth: 620, minHeight: 480,
-    title: '图片资产', autoHideMenuBar: true, backgroundColor: '#f7f9fc',
-    webPreferences: { preload: path.join(__dirname, '../preload/preload.js'), contextIsolation: true, sandbox: true, nodeIntegration: false } });
-  const url = new URL(rendererUrl()); url.searchParams.set('panel', 'image-assets');
-  void assetsWindow.loadURL(url.toString());
-  assetsWindow.on('closed', () => { assetsWindow = null; });
-}
 async function useImageAssets(ids: string[], accountId: number) {
   if (assetUploading) throw new Error('正在添加图片，请稍候');
   if (!Array.isArray(ids) || !ids.length) throw new Error('请先选择图片');
@@ -645,65 +660,8 @@ function archiveDownload(taskId: number, sourcePath: string, accountId: number) 
   canvasBridge?.completeFromDownload(accountId, destination);
   return db.completeTask(taskId, destination, accountId);
 }
-function notifyImageAssets() {
-  for (const win of BrowserWindow.getAllWindows()) if (!win.isDestroyed()) win.webContents.send('image-assets:changed');
-}
-function quickImageIds(): string[] {
-  try { const ids = JSON.parse(db.getSetting('quickImageIds') || '[]'); return Array.isArray(ids) ? ids.filter((id): id is string => typeof id === 'string') : []; } catch { return []; }
-}
-function orderedQuickImages() {
-  const available = new Map(imageAssets.list().map(item => [item.id, item]));
-  return [...new Set(quickImageIds())].flatMap(id => available.has(id) ? [available.get(id)!] : []);
-}
 function setupIpc() {
-  ipcMain.handle('image-assets:quick-list', () => orderedQuickImages());
-  ipcMain.handle('image-assets:quick-reorder', (event, requested: string[]) => {
-    if (!BrowserWindow.fromWebContents(event.sender)) throw new Error('无效的图片排序请求');
-    const current = orderedQuickImages().map(item => item.id);
-    if (!Array.isArray(requested) || requested.length !== current.length || new Set(requested).size !== current.length
-      || requested.some(id => typeof id !== 'string' || !current.includes(id))) throw new Error('图片列表已改变，请重试排序');
-    db.setSetting('quickImageIds', JSON.stringify(requested)); notifyImageAssets();
-    return orderedQuickImages();
-  });
-  ipcMain.handle('image-assets:quick-add', (_event, requested: string[]) => {
-    if (!Array.isArray(requested) || !requested.length) throw new Error('请先选择图片资产');
-    for (const id of requested) imageAssets.resolve(id);
-    const available = imageAssets.list();
-    const ids = [...new Set([...quickImageIds().filter(id => available.some(item => item.id === id)), ...requested])];
-    db.setSetting('quickImageIds', JSON.stringify(ids)); notifyImageAssets();
-    return orderedQuickImages();
-  });
-  ipcMain.handle('image-assets:quick-remove', (_event, requested: string[]) => {
-    if (!Array.isArray(requested)) throw new Error('请选择要移出的快捷预览');
-    const ids = quickImageIds().filter(id => !requested.includes(id));
-    db.setSetting('quickImageIds', JSON.stringify(ids)); notifyImageAssets();
-    return orderedQuickImages();
-  });
-  ipcMain.on('image-assets:drag', (event, ids: string[]) => {
-    try {
-      if (!Array.isArray(ids) || !ids.length) return;
-      const files = [...new Set(ids)].map(id => imageAssets.resolve(id));
-      const icon = nativeImage.createFromPath(files[0]).resize({ width: 64, height: 64 });
-      if (icon.isEmpty()) throw new Error('图片无法读取，请重新导入');
-      event.sender.startDrag({ file: files[0], files, icon });
-    } catch (error) { event.sender.send('browser:error', error instanceof Error ? error.message : String(error)); }
-  });
-  ipcMain.handle('image-assets:open', () => { openImageAssets(); return true; });
-  ipcMain.handle('image-assets:list', () => ({ items: imageAssets.list(), accountId: [...accountViews].find(([, view]) => view === currentView)?.[0] ?? null }));
-  ipcMain.handle('image-assets:import', async (event) => {
-    const owner = BrowserWindow.fromWebContents(event.sender);
-    if (!owner) throw new Error('资产窗口已关闭');
-    const result = await dialog.showOpenDialog(owner, { properties: ['openFile', 'multiSelections'], filters: [{ name: '图片', extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif'] }] });
-    const items = result.canceled ? imageAssets.list() : imageAssets.import(result.filePaths);
-    notifyImageAssets(); return items;
-  });
-  // 网关模式：按路径直接导入（支持文档/代码/音频等），不弹对话框。
-  ipcMain.handle('image-assets:import-paths', (_event, paths: string[]) => {
-    const items = imageAssets.import(Array.isArray(paths) ? paths : []);
-    notifyImageAssets(); return items;
-  });
-  ipcMain.handle('image-assets:remove', (_event, id: string) => { const items = imageAssets.remove(id); notifyImageAssets(); return items; });
-  ipcMain.handle('image-assets:use', (_event, ids: string[], accountId: number) => useImageAssets(ids, accountId));
+  registerImageAssetsIpc({ db: () => db, imageAssets: () => imageAssets, openPanel: () => panels.openImageAssets(), activeAccountId: () => [...accountViews].find(([, view]) => view === currentView)?.[0] ?? null, useImageAssets });
   ipcMain.handle('share:parse', async (_event, text: string) => {
     if (shareParsing) return { error: '正在解析，请稍候' };
     shareParsing = true;
@@ -722,24 +680,7 @@ function setupIpc() {
       return { path: saved.path };
     } catch (error) { return { error: error instanceof Error ? error.message : '保存失败，请重试' }; }
   });
-  ipcMain.handle('workspace:load', () => ({ accounts: db.accounts(), projects: db.projects(), dashboard: db.dashboard(), downloadDirectory: db.getSetting('downloadDirectory') || '', imageBarHeight, accountBarHeight, accountShortcuts: accountShortcuts() }));
-  ipcMain.handle('settings:account-shortcut', (event, index: number, value: string) => {
-    if (!BrowserWindow.fromWebContents(event.sender)) throw new Error('只能在工作站设置快捷键');
-    const accounts = db.accounts();
-    if (!Number.isSafeInteger(index) || index < 0 || index >= accounts.length || typeof value !== 'string' || value.length > 60) throw new Error('快捷键设置无效');
-    const shortcut = normalizeAccountShortcut(value), custom = accountShortcuts();
-    const conflict = accounts.findIndex((_account, other) => other !== index && shortcut && accountShortcut(other, custom) === shortcut);
-    if (conflict >= 0) throw new Error(`该快捷键已用于第 ${conflict + 1} 个账号，请先清除或更改它`);
-    custom[String(index)] = shortcut; db.setSetting('accountShortcuts', JSON.stringify(custom));
-    for (const win of BrowserWindow.getAllWindows()) win.webContents.send('workspace:changed');
-    return custom;
-  });
-  ipcMain.handle('settings:account-shortcuts-reset', event => {
-    if (!BrowserWindow.fromWebContents(event.sender)) throw new Error('只能在工作站设置快捷键');
-    db.setSetting('accountShortcuts', '{}');
-    for (const win of BrowserWindow.getAllWindows()) win.webContents.send('workspace:changed');
-    return {};
-  });
+  registerWorkspaceIpc({ db: () => db, accountShortcuts, barHeights: () => ({ imageBarHeight, accountBarHeight }), archiveDownload });
   ipcMain.handle('browser:image-bar-height', (event, value: number, save: boolean) => {
     if (event.sender !== windowRef?.webContents || !Number.isFinite(value)) throw new Error('图片栏尺寸无效');
     const max = Math.min(360, Math.max(56, windowRef.getContentSize()[1] - accountBarHeight - 200));
@@ -756,12 +697,11 @@ function setupIpc() {
     if (save) db.setSetting('accountBarHeight', String(accountBarHeight));
     return accountBarHeight;
   });
-  ipcMain.handle('videos:list', () => db.videoLibrary());
-  ipcMain.handle('accounts:update', (_e, id, patch) => { const next = db.updateAccount(id, patch); windowRef?.webContents.send('workspace:changed'); return next; });
+  ipcMain.handle('accounts:update', (_e, id, patch) => { const next = db.updateAccount(id, patch); broadcast('workspace:changed'); return next; });
   ipcMain.handle('accounts:move', (event, id: number, targetId: number, before: boolean) => {
     if (!BrowserWindow.fromWebContents(event.sender)) throw new Error('只能在工作站窗口操作');
     const accounts = db.moveAccount(id, targetId, before);
-    for (const win of BrowserWindow.getAllWindows()) if (!win.isDestroyed()) win.webContents.send('workspace:changed');
+    broadcast('workspace:changed');
     return accounts;
   });
   const deleteAccount = (id: number) => {
@@ -775,7 +715,7 @@ function setupIpc() {
     canvasBridge?.forgetAccount(id);
     if (wasCurrent) { currentView = null; }
     if (activeAccountId === id) { activeAccountId = null; }
-    for (const win of BrowserWindow.getAllWindows()) if (!win.isDestroyed()) win.webContents.send('workspace:changed');
+    broadcast('workspace:changed');
     if (view && !view.webContents.isDestroyed()) {
       if (windowRef && !windowRef.isDestroyed()) windowRef.removeBrowserView(view);
       view.webContents.close({ waitForBeforeUnload: false });
@@ -787,6 +727,7 @@ function setupIpc() {
         catch (error) { windowRef?.webContents.send('browser:error', `账号已删除，打开下一个账号失败：${error instanceof Error ? error.message : String(error)}`); }
       }
     }
+    void syncAccountsToBeefTv(db.accounts(), ensureGatewayApiKey(), { gatewayBaseUrl: gateway?.url });
     return removed;
   };
   ipcMain.handle('accounts:delete', (_event, id: number) => deleteAccount(id));
@@ -802,10 +743,16 @@ function setupIpc() {
     if (result.response !== 1) return false;
     return deleteAccount(id);
   });
-  ipcMain.handle('accounts:create', (_e, data) => { const next = db.createAccount(data); windowRef?.webContents.send('workspace:changed'); return next; });
-  ipcMain.handle('settings:open', () => { openSettingsWindow(); return true; });
-  ipcMain.handle('donation:open', () => { openDonationWindow(); return true; });
-  ipcMain.handle('author:open-douyin', () => shell.openExternal('https://v.douyin.com/Mm0paOp_7fE/'));
+  ipcMain.handle('accounts:create', (_e, data) => {
+    const next = db.createAccount(data);
+    broadcast('workspace:changed');
+    void syncAccountsToBeefTv(db.accounts(), ensureGatewayApiKey(), { gatewayBaseUrl: gateway?.url });
+    return next;
+  });
+  ipcMain.handle('beeftv:sync', () => syncAccountsToBeefTv(db.accounts(), ensureGatewayApiKey(), { syncNative: true, gatewayBaseUrl: gateway?.url }));
+  ipcMain.handle('beeftv:launch', () => launchNativeBeefTv());
+  ipcMain.handle('settings:open', () => { panels.openSettings(); return true; });
+  ipcMain.handle('donation:open', () => { panels.openDonation(); return true; });
   ipcMain.handle('accounts:open', (_e, id) => { if (!openAccountBrowser(id)) throw new Error('账号不存在或窗口尚未就绪'); return true; });
   ipcMain.handle('browser:hide', () => { hideBrowser(); return true; });
   ipcMain.handle('browser:set-fullscreen', (_e, value) => {
@@ -813,21 +760,10 @@ function setupIpc() {
     setBrowserFullscreen(Boolean(value));
     return browserFullscreen;
   });
-  ipcMain.handle('projects:create', (_e, name) => db.createProject(name));
-  ipcMain.handle('tasks:list', (_e, projectId) => db.tasks(projectId));
-  ipcMain.handle('tasks:create', (_e, data) => db.createTask(data));
-  ipcMain.handle('tasks:update', (_e, id, patch) => db.updateTask(id, patch));
-  ipcMain.handle('tasks:complete', (_e, id, videoPath, accountId) => archiveDownload(id, videoPath, accountId));
-  ipcMain.handle('files:select-images', async () => (await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'], filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp'] }] })).filePaths);
-  // 网关模式发任意文件给模型：豆包 accept 列表覆盖文档/代码/音频等。
-  ipcMain.handle('files:select-files', async () => (await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'], filters: [{ name: '文件', extensions: ['pdf', 'txt', 'csv', 'docx', 'doc', 'xlsx', 'xls', 'pptx', 'ppt', 'md', 'mobi', 'epub', 'png', 'jpeg', 'jpg', 'webp', 'mp3', 'wav', 'm4a', 'flac', 'json', 'yaml', 'yml', 'xml', 'html', 'css', 'js', 'ts', 'py', 'java', 'go', 'rs', 'c', 'cpp', 'sh'] }] })).filePaths);
-  ipcMain.handle('files:select-directory', async () => { const owner = BrowserWindow.getFocusedWindow() ?? windowRef ?? undefined; const result = owner ? await dialog.showOpenDialog(owner, { properties: ['openDirectory', 'createDirectory'] }) : await dialog.showOpenDialog({ properties: ['openDirectory', 'createDirectory'] }); return result.filePaths[0] || ''; });
+  registerFilesIpc({ mainWindow: () => windowRef });
   ipcMain.handle('files:watch-downloads', (_e, directory) => { if (directory) watchDownloads(directory); return directory; });
-  ipcMain.handle('files:open', (_e, target) => shell.openPath(target));
-  ipcMain.handle('files:folder', (_e, target) => shell.showItemInFolder(target));
-  ipcMain.handle('files:url', (_e, target) => pathToFileURL(target).toString());
   ipcMain.handle('gateway:status', () => gatewayStatus());
-  ipcMain.handle('gateway:open', () => { openGatewayWindow(); return true; });
+  ipcMain.handle('gateway:open', () => { panels.openGateway(); return true; });
   ipcMain.handle('gateway:restart', (_e, config: { port?: number; apiKey?: string; enabled?: boolean }) => {
     if (config && typeof config === 'object') {
       if (Number.isSafeInteger(config.port) && config.port! > 0 && config.port! < 65536) db.setSetting('gatewayPort', String(config.port));
@@ -844,7 +780,6 @@ function setupIpc() {
     windowRef?.webContents.send('workspace:changed');
     return result;
   });
-  ipcMain.handle('gateway:copy', (_e, text: string) => { clipboard.writeText(String(text ?? '').slice(0, 2000)); return true; });
 
   // ── Gateway mode: chat threads driven from the renderer ────────────────────
   ipcMain.handle('app:mode', () => currentAppMode());
@@ -862,7 +797,7 @@ function setupIpc() {
     } else {
       hideBrowser();
     }
-    for (const win of BrowserWindow.getAllWindows()) if (!win.isDestroyed()) win.webContents.send('app:mode-changed', next);
+    broadcast('app:mode-changed', next);
     return next;
   });
 
@@ -1046,6 +981,51 @@ function setupGateway() {
     accounts: () => db.accounts(),
     viewForAccount: (accountId) => ensureAccountView(accountId),
     openAccount: (accountId) => ensureAccountView(accountId),
+    prepareNewConversation: async (accountId) => {
+      await prepareAccountNewConversation(accountId);
+    },
+    addAccount: async () => {
+      const existing = db.accounts();
+      const nextNum = existing.length + 1;
+      const account = db.createAccount({ name: `账号${nextNum}`, platform: 'doubao' });
+      openAccountBrowser(account.id);
+      windowRef?.webContents.send('workspace:changed');
+      void syncAccountsToBeefTv(db.accounts(), apiKey, { hostBaseUrl: beeftvHost?.url, gatewayBaseUrl: gateway?.url });
+      return account;
+    },
+    createVideoTask: async (options) => {
+      const task = await canvasBridge!.create({
+        prompt: options.prompt,
+        model: options.model,
+        ratio: options.ratio,
+        duration: options.duration,
+        targetAccountId: options.accountId ?? undefined,
+        referencePaths: options.referencePaths,
+      });
+      return { id: task.id, status: task.status, createdAt: task.createdAt };
+    },
+    getVideoTask: (taskId) => {
+      const t = canvasBridge?.task(taskId);
+      if (!t) return null;
+      return {
+        id: t.id,
+        status: t.status,
+        statusText: t.statusText,
+        videoPath: t.videoPath,
+        lastFramePath: t.lastFramePath,
+        latestReply: t.latestReply ?? null,
+        createdAt: t.createdAt,
+        updatedAt: t.updatedAt,
+        error: t.error,
+      };
+    },
+    cancelVideoTask: (taskId) => {
+      return canvasBridge?.cancelTask(taskId) ?? false;
+    },
+    confirmVideoTask: (taskId, text) => {
+      if (!canvasBridge) throw new Error('画布桥未启动，无法发送补充消息');
+      return canvasBridge.confirmTask(taskId, text);
+    },
   }, {
     port,
     apiKey,
@@ -1056,6 +1036,8 @@ function setupGateway() {
     },
   });
   gateway.start();
+  // 迁移旧版默认模型配置；豆包节点通过网关独立读取账号。
+  void syncAccountsToBeefTv(db.accounts(), apiKey, { hostBaseUrl: beeftvHost?.url, gatewayBaseUrl: gateway?.url });
   setTimeout(() => {
     const failure = gateway?.error;
     if (failure) windowRef?.webContents.send('browser:error', failure);
@@ -1063,9 +1045,13 @@ function setupGateway() {
 }
 
 function createWindow() {
-  windowRef = new BrowserWindow({ icon: workspaceIcon, width: 1480, height: 920, minWidth: 1100, minHeight: 700, backgroundColor: '#f7f9fc', title: '豆包工作站', webPreferences: { preload: path.join(__dirname, '../preload/preload.js'), contextIsolation: true, sandbox: true, nodeIntegration: false } });
+  windowRef = new BrowserWindow({ icon: workspaceIcon, width: 1480, height: 920, minWidth: 1100, minHeight: 700, backgroundColor: '#f7f9fc', title: '豆奶画布', webPreferences: { preload: path.join(__dirname, '../preload/preload.js'), contextIsolation: true, sandbox: true, nodeIntegration: false } });
   attachAccountShortcuts(windowRef.webContents);
-  windowRef.loadURL(rendererUrl());
+  // 豆包 3.0：先显示启动占位页；BeefTV 宿主就绪后加载原生画布（见 whenReady 尾部），
+  // 宿主失败时回退工作站自带 UI。避免旧 UI 短暂加载产生副作用（如自动打开账号页）。
+  const splashIconUrl = `data:image/png;base64,${fs.readFileSync(workspaceIcon).toString('base64')}`;
+  const splashHtml = `<body style="margin:0;background:#0d0d0d;display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui,sans-serif;color:#f3f4f6"><div style="text-align:center"><img src="${splashIconUrl}" style="width:72px;height:72px;border-radius:18px;margin-bottom:16px;box-shadow:0 12px 32px rgba(0,0,0,0.5);object-fit:cover;" /><div style="font-size:15px;font-weight:600;margin-bottom:6px;letter-spacing:0.5px">正在启动豆奶画布…</div><div style="font-size:12px;opacity:.55">正在初始化画布引擎，请稍候</div></div></body>`;
+  windowRef.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(splashHtml));
   windowRef.webContents.once('did-finish-load', () => {
     // Stagger cold page starts so the visible account gets a head start.
     db.accounts().forEach((account, index) => {
@@ -1101,6 +1087,41 @@ if (!app.requestSingleInstanceLock()) {
 
 app.whenReady().then(() => {
   Menu.setApplicationMenu(null);
+  if (process.platform === 'win32') app.setAppUserModelId('com.dbgzz.doubao.workspace');
+  const installed = fs.readdirSync(path.dirname(app.getPath('exe'))).some(name => /^Uninstall.*\.exe$/i.test(name));
+  const disabledReason = !app.isPackaged ? '开发版不执行自动更新，请使用正式安装版。'
+    : process.platform !== 'win32' || !installed ? '请先安装正式安装版后使用自动更新。' : '';
+  appUpdates = new AppUpdateService(autoUpdater, app.getVersion(), {
+    disabledReason,
+    beforeInstall: () => {
+      const activeTasks = canvasBridge?.list().some(task => !['completed', 'failed', 'cancelled', 'needs_attention'].includes(task.status));
+      if (activeTasks || canvasBridge?.busyIds().size || pendingDownloads.size) throw new Error('仍有任务或下载正在进行，请等待完成后再安装更新。');
+    },
+    notifyAvailable: (version) => {
+      if (!Notification.isSupported()) return;
+      const notice = new Notification({ title: `豆奶画布 ${version} 已发布`, body: '点击打开软件，在左下角下载并安装更新。', icon: workspaceIcon });
+      notice.on('click', () => {
+        if (!windowRef || windowRef.isDestroyed()) return;
+        if (windowRef.isMinimized()) windowRef.restore();
+        windowRef.show(); windowRef.focus();
+      });
+      notice.show();
+    },
+    log: (message) => console.error('[app-update]', message),
+  });
+  for (const [channel, action] of Object.entries({
+    'app-update:status': () => appUpdates.snapshot(),
+    'app-update:check': () => appUpdates.check(),
+    'app-update:download': () => appUpdates.download(),
+    'app-update:install': () => appUpdates.install(),
+  })) {
+    ipcMain.handle(channel, (event) => {
+      const url = event.senderFrame?.url || '';
+      const trusted = url === rendererUrl() || Boolean(beeftvHost && new URL(url).origin === new URL(beeftvHost.url).origin);
+      if (!windowRef || event.sender !== windowRef.webContents || event.senderFrame !== event.sender.mainFrame || !trusted) throw new Error('更新请求仅允许来自工作站主窗口。');
+      return action();
+    });
+  }
   db = new WorkspaceDatabase();
   imageBarHeight = Math.max(56, Math.min(360, Number(db.getSetting('imageBarHeight')) || 76));
   accountBarHeight = Math.max(42, Math.min(160, Number(db.getSetting('accountBarHeight')) || 58));
@@ -1112,7 +1133,10 @@ app.whenReady().then(() => {
     accounts: () => db.accounts(),
     openAccount: (accountId) => ensureVideoAccountView(accountId),
     viewForAccount: (accountId) => ensureVideoAccountView(accountId),
-    isViewAttached: (view) => Boolean(windowRef?.getBrowserViews().includes(view)),
+    isViewAttached: (view) => Boolean(
+      windowRef?.getBrowserViews().includes(view) ||
+      [...scanWindows.values()].some(win => !win.isDestroyed() && win.getBrowserViews().includes(view))
+    ),
     onTaskChanged: (task) => {
       windowRef?.webContents.send('workspace:changed');
       if (task) {
@@ -1130,37 +1154,32 @@ app.whenReady().then(() => {
       const result = await downloadHDVideoFromView(view);
       return result?.path ?? null;
     },
+    popupAccountForCaptcha: (accountId, reason) => popupAccountForCaptcha(accountId, reason),
   }, app.getPath('userData'));
+  canvasBridge.poolRef.onLoggedOut = (accountId) => {
+    // 池判定登录失效（classify 命中 logged_out / 页面要求重新登录）时同步落库，
+    // 账号立即在界面显示"未登录"并被摘出调度，而不是冷却完又被反复调度。
+    const current = db.accounts().find(item => item.id === accountId);
+    if (!current || !current.isLoggedIn) return;
+    db.updateAccount(accountId, { isLoggedIn: false });
+    windowRef?.webContents.send('workspace:changed');
+  };
   setupAccountSend({ accounts: () => db.accounts(), views: accountViews, current: () => currentView,
     main: () => windowRef, rendererUrl, preload: path.join(__dirname, '../preload/preload.js'), bridge: () => canvasBridge,
     assets: () => imageAssets, upload: useImageAssets, staged: stagedImageAssets, stagedUrls: stagedImageUrls,
     openAccount: (id, background) => openAccountBrowser(id, background) ?? null });
   gatewayChat = createGatewayChat(db as any, {
-    accountPlatform: accountId => db.accounts().find(account => account.id === accountId)?.platform,
-    streamForAccount: async (accountId, view, prompt, options) => {
-      const account = db.accounts().find(item => item.id === accountId);
-      if (!account) throw new Error('账号不存在，请重新选择发送账号');
-      if (account.platform === 'dola') {
-        if (options?.conversationId) {
-          await prepareDolaConversation(view, options.conversationId);
-        }
-        return streamDolaChat(view, prompt, options);
-      }
-      return streamChat(view, prompt, options);
-    },
-    viewForAccount: accountId => db.accounts().find(account => account.id === accountId)?.platform === 'dola'
-      ? ensureVideoAccountView(accountId) : ensureAccountView(accountId),
+    viewForAccount: (accountId) => ensureAccountView(accountId),
     prepareNewConversation: async (accountId) => {
       await prepareAccountNewConversation(accountId);
     },
     syncConversationPage: async (accountId, conversationId) => {
       await syncAccountConversationPage(accountId, conversationId);
     },
-    pickAccount: excluded => {
+    pickAccount: () => {
       const pool = canvasBridge?.poolRef;
-      const accounts = db.accounts();
-      const busy = new Set([...(canvasBridge?.busyIds() ?? []), ...(excluded ?? [])]);
-      const picked = pool ? pool.pick(accounts, busy) : accounts.find(a => a.isLoggedIn && !busy.has(a.id));
+      const accounts = db.accounts().filter(account => account.platform === 'doubao');
+      const picked = pool ? pool.pick(accounts, canvasBridge?.busyIds() ?? new Set<number>()) : accounts.find(a => a.isLoggedIn);
       return picked ? { id: picked.id } : null;
     },
     // Which account produced the last image/video, so the reply can be labelled.
@@ -1213,8 +1232,25 @@ app.whenReady().then(() => {
           if (!options.conversationId) {
             await prepareAccountNewConversation(account.id);
           }
-          const uploaded = options.attachments?.length ? await Promise.all(options.attachments.map(item => uploadImageToDoubao(view, item.path, item.name))) : [];
-          const images = await generateImages(view, prompt, { model: options.model, ratio: options.ratio, conversationId: options.conversationId, attachments: uploaded });
+          const uploaded: unknown[] = [];
+          if (options.attachments?.length) {
+            for (const item of options.attachments) {
+              uploaded.push(await uploadImageToDoubao(view, item.path, item.name));
+            }
+          }
+          let images: Array<{ url: string; width?: number; height?: number; format?: string }> = [];
+          if (uploaded.length > 0) {
+            const chatPrompt = options.ratio ? `${prompt}（请生成 ${options.ratio} 比例的图片）` : prompt;
+            const result = await streamChat(view, chatPrompt, {
+              conversationId: options.conversationId,
+              attachments: uploaded,
+            });
+            const urls = new Set<string>(result.mediaUrls?.length ? result.mediaUrls : extractMediaUrls(result.answer));
+            if (!urls.size) throw new Error(`豆包未返回生成的图片：${result.answer.slice(0, 80) || '无响应内容'}`);
+            images = Array.from(urls).map(url => ({ url, width: 0, height: 0, format: 'png' }));
+          } else {
+            images = await generateImages(view, prompt, { model: options.model, ratio: options.ratio, conversationId: options.conversationId });
+          }
           const attachments: GatewayAttachment[] = [];
           for (const image of images) {
             // CDN links expire and are cookie-bound; persist the bytes locally.
@@ -1351,8 +1387,106 @@ app.whenReady().then(() => {
   }, 20_000);
   createWindow();
   setupGateway();
+  // 豆包 3.0：启动 BeefTV 宿主（静态服务 + 后端子进程）后加载主窗口。
+  beeftvDataDir = path.join(app.getPath('userData'), 'beeftv-data');
+  void (async () => {
+    try {
+      beeftvHost = new BeefTvHost({
+        webRoot: beeftvWebDist(),
+        backendExe: beeftvBackendExe(),
+        backendDataDir: beeftvDataDir,
+        backendEnv: { CANVAS_OFFICIAL_PLUGIN_DIR: beeftvPluginDir() },
+        // 后端首次启动会生成 agent_owner_token；用 getter 让代理随时读到最新值。
+        ownerToken: () => {
+          try {
+            return fs.readFileSync(path.join(beeftvDataDir, 'agent_owner_token'), 'utf8').trim();
+          } catch {
+            return '';
+          }
+        },
+        onLog: (() => {
+          // 打包版没有 stdout，宿主日志写入 userData 便于诊断。
+          const logPath = path.join(beeftvDataDir, 'beeftv-host.log');
+          return (entry: string) => {
+            console.log(`[beeftv-host] ${entry}`);
+            try { fs.appendFileSync(logPath, `${new Date().toISOString()} ${entry}\n`); } catch { /* 日志失败不影响主流程 */ }
+          };
+        })(),
+      });
+      await beeftvHost.start();
+    } catch (error) {
+      console.error('BeefTV 宿主首次启动失败，稍后重试（主窗口不回退旧 UI）：', error);
+      beeftvHost = null;
+    }
+    // 宿主启动失败时每 5 秒重试（端口被残留进程占用等情况恢复后自动就绪）；
+    // 主窗口保持启动占位页，绝不回退旧双模式 UI——3.0 的主界面只有 BeefTV。
+    if (!beeftvHost) {
+      const retryTimer = setInterval(() => {
+        void (async () => {
+          try {
+            beeftvHost = new BeefTvHost({
+              webRoot: beeftvWebDist(),
+              backendExe: beeftvBackendExe(),
+              backendDataDir: beeftvDataDir,
+              backendEnv: { CANVAS_OFFICIAL_PLUGIN_DIR: beeftvPluginDir() },
+              ownerToken: () => {
+                try {
+                  return fs.readFileSync(path.join(beeftvDataDir, 'agent_owner_token'), 'utf8').trim();
+                } catch {
+                  return '';
+                }
+              },
+              onLog: (() => {
+                const logPath = path.join(beeftvDataDir, 'beeftv-host.log');
+                return (entry: string) => {
+                  console.log(`[beeftv-host] ${entry}`);
+                  try { fs.appendFileSync(logPath, `${new Date().toISOString()} ${entry}\n`); } catch { /* ignore */ }
+                };
+              })(),
+            });
+            await beeftvHost.start();
+            clearInterval(retryTimer);
+            console.log('[beeftv-host] 宿主重试启动成功');
+            await syncAccountsToBeefTv(db.accounts(), ensureGatewayApiKey(), { hostBaseUrl: beeftvHost.url, gatewayBaseUrl: gateway?.url });
+            if (windowRef && !windowRef.isDestroyed()) windowRef.loadURL(beeftvHost.url);
+          } catch (retryError) {
+            beeftvHost = null;
+            console.error('BeefTV 宿主重试仍失败：', retryError instanceof Error ? retryError.message : retryError);
+          }
+        })();
+      }, 5000);
+      retryTimer.unref();
+      return;
+    }
+    // 后端启动后同步助手可选的豆包账号渠道（只含文本），并清理旧版注入到默认模型的引用。
+    const initialSync = await syncAccountsToBeefTv(db.accounts(), ensureGatewayApiKey(), { hostBaseUrl: beeftvHost?.url, gatewayBaseUrl: gateway?.url });
+    console.log(`[beeftv-host] 启动时豆包助手渠道同步${initialSync.ok ? '完成' : `失败：${initialSync.error || ''}`}`);
+    // 重试渠道同步，并恢复意外退出的 API 助手宿主。
+    const assistantGuard = setInterval(() => {
+      if (!beeftvHost) return;
+      void (async () => {
+        try {
+          const apiKey = ensureGatewayApiKey();
+          if (hostedModelConfigNeedsCleanup(beeftvDataDir, { accounts: db.accounts(), apiKey, gatewayBaseUrl: gateway?.url })) {
+            const result = await syncAccountsToBeefTv(db.accounts(), apiKey, { hostBaseUrl: beeftvHost.url, gatewayBaseUrl: gateway?.url });
+            console.log(`[beeftv-host] 豆包助手渠道同步${result.ok ? '完成' : `失败：${result.error || ''}`}`);
+          }
+          const response = await fetch(`${beeftvHost.url}/api/assistant/status`, { signal: AbortSignal.timeout(5000) });
+          const payload = await response.json() as { data?: { available?: boolean; reason?: string } };
+          if (payload?.data?.available) return;
+          const reason = payload?.data?.reason || '';
+          if (reason === 'host_start_failed' || reason === 'host_unreachable') {
+            await fetch(`${beeftvHost.url}/api/assistant/host/start`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}', signal: AbortSignal.timeout(20000) });
+            console.log(`[beeftv-host] agent 宿主自愈：已重新拉起（${reason}）`);
+          }
+        } catch { /* 守护失败等下一轮 */ }
+      })();
+    }, 30_000);
+    assistantGuard.unref();
+    if (windowRef && !windowRef.isDestroyed()) windowRef.loadURL(beeftvHost ? beeftvHost.url : rendererUrl());
+  })();
   app.on('activate', () => { if (!BrowserWindow.getAllWindows().length) createWindow(); });
 });
-app.on('before-quit', () => { gateway?.stop(); canvasBridge?.stop(); if (canvasDownloadPoll) clearInterval(canvasDownloadPoll); if (captchaProbePoll) clearInterval(captchaProbePoll); });
+app.on('before-quit', () => { gateway?.stop(); canvasBridge?.stop(); beeftvHost?.stop(); if (canvasDownloadPoll) clearInterval(canvasDownloadPoll); if (captchaProbePoll) clearInterval(captchaProbePoll); });
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
 

@@ -65,6 +65,8 @@ function emptyEntry(accountId: number, now: number): AccountPoolEntry {
 export class AccountPool {
   private entries = new Map<number, AccountPoolEntry>();
   private readonly storePath: string | null;
+  /** 判定 logged_out 时的回调（宿主用它把 db.isLoggedIn 同步置 false）。 */
+  onLoggedOut: ((accountId: number) => void) | null = null;
 
   constructor(storePath: string | null = null, private readonly now: () => number = Date.now, private readonly rng: () => number = Math.random) {
     this.storePath = storePath;
@@ -207,6 +209,7 @@ export class AccountPool {
       case 'logged_out':
         entry.health = 'logged_out';
         entry.cooldownUntil = null;
+        this.onLoggedOut?.(accountId);
         break;
       default: {
         const backoff = Math.min(MAX_COOLDOWN_MS, BASE_COOLDOWN_MS * 2 ** (entry.consecutiveFailures - 1));

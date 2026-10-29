@@ -1,0 +1,15 @@
+# BeefTV: MiniMax H3 Max Turbo
+
+2026-10-13 implementation scope: the managed BeefTV catalog registers exactly `minimax-h3-max-turbo` as a video model using the BeefAPI gateway. fal credentials stay at the gateway. Custom providers with the same name keep their selected protocol.
+
+The server catalog supplies whole-second duration (1–15, default 5), resolutions (768p default, 480p, 1080p), ratios and CNY second prices. Native sound has no mute switch; there is no watermark switch or reference-video input. One or two images are keyframes, not subject references. An explicit last frame may be sent without a first frame. One optional audio input pins the soundtrack; video and audio must each be at least two seconds. Model refresh persists the same configuration for desktop and frontend consumers.
+
+Desktop H3 requests reuse the existing gateway task lifecycle, including saved provider IDs, cancellable polling, authenticated content download, recovery and result materialization. Poll/download recovery must not create another paid generation. The direct web protocol sends explicit first/last keys and reads the existing task envelope.
+
+Verification: gateway-shaped synthetic catalog and transport fixtures cover selection, prices, keyframes, 768p, rejected extra media and missing frames, audio and video delivery. Focused Go checks, 39 related Bun tests and the frontend build passed. The existing portrait-recovery test fails on unchanged base `5e2ad602` too; that baseline gap is not an H3 regression.
+
+On 2026-10-13, Ender's CNY 20 budget funded four real fal generations through a local gateway using the production fal adaptor and this desktop Go generation path: text/768p, first+last/480p, last-only/1080p, and target-audio/768p, each requested for 3 seconds. All succeeded with H.264/AAC downloads. The accepted first task was resumed without a fifth create. Start/end frame positions and the input's 440 Hz tone were verified. Inference estimate is CNY 2.2582062 at platform rate 6.7814; conservative standard-price reservation is CNY 5.018236. Invoice readback returned HTTP 403, so actual charged cost remains unconfirmed.
+
+`TestBeefAPIH3RealMediaDeliverySurvivesRestart` subsequently consumed only those existing files. It exercised local service ingestion, real SQLite schema, materialized assets, original-node binding, saved-canvas/SQLite reopening, byte-identical owned-resource playback reads, and idempotent recovery. All four cases passed without inference or credentials. Opt in with `FAL_H3_REAL_MEDIA_DIR`; this test is skipped in ordinary runs.
+
+Evidence is in `/Volumes/ExternalWork/beeftv/artifacts/h3-max-turbo-20261013/`. A fifth 3-second 768p task subsequently passed the installed native v1.7.18 CLI through the deployed gateway, authenticated content proxy, enterprise CNY settlement (0.73239), saved canvas, native playback and process restart with byte-identical resource readback. No sixth inference was submitted. See [the native production record](release-evidence/v1.7.18-review.md) for task IDs, source binding, cost uncertainty and CI. Public desktop release gates remain separate.

@@ -1,0 +1,14 @@
+/* Use the supplied left-side Beef lockup consistently in the workspace. */
+body .app-user-workspace .app-workspace-brand-mark {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+body .app-user-workspace .app-workspace-brand-mark img {
+    width: 34px !important;
+    height: 26px !important;
+    object-fit: contain !important;
+    object-position: center !important;
+}

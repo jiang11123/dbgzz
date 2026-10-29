@@ -1,0 +1,24 @@
+{
+  "version": "v1.7.22",
+  "sourceCommit": "dbffa9510441be0e1c1bd3b0189db674c7a13294",
+  "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+  "status": "approved",
+  "scope": "prepared-original-task-acceptance-receipt-and-proof",
+  "reviewer": "Grok Build",
+  "independent": true,
+  "reviewJobId": "20261014-220028-continue-677ac682",
+  "reviewedFiles": [
+    {
+      "path": "docs/release-evidence/v1.7.22.json",
+      "sha256": "b5c2eb8ddd133e1e0759d4f3ac3634cc7ac54dd57aaf775d897252bff3acf07d"
+    },
+    {
+      "path": "docs/release-evidence/v1.7.22-proof.json",
+      "sha256": "53a113a8c8d6036a666818c8e1dee8b45dfb3f19643a646551a8f2982b3b15aa"
+    }
+  ],
+  "preparationMarkerMeaning": "The pending receipt-review markers in the reviewed files preserve their preparation-time state. This separate attestation records the subsequent independent approval of those exact bytes.",
+  "newPaidVideoSubmissions": 0,
+  "formalPackagesPublishedByThisReview": false,
+  "formalPublicationWorkflow": ".github/workflows/release-desktop.yml"
+}

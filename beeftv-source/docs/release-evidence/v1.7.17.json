@@ -1,0 +1,108 @@
+{
+  "version": "v1.7.17",
+  "sourceDigest": "cf1cbd23e51a2fe181857731473fd52b8ec304b00b91d826b68e85e828e826c9",
+  "ownerException": {
+    "scope": "generation-delivery-owner-accepted-20261013",
+    "approvedBy": "Ender",
+    "instruction": "采用本次实测，不重复付费（推荐）",
+    "evidence": ["docs/release-evidence/v1.7.17-review.md#授权与实际测试范围"]
+  },
+  "releaseAuthorization": {
+    "approvedBy": "Ender",
+    "instruction": "直接发布 UI什么的他之前review过了吧",
+    "additionalHumanReplyRequired": false,
+    "scope": "v1.7.17 only; does not change future cross-review requirements"
+  },
+  "paidSubmissionLimit": 0,
+  "newBudgetCNY": 0,
+  "newSpentCNY": 0,
+  "newPendingCNY": 0,
+  "cases": [],
+  "liveMatrixStatus": "not_run_owner_waived",
+  "agentAcceptanceStatus": "not_run_owner_waived",
+  "acceptanceComplete": false,
+  "ownerAcceptance": {
+    "generationDelivery": {
+      "confirmedBy": "Ender",
+      "method": "native",
+      "status": "passed",
+      "testedSourceDigest": "d8024f245c9fdbb054a1f4adc705e783caed2e5e6b4fb07ea43e9c043aea9b3c",
+      "instruction": "我试过没问题了",
+      "evidence": ["Owner native confirmation on candidate 575c6d9e; preserved separately from final-source deterministic checks", "docs/release-evidence/v1.7.17-review.md"]
+    },
+    "videoFullscreen": {
+      "confirmedBy": "Ender",
+      "method": "native",
+      "status": "passed",
+      "testedSourceDigest": "a25801431e4bf791ee0ef8679fbc6ba1ddae717ac737fc0feeec730225ab6870",
+      "instruction": "全屏没问题了 我点过了",
+      "evidence": ["Owner native confirmation on candidate a9e9104f", "docs/release-evidence/v1.7.17-review.md"]
+    }
+  },
+  "budgetCNY": null,
+  "spentCNY": null,
+  "pendingCNY": null,
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.16",
+    "pendingCNY": null,
+    "evidence": ["docs/release-evidence/v1.7.16.json"]
+  },
+  "review": {
+    "result": "approved",
+    "independent": true,
+    "reviewer": "Grok Companion; separate implementation-agent cross-reviews",
+    "sourceDigest": "cf1cbd23e51a2fe181857731473fd52b8ec304b00b91d826b68e85e828e826c9",
+    "evidence": ["docs/release-evidence/v1.7.17-review.md#独立复核"]
+  },
+  "upgrade": {
+    "preservedData": true,
+    "sourceDigest": "cf1cbd23e51a2fe181857731473fd52b8ec304b00b91d826b68e85e828e826c9",
+    "evidence": ["Canonical macOS app build/install/start; read-only task/resource row hashes unchanged; original 178 snapshot rows unchanged; 32 canvas projects retained", "docs/release-evidence/v1.7.17-review.md#确定性验证"]
+  },
+  "verification": {
+    "generationDelivery": {
+      "status": "passed",
+      "sourceDigest": "cf1cbd23e51a2fe181857731473fd52b8ec304b00b91d826b68e85e828e826c9",
+      "evidence": ["Backend checks and actual browser stop/resume/scope tests: https://github.com/glanderness/BeefTV/actions/runs/38294537700", "docs/release-evidence/v1.7.17-review.md#已修复并验证"]
+    },
+    "imageRecoveryBudget": {
+      "status": "passed",
+      "sourceDigest": "cf1cbd23e51a2fe181857731473fd52b8ec304b00b91d826b68e85e828e826c9",
+      "evidence": ["Full web and backend suites including image recovery attempt-budget tests: https://github.com/glanderness/BeefTV/actions/runs/38294537700"]
+    },
+    "noDuplicateSubmission": {
+      "status": "passed",
+      "sourceDigest": "cf1cbd23e51a2fe181857731473fd52b8ec304b00b91d826b68e85e828e826c9",
+      "evidence": ["Browser resume retains task ID and emits only cancel/retry; real host abort/restart request replay uses one model-stub call", "https://github.com/glanderness/BeefTV/actions/runs/38294537700"]
+    },
+    "localReleaseGate": {
+      "status": "passed",
+      "sourceDigest": "cf1cbd23e51a2fe181857731473fd52b8ec304b00b91d826b68e85e828e826c9",
+      "evidence": ["scripts/verify-beeftv-local-release.sh passed during canonical macOS build; 24/24 release authorization gate tests passed", "docs/release-evidence/v1.7.17-review.md#确定性验证"]
+    },
+    "ci": {
+      "status": "passed",
+      "sourceDigest": "cf1cbd23e51a2fe181857731473fd52b8ec304b00b91d826b68e85e828e826c9",
+      "evidence": ["https://github.com/glanderness/BeefTV/actions/runs/38294537700", "https://github.com/glanderness/BeefTV/actions/runs/38294537706", "https://github.com/glanderness/BeefTV/actions/runs/38294537695"]
+    },
+    "videoFullscreen": {
+      "status": "passed",
+      "sourceDigest": "cf1cbd23e51a2fe181857731473fd52b8ec304b00b91d826b68e85e828e826c9",
+      "evidence": ["Wails v2.16.0 FullscreenEnabled remains enabled; macOS final-source compilation/signature/start checks passed. Native fullscreen click is historical owner acceptance, not repeated on final source.", "docs/release-evidence/v1.7.17-review.md"]
+    }
+  },
+  "packages": {
+    "platforms": ["darwin-arm64", "darwin-amd64", "windows-amd64", "linux-amd64"],
+    "status": "pending_release_workflow",
+    "archives": null,
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "linuxNativeWindowBeforeUpload": true,
+    "signedManifestBeforePublish": true,
+    "publicReadbackAfterPublish": true,
+    "workflowEvidence": [".github/workflows/release-desktop.yml", "docs/release-evidence/v1.7.17-review.md#正式发布仍需验证"]
+  },
+  "releasePublished": false,
+  "releaseComplete": false
+}

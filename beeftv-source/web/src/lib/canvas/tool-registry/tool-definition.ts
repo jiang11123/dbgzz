@@ -1,0 +1,232 @@
+import type { ReactNode } from "react";
+import type { CanvasWorkflowContribution } from "@/lib/canvas/workflow-capability";
+import type { MouseEvent } from "react";
+
+import type { CanvasAlignmentMode } from "@/lib/canvas/canvas-layout";
+import type { CanvasBackgroundMode } from "@/lib/canvas-theme";
+import type { CanvasNodeData, CanvasNodeMetadata, CanvasNodeTypeId, CanvasToolMode, CanvasWorkspaceMode, DoubaoNodeTaskMode } from "@/types/canvas";
+
+/** 工具栏标识——每个工具栏有独立的注册表与偏好 */
+export type ToolbarId = "main" | "selection" | "node-hover" | "add-node-menu";
+export type NodeToolbarGroup = "primary" | "portrait" | "viewpoint" | "lighting" | "panorama" | "process" | "workspace" | "utility" | "more";
+
+/** 工具分类——用于分组渲染、危险隔离与 separator 自动插入 */
+export type ToolCategory =
+    | "navigation"
+    | "history"
+    | "create"
+    | "appearance"
+    | "selection"
+    | "layout"
+    | "arrange"
+    | "danger"
+    | "node-state"
+    | "resource";
+
+/** 所有工具栏回调的聚合类型。工具定义通过 ctx.handlers.onXxx 访问 */
+export type ToolbarHandlers = {
+    // 主工具栏——画布操作
+    onToolChange: (tool: CanvasToolMode) => void;
+    onDeselect: () => void;
+    onUndo: () => void;
+    onRedo: () => void;
+    onClear: () => void;
+    // 主工具栏——创建节点
+    onAddText: () => void;
+    onAddImage: () => void;
+    onAddVideo: () => void;
+    onAddAudio: () => void;
+    onAddScript: () => void;
+    onAddFrame: () => void;
+    onAddFolder: () => void;
+    onAddDrawing: () => void;
+    onAddWorkflow: () => void;
+    /**
+     * 扩展节点（Markdown / SVG / HTML / 全景 / 对比 / 图表 / 调色）统一走这一个入口。
+     * 不给每种扩展节点单开一个 onAddXxx —— 那会让 ToolbarHandlers 随节点数线性膨胀，
+     * 而它们的创建逻辑完全一致（都只是 createNode(type)）。
+     */
+    onAddExtensionNode: (type: CanvasNodeTypeId) => void;
+    /** 豆包账号节点：同一底层节点类型按默认任务模式（图片/视频）创建预设。 */
+    onAddDoubaoAccountNode: (defaultMode: DoubaoNodeTaskMode) => void;
+    onChooseStyle: () => void;
+    onOpenDirector: () => void;
+    // 主工具栏——资源
+    onUpload: () => void;
+    onOpenMyAssets: () => void;
+    onOpenProjectCharacters: () => void;
+    onOpenGenerationHistory: () => void;
+    onOpenShortcuts: () => void;
+    // 主工具栏——外观
+    onBackgroundModeChange: (mode: CanvasBackgroundMode) => void;
+    onShowImageInfoChange: (show: boolean) => void;
+    // 主工具栏——面板开关（组件内部状态，由组件实现）
+    onToggleAddPanel: (event: MouseEvent<HTMLElement>) => void;
+    onToggleAppearancePanel: (event: MouseEvent<HTMLElement>) => void;
+    onToggleSettingsPanel: () => void;
+    // 主工具栏——删除选中
+    onDeleteSelected: () => void;
+    // 多选工具栏
+    onAlign: (mode: CanvasAlignmentMode) => void;
+    onArrange: (mode: "row" | "column" | "grid" | "flow") => void;
+    onCreateStoryboard: () => void;
+    onCreateReferenceGroup: () => void;
+    onBatchConnect: () => void;
+    onMergeVideos: () => void;
+    /** 只有画布页的多选工具栏提供这个入口；主工具栏不装配它。 */
+    onAskAssistant?: () => void;
+    onSaveWorkflow?: () => void;
+    // 节点悬停工具栏——节点操作（均接收当前节点）
+    onNodeInfo: (node: CanvasNodeData) => void;
+    onNodeDelete: (node: CanvasNodeData) => void;
+    onNodeRetry: (node: CanvasNodeData) => void;
+    onNodeEditText: (node: CanvasNodeData) => void;
+    onNodeDecreaseFont: (node: CanvasNodeData) => void;
+    onNodeIncreaseFont: (node: CanvasNodeData) => void;
+    onNodeToggleDialog: (node: CanvasNodeData) => void;
+    onNodeAnnotate: (node: CanvasNodeData) => void;
+    onNodeGenerateImage: (node: CanvasNodeData) => void;
+    onNodeUpload: (node: CanvasNodeData) => void;
+    onNodeDownload: (node: CanvasNodeData) => void;
+    onNodeSaveAsset: (node: CanvasNodeData) => void;
+    onNodeMaskEdit: (node: CanvasNodeData) => void;
+    onNodeEmotion: (node: CanvasNodeData) => void;
+    onNodePortraitTexture: (node: CanvasNodeData) => void;
+    onNodeCrop: (node: CanvasNodeData) => void;
+    onNodeSplit: (node: CanvasNodeData) => void;
+    onNodeUpscale: (node: CanvasNodeData) => void;
+    onNodeSuperResolve: (node: CanvasNodeData) => void;
+    onNodeAngle: (node: CanvasNodeData) => void;
+    onNodeViewImage: (node: CanvasNodeData) => void;
+    onNodeExtractVideoFrames: (node: CanvasNodeData, preset?: "current" | "first" | "last") => void;
+    onNodeExtractAudioFromVideo: (node: CanvasNodeData) => void;
+    onNodeTrimVideoSegments: (node: CanvasNodeData) => void;
+    onNodeCropVideo: (node: CanvasNodeData) => void;
+    onNodeDepthCapture: (node: CanvasNodeData) => void;
+    onNodeSubtitles: (node: CanvasNodeData) => void;
+    onNodeTimeline: (node: CanvasNodeData) => void;
+    onNodeReversePrompt: (node: CanvasNodeData) => void;
+    onNodeToggleFreeResize: (node: CanvasNodeData) => void;
+    onNodeToggleLocked: (node: CanvasNodeData) => void;
+    onNodeCopyPrompt: (node: CanvasNodeData) => void;
+};
+
+/** 工具运行时可见的上下文。工具定义通过纯函数读取状态 */
+export type ToolContext = {
+    selectedCount: number;
+    selectedNodeTypes: Set<CanvasNodeTypeId>;
+    selectedVideoCount: number;
+    canvasTool: CanvasToolMode;
+    workspaceMode: CanvasWorkspaceMode;
+    isProjectLinked: boolean;
+    canUndo: boolean;
+    canRedo: boolean;
+    /** 节点悬停工具栏专用——当前悬停/选中的节点 */
+    node?: CanvasNodeData;
+    /** 便捷访问 node.metadata（node 为空时为 undefined） */
+    nodeMetadata?: CanvasNodeMetadata;
+    /** 视频画面提取中（节点悬停工具栏用） */
+    extractingVideoFrames: boolean;
+    /** 视频音频提取/片段截取进行中（节点悬停工具栏用） */
+    extractingAudio: boolean;
+    trimmingVideo: boolean;
+    /** 合并视频中（多选工具栏用） */
+    mergingVideos: boolean;
+    /** 主工具栏面板开关状态（仅主工具栏使用） */
+    addPanelOpen: boolean;
+    appearancePanelOpen: boolean;
+    settingsPanelOpen: boolean;
+    handlers: ToolbarHandlers;
+};
+
+/** 添加节点菜单只依赖创建动作，避免右键菜单为工具栏状态补无意义字段。 */
+export type AddNodeMenuContext = {
+    showDoubaoNodes?: boolean;
+    workspaceMode: CanvasWorkspaceMode;
+    isProjectLinked: boolean;
+    /** 内置应用插件的启用状态；未声明时视为未提供 gating 信息。 */
+    enabledPluginIds?: ReadonlySet<string>;
+    handlers: Pick<ToolbarHandlers,
+        | "onAddText"
+        | "onAddImage"
+        | "onAddVideo"
+        | "onAddAudio"
+        | "onAddScript"
+        | "onAddFrame"
+        | "onAddFolder"
+        | "onAddDrawing"
+        | "onAddWorkflow"
+        | "onAddExtensionNode"
+        | "onAddDoubaoAccountNode"
+        | "onChooseStyle"
+        | "onOpenDirector"
+        | "onUpload"
+        | "onOpenMyAssets"
+        | "onOpenProjectCharacters"
+        | "onOpenGenerationHistory"
+    >;
+};
+
+/** 工具定义——注册表的基本单元 */
+export type ToolDefinition = {
+    workflow?: CanvasWorkflowContribution;
+    id: string;
+    toolbar: ToolbarId;
+    category: ToolCategory;
+    label: string | ((ctx: ToolContext) => string);
+    /** Dock 标签模式下的短文案，缺省用 label */
+    displayLabel?: string | ((ctx: ToolContext) => string);
+    icon: ReactNode | ((ctx: ToolContext) => ReactNode);
+    /** 用户默认可见（可被 prefs 覆盖） */
+    defaultVisible: boolean;
+    /** 默认排序权重，升序 */
+    defaultOrder: number;
+    /** 节点工具条的展示层级；由注册表统一决定，避免组件按工具 ID 二次编排。 */
+    nodeToolbar?: {
+        group: NodeToolbarGroup | ((ctx: ToolContext) => NodeToolbarGroup);
+        order?: number | ((ctx: ToolContext) => number);
+        section?: string;
+        description?: string;
+    };
+    active?: (ctx: ToolContext) => boolean;
+    disabled?: (ctx: ToolContext) => boolean;
+    /** 危险操作——渲染时隔离到独立分组 */
+    danger?: boolean;
+    /** 主入口强调态——用于保持画布核心动作的视觉优先级。 */
+    prominent?: boolean;
+    /** 面板展开型工具——使用 aria-expanded 而非 aria-pressed */
+    expands?: boolean;
+    /** 互斥开关：在 dock 中渲染为分段切换，而不是两个独立按钮 */
+    switchGroup?: {
+        value: (ctx: ToolContext) => string;
+        options: Array<{ id: string; label: string; icon: ReactNode; value: string }>;
+        onChange: (ctx: ToolContext, value: string) => void;
+    };
+    /** 上下文可见性谓词——返回 false 时工具不渲染（不受 prefs 控制） */
+    applicable?: (ctx: ToolContext) => boolean;
+    /** 执行动作。event 来自 Dock 按钮点击 */
+    run: (ctx: ToolContext, event?: MouseEvent<HTMLElement>) => void;
+};
+
+/** 添加节点菜单命令：项目级动作与真正的节点创建分开呈现。 */
+export type AddNodeMenuCommand = {
+    id: string;
+    label: string;
+    icon: ReactNode;
+    badge?: string;
+    /** 前端保留入口但暂时不可用时的说明；不会执行 run。 */
+    disabledReason?: string;
+    // extension：展示与加工类扩展节点。单独一区，避免挤散 node 区调好的四列网格。
+    section: "node" | "workflow" | "project" | "resource";
+    defaultOrder: number;
+    applicable?: (ctx: AddNodeMenuContext) => boolean;
+    run: (ctx: AddNodeMenuContext) => void;
+};
+
+/** 用户偏好——排序与显隐 */
+export type ToolbarPrefs = {
+    /** 工具 id 按显示顺序排列 */
+    order: string[];
+    /** 用户隐藏的工具 id */
+    hidden: string[];
+};

@@ -1,0 +1,47 @@
+[
+  {"message":"第 2 个参考视频平均帧率为 120.000 FPS，需要 24–60 FPS；请重新导出","reason":"120.000 FPS","action":"24–60 FPS"},
+  {"message":"素材转换失败: Frame rate must be between 24 and 60.","reason":"帧率","action":"24–60 FPS"},
+  {"message":"素材转换失败: unsupported video codec","reason":"编码","action":"只修改文件后缀无效"},
+  {"message":"asset is not ready","reason":"仍在处理中","action":"确认处理完成"},
+  {"message":"asset access denied","reason":"无权访问","action":"上传该素材的账号"},
+  {
+    "message": "第 1 个参考视频：参考视频下载失败，请检查素材链接或重新上传",
+    "reason": "第 1 个参考视频",
+    "action": "MP4/MOV"
+  },
+  {
+    "message": "第 2 个参考视频尺寸为 200×640，需要宽高均在 300–6000 像素之间；请调整尺寸后再提交",
+    "reason": "200×640",
+    "action": "300–6000"
+  },
+  {
+    "message": "第 1 个参考视频：参考视频文件不能超过 200MB",
+    "reason": "文件过大",
+    "action": "200MB"
+  },
+  {
+    "message": "第 1 个参考视频：参考视频需使用 MP4/MOV 文件",
+    "reason": "格式或地址",
+    "action": "MP4/MOV"
+  },
+  {
+    "message": "第 1 个参考视频像素总量为 331776（432×768），需要 407696–8295044 像素；请调整尺寸",
+    "reason": "432×768",
+    "action": "407696–8295044"
+  },
+  {
+    "message": "第 1 个参考视频时长为 1.500 秒，需要 2–15 秒；请裁剪或更换素材后再提交",
+    "reason": "1.500",
+    "action": "2–15"
+  },
+  {
+    "message": "素材转换失败: Pixel count must be between 407696 and 8295044.",
+    "reason": "像素总量",
+    "action": "407696–8295044"
+  },
+  {
+    "message": "第 1 个参考视频像素总量为 331776（432×768），需要 至少 407696 像素；请调整尺寸",
+    "reason": "432×768",
+    "action": "至少 407696"
+  }
+]

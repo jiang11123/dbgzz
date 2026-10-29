@@ -1,0 +1,21 @@
+{
+  "version": "v2.0.2",
+  "approvedBy": "Ender",
+  "date": "2026-10-22",
+  "instruction": "本版豁免完整十二次生成和整套助手验收；不新增付费生成，源码 review、专项回归、四平台包、升级回滚及签名检查通过后发布",
+  "includedMain": "d33ff1b7553cb938dc9e8f777c04a7e396a45d11",
+  "includedPullRequests": [221, 222, 223, 224, 225, 226, 227, 228, 230, 231, 233],
+  "waiveCompleteGenerationMatrix": true,
+  "waiveCompleteAssistantAcceptance": true,
+  "newPaidBudgetCNY": 0,
+  "requiredBeforePublish": ["independent_source_review", "targeted_regression", "four_platform_packages", "windows_upgrade_and_rollback", "linux_native_window", "signed_manifest", "public_readback"],
+  "deferredDependencyPullRequests": [164, 166],
+  "scope": "The eleven already merged application changes in includedMain, release metadata, and the explicitly approved bounded Seedream assistant repairs. Deferred PRs are excluded. Existing production model channel, price and Skill submission settings are not changed by this release.",
+  "repairInstruction": "本版先明确提示暂不支持的整片组合，修好检查按钮后继续发版",
+  "repairScope": "Reject unsupported whole-film Seedream layers/groups before paid admission, preserve supported single-image settings, and recognize the persisted independent output list for the result-check action. Do not add variable-output whole-film production.",
+  "additionalHumanReviewInstruction": "本版由我确认这两处修复，豁免新增人工 review",
+  "additionalHumanReviewWaivedFor": "Only the two bounded Seedream assistant repairs; independent source review and all required release safety gates remain required.",
+  "githubChannelInstruction": "允许本次发布 PR 使用 gh，#164/#166 仍暂留",
+  "communicationInstruction": "发布了记得群里总结一下和Lucas说一声；记得把新修复的截图发群里就好",
+  "source": "Direct human selection in this release conversation on 2026-10-22. Authorization is not test success. Prior-version waivers and paid budgets are not inherited."
+}

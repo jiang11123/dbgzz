@@ -1,0 +1,353 @@
+{
+  "version": "v1.7.22",
+  "sourceCommit": "dbffa9510441be0e1c1bd3b0189db674c7a13294",
+  "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+  "ownerException": {
+    "approvedBy": "Ender",
+    "instruction": "原任务验收，不新增付费生成（推荐）",
+    "scope": "video-unified-original-task-delivery-20261014",
+    "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+    "evidence": [
+      "docs/release-evidence/v1.7.22-targeted.md",
+      "docs/release-evidence/v1.7.22-proof.json"
+    ]
+  },
+  "releaseAuthorization": {
+    "instruction": "那你就统一做吧，所有视频模型都按这套策略走，别再按模型加限制了，跑通后review没问题就上线",
+    "scope": "v1.7.22 only",
+    "additionalHumanReplyRequired": false,
+    "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+    "evidence": [
+      "docs/release-evidence/v1.7.22-targeted.md",
+      "docs/release-evidence/v1.7.22-proof.json"
+    ]
+  },
+  "liveMatrixStatus": "not_run_owner_waived",
+  "agentAcceptanceStatus": "not_run_owner_waived",
+  "acceptanceComplete": false,
+  "freshGeneration": false,
+  "liveModelCoverage": "limited_to_existing_original_tasks",
+  "allModelsLiveTested": false,
+  "paidSubmissionLimit": 0,
+  "newPaidSubmissions": 0,
+  "newBudgetCNY": 0,
+  "newSpentCNY": 0,
+  "newPendingCNY": 0,
+  "billingAttempts": [],
+  "budgetCNY": null,
+  "spentCNY": null,
+  "pendingCNY": null,
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.21",
+    "pendingCNY": null,
+    "evidence": [
+      "docs/release-evidence/v1.7.21.json",
+      "docs/release-evidence/v1.7.20.json"
+    ]
+  },
+  "cases": [
+    {
+      "method": "native-original-task-retrieval",
+      "retrievalMethod": "current-downloader-original-task",
+      "originalStatus": "succeeded",
+      "clientVersion": "v1.7.22",
+      "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+      "executedSourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+      "evidence": [
+        "docs/release-evidence/v1.7.22-proof.json"
+      ],
+      "model": "seedance-2.0-mini",
+      "platform": "darwin-arm64",
+      "taskId": "ee1291b1f8313491528acc2c585e67e1",
+      "originalTaskId": "ee1291b1f8313491528acc2c585e67e1",
+      "reopenedTaskId": "ee1291b1f8313491528acc2c585e67e1",
+      "providerRequestId": "task_NwgS6TK7jjgg1cax74tGdEQ43T71Cb7r",
+      "originalProviderRequestId": "task_NwgS6TK7jjgg1cax74tGdEQ43T71Cb7r",
+      "gatewayTaskId": "task_NwgS6TK7jjgg1cax74tGdEQ43T71Cb7r",
+      "originalGatewayTaskId": "task_NwgS6TK7jjgg1cax74tGdEQ43T71Cb7r",
+      "resourceId": "e104520550e682a1710e2f8d4eb46c24",
+      "freshSubmission": false,
+      "submissionCount": 0,
+      "status": "succeeded",
+      "downloaded": true,
+      "saved": true,
+      "canvasVerified": true,
+      "canvasFirstFrame": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "playbackVerified": true,
+      "reopened": true,
+      "noDuplicateSubmission": true,
+      "bytes": 743509,
+      "artifactSHA256": "b1aa95b1c98c8fed4ec36edf70b903fde7c1f3296b078fb3cc50315a23b0a85f",
+      "artifactIdentity": {
+        "method": "existing-resource-sha256",
+        "referenceSHA256": "b1aa95b1c98c8fed4ec36edf70b903fde7c1f3296b078fb3cc50315a23b0a85f",
+        "evidence": [
+          "docs/release-evidence/v1.7.22-proof.json"
+        ]
+      },
+      "downloadExecution": {
+        "method": "current-downloader",
+        "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+        "evidence": [
+          "docs/release-evidence/v1.7.22-proof.json"
+        ]
+      },
+      "originalGeneration": {
+        "status": "recorded",
+        "commit": "7685a7c8a8bd4576bce6e2822a5ea2b8db525af6",
+        "sourceDigest": "eb664aef1a07681a4e4b7fdf6106dca9540a1849126c90610a928fac312fa77c",
+        "evidence": [
+          "docs/release-evidence/v1.7.21.json",
+          "docs/release-evidence/v1.7.22-proof.json"
+        ]
+      },
+      "originalCreatedAt": "2026-10-14T05:02:10.004597Z",
+      "retrievalStartedAt": "2026-10-14T13:31:09.008331Z",
+      "downloadCompletedAt": "2026-10-14T13:31:24.748071Z",
+      "savedAt": "2026-10-14T13:31:24.750018Z",
+      "firstFrameObservedAt": "2026-10-14T13:34:36.315Z",
+      "reopenedAt": "2026-10-14T13:37:06.949Z",
+      "firstFrameTiming": "observation_upper_bound",
+      "billingBefore": {
+        "status": "settled",
+        "costCNY": 0.40594
+      },
+      "billingAfter": {
+        "status": "settled",
+        "costCNY": 0.40594
+      },
+      "billingUnchanged": {
+        "status": "passed",
+        "method": "readonly-reconciliation",
+        "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+        "evidence": [
+          "docs/release-evidence/v1.7.22-proof.json"
+        ]
+      },
+      "timingLimitation": "Original-task download and native existing-resource canvas are separate operations; deliberate observation gaps and no precise first-paint claim.",
+      "sameExistingResourceAfterUpgrade": true,
+      "newResourceBindingClaim": false,
+      "sourceCommit": "dbffa9510441be0e1c1bd3b0189db674c7a13294"
+    }
+  ],
+  "review": {
+    "result": "approved",
+    "independent": true,
+    "reviewer": "Grok Build; prior delivery code review plus exact unchanged backend/protocol scope and current PR149 frontend source review",
+    "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+    "evidence": [
+      "docs/release-evidence/v1.7.22-proof.json"
+    ],
+    "sourceCodeApproved": true,
+    "newReceiptIndependentlyReviewed": false
+  },
+  "upgrade": {
+    "preservedData": true,
+    "status": "passed",
+    "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+    "evidence": [
+      "docs/release-evidence/v1.7.22-proof.json"
+    ],
+    "allTaskIDsPreserved": true,
+    "allResourceIDsPreservedFromOriginalUpgradeBefore": "not_claimed",
+    "preservationScope": "original task/resource/node, task IDs and resource count; resource-ID sample only from its actual 08:52 baseline"
+  },
+  "verification": {
+    "allVideoProtocols": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+      "evidence": [
+        "docs/release-evidence/v1.7.22-proof.json"
+      ],
+      "registeredProtocols": [
+        "agnes-video",
+        "agnes-video-v20",
+        "autodl-comfyui",
+        "baidu-video",
+        "dashscope-wan-video",
+        "fal-queue-video",
+        "full-video",
+        "gemini-veo",
+        "kling-video",
+        "luma-dream-machine",
+        "minimax-video",
+        "newapi",
+        "newapi-channel-1",
+        "newapi-channel-2",
+        "novita-video",
+        "pika-via-fal",
+        "pixverse-video",
+        "replicate-prediction-video",
+        "rolldek-wan-video",
+        "runninghub-workflow",
+        "runway-video",
+        "seedance-videos-compatible",
+        "tencent-hunyuan-video",
+        "vertex-veo",
+        "vidu-video",
+        "volcengine-ark-agent-plan-video",
+        "volcengine-ark-video",
+        "volcengine-jimeng-video",
+        "xai-video",
+        "zhipu-cogvideox"
+      ],
+      "testedProtocols": [
+        "agnes-video",
+        "agnes-video-v20",
+        "autodl-comfyui",
+        "baidu-video",
+        "dashscope-wan-video",
+        "fal-queue-video",
+        "full-video",
+        "gemini-veo",
+        "kling-video",
+        "luma-dream-machine",
+        "minimax-video",
+        "newapi",
+        "newapi-channel-1",
+        "newapi-channel-2",
+        "novita-video",
+        "pika-via-fal",
+        "pixverse-video",
+        "replicate-prediction-video",
+        "rolldek-wan-video",
+        "runninghub-workflow",
+        "runway-video",
+        "seedance-videos-compatible",
+        "tencent-hunyuan-video",
+        "vertex-veo",
+        "vidu-video",
+        "volcengine-ark-agent-plan-video",
+        "volcengine-ark-video",
+        "volcengine-jimeng-video",
+        "xai-video",
+        "zhipu-cogvideox"
+      ],
+      "handwrittenAndWorkflowDelivery": true,
+      "applicabilityMethod": "exact_backend_protocol_and_test_tree_byte_equivalence",
+      "actualPriorExecutionCommit": "5fe11cbb978a0506f4761b4f5ad127b750339e94",
+      "actualPriorExecutionSourceDigest": "0dd71f0bc45f1e4df74e3cb0c6b699f91839d2946608575e06c6c38fc837c4c0",
+      "priorRaceRelabeledAsCurrentExecution": false,
+      "currentFullGoCIAlsoPassed": true
+    },
+    "directAndBackupDelivery": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+      "evidence": [
+        "docs/release-evidence/v1.7.22-proof.json"
+      ],
+      "applicabilityMethod": "exact_backend_protocol_and_test_tree_byte_equivalence",
+      "actualPriorExecutionCommit": "5fe11cbb978a0506f4761b4f5ad127b750339e94",
+      "actualPriorExecutionSourceDigest": "0dd71f0bc45f1e4df74e3cb0c6b699f91839d2946608575e06c6c38fc837c4c0",
+      "priorRaceRelabeledAsCurrentExecution": false,
+      "currentFullGoCIAlsoPassed": true
+    },
+    "signedURLRefresh": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+      "evidence": [
+        "docs/release-evidence/v1.7.22-proof.json"
+      ],
+      "applicabilityMethod": "exact_backend_protocol_and_test_tree_byte_equivalence",
+      "actualPriorExecutionCommit": "5fe11cbb978a0506f4761b4f5ad127b750339e94",
+      "actualPriorExecutionSourceDigest": "0dd71f0bc45f1e4df74e3cb0c6b699f91839d2946608575e06c6c38fc837c4c0",
+      "priorRaceRelabeledAsCurrentExecution": false,
+      "currentFullGoCIAlsoPassed": true
+    },
+    "providerAuthIsolation": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+      "evidence": [
+        "docs/release-evidence/v1.7.22-proof.json"
+      ],
+      "applicabilityMethod": "exact_backend_protocol_and_test_tree_byte_equivalence",
+      "actualPriorExecutionCommit": "5fe11cbb978a0506f4761b4f5ad127b750339e94",
+      "actualPriorExecutionSourceDigest": "0dd71f0bc45f1e4df74e3cb0c6b699f91839d2946608575e06c6c38fc837c4c0",
+      "priorRaceRelabeledAsCurrentExecution": false,
+      "currentFullGoCIAlsoPassed": true
+    },
+    "cancelAndStall": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+      "evidence": [
+        "docs/release-evidence/v1.7.22-proof.json"
+      ],
+      "applicabilityMethod": "exact_backend_protocol_and_test_tree_byte_equivalence",
+      "actualPriorExecutionCommit": "5fe11cbb978a0506f4761b4f5ad127b750339e94",
+      "actualPriorExecutionSourceDigest": "0dd71f0bc45f1e4df74e3cb0c6b699f91839d2946608575e06c6c38fc837c4c0",
+      "priorRaceRelabeledAsCurrentExecution": false,
+      "currentFullGoCIAlsoPassed": true
+    },
+    "noDuplicateSubmission": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+      "evidence": [
+        "docs/release-evidence/v1.7.22-proof.json"
+      ],
+      "applicabilityMethod": "exact_backend_protocol_and_test_tree_byte_equivalence",
+      "actualPriorExecutionCommit": "5fe11cbb978a0506f4761b4f5ad127b750339e94",
+      "actualPriorExecutionSourceDigest": "0dd71f0bc45f1e4df74e3cb0c6b699f91839d2946608575e06c6c38fc837c4c0",
+      "priorRaceRelabeledAsCurrentExecution": false,
+      "currentFullGoCIAlsoPassed": true
+    },
+    "localReleaseGate": {
+      "status": "passed",
+      "method": "local-script",
+      "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+      "evidence": [
+        "docs/release-evidence/v1.7.22-proof.json"
+      ]
+    },
+    "ci": {
+      "status": "passed",
+      "method": "github-actions",
+      "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+      "evidence": [
+        "docs/release-evidence/v1.7.22-proof.json"
+      ],
+      "runs": [
+        "https://github.com/glanderness/BeefTV/actions/runs/38571403444",
+        "https://github.com/glanderness/BeefTV/actions/runs/38571403542",
+        "https://github.com/glanderness/BeefTV/actions/runs/38571403474"
+      ]
+    }
+  },
+  "liveCoverageNotes": "真实取回/原生播放覆盖原 Seedance Mini 已成功任务；无可用原生 Sora/Veo/Grok 成功原任务，未以新付费生成补齐。确定性协议测试不等于所有模型真实生成。",
+  "packages": {
+    "platforms": [
+      "darwin-arm64",
+      "darwin-amd64",
+      "windows-amd64",
+      "linux-amd64"
+    ],
+    "status": "pending_release_workflow",
+    "archives": null,
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "linuxNativeWindowBeforeUpload": true,
+    "signedManifestBeforePublish": true,
+    "publicReadbackAfterPublish": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml"
+    ],
+    "gateBooleansMeanRequiredBeforePublication": true
+  },
+  "releasePublished": false,
+  "releaseComplete": false,
+  "receiptReview": {
+    "status": "pending_root_independent_review",
+    "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+    "evidence": [
+      "docs/release-evidence/v1.7.22-proof.json"
+    ]
+  }
+}

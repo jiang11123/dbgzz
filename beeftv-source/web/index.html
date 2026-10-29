@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN" class="dark font-sans" style="color-scheme: dark">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="AI 影视与短剧创作工作台" />
+        <link rel="icon" href="/beef-logo.png" type="image/png" />
+        <title>正在加载</title>
+        <style>
+            html,
+            body {
+                margin: 0;
+                background: var(--background, #0f0f0f);
+            }
+            #root:empty {
+                position: fixed;
+                inset: 0;
+                min-height: 100vh;
+                overflow: hidden;
+                background: #090909;
+            }
+            #root:empty::after {
+                content: "";
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                width: min(160px, 42vw);
+                aspect-ratio: 1;
+                transform: translate(-50%, -50%);
+                background: #fff url('/beef-logo.png') center / contain no-repeat;
+                border-radius: 24px;
+            }
+            @keyframes appearance-bootstrap-shimmer {
+                0%, 12% { background-position: 100% 0; }
+                82%, 100% { background-position: 0 0; }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                #root:empty::after {
+                    animation: none;
+                }
+            }
+        </style>
+        <script>
+            // Match the saved preference before the first paint; invalid storage stays dark.
+            let theme = "dark";
+            try {
+                if (JSON.parse(localStorage.getItem("infinite-canvas:theme_store"))?.state?.theme === "light") theme = "light";
+            } catch {}
+            document.documentElement.classList.toggle("dark", theme === "dark");
+            document.documentElement.style.colorScheme = theme;
+            document.documentElement.style.setProperty("--background", theme === "dark" ? "#0f0f0f" : "#f5f5f5");
+        </script>
+    </head>
+    <body class="bg-background text-foreground antialiased">
+        <div id="root"></div>
+        <script type="module" src="/src/main.tsx"></script>
+    </body>
+</html>

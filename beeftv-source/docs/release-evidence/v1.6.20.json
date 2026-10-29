@@ -1,0 +1,47 @@
+{
+  "version": "v1.6.20",
+  "sourceCommit": "3b35e58",
+  "sourceDigest": "7c37faea6ee38169e09ce88f865ac1b6acad98273fa94e72789ebc41f86e0142",
+  "budgetCNY": 0,
+  "spentCNY": 0,
+  "pendingCNY": 0,
+  "liveTestWaiver": {
+    "approvedBy": "Ender",
+    "instruction": "本版豁免付费生成矩阵，review 通过就发布（推荐）",
+    "approvedDate": "2026-10-01",
+    "scope": "Only v1.6.20 paid generation matrix. Windows download regression, CI, independent review and existing data preservation remain required. No paid generation was submitted."
+  },
+  "cases": [],
+  "upgrade": {
+    "preservedData": true,
+    "platform": "windows-amd64",
+    "retainedCounts": {"canvas_projects": 5, "tasks": 8, "resources": 20},
+    "retainedIDs": {"canvas_projects": true, "tasks": true, "resources": true},
+    "note": "Existing test workspace backed up with SQLite backup API before final v1.6.20 candidate launch. All prior IDs remained present."
+  },
+  "review": {
+    "reviewer": "Grok independent read-only review",
+    "result": "approved",
+    "scope": "Windows download and MIME callers; paid generation matrix is covered only by the separate Owner waiver above.",
+    "reviewedCommit": "3b35e58",
+    "reviewJob": "20261001-194258-continue-157e3e51",
+    "initialReview": "Test coverage finding addressed with sanitized, uppercase, multi-dot and long Unicode names. Native format filter scoped to Windows; other platforms retain original dialog options."
+  },
+  "verification": {
+    "windowsDownloads": "passed",
+    "ci": "passed",
+    "realGenerationMatrix": "WAIVED, not completed",
+    "go": "Full Go suite passed after building official protocol packages; focused desktop and bootstrap suite rerun after final changes.",
+    "web": "19 download tests passed; TypeScript check and desktop frontend build passed.",
+    "releaseGate": "Nine isolated checks passed: valid waiver accepted; missing review/native/CI/owner, bad source, spending/pending billing and v1.6.21 carryover rejected.",
+    "baseline": {"version": "v1.6.19", "windowsZipSHA256": "a1d5d87514dc94e63226e7c148b03f9923eaa40c6c0cd63951f7a277ac570159", "reproduction": "Editing filename to a basename without extension saved a 419392-byte extensionless MP4."},
+    "candidate": {"version": "v1.6.20", "commit": "3b35e58", "windowsExeSHA256": "6b26a3ce6941667569a5ad3dec1523328547281f7790dacef137e30b9f10dd6a"},
+    "nativeChecks": ["Default MP4 filename retains extension", "Basename-only rename appends .mp4, .m4a and .png", "Existing target prompts with completed .mp4 filename", "Declining overwrite and cancelling preserves target hash"],
+    "nativeOutputs": [
+      {"format": "mp4", "bytes": 419392, "durationSeconds": 4, "width": 640, "height": 360, "sha256": "377ee184f117d410ec23b6ac8a6950bd7113dd4e984763f600b13bef5955523e", "decodeExit": 0},
+      {"format": "m4a", "bytes": 36352, "durationSeconds": 4, "sha256": "47191d5add4205f09eb3b88213d336355772370fdd5ea23c88ffdc82714cd0fe", "decodeExit": 0},
+      {"format": "png", "bytes": 1598250, "width": 1672, "height": 941, "sha256": "3fa4cb6253a73cb93f98df96741ecb9f53c6bdeefdbcb54c10330dabe5a643b5", "decodeExit": 0}
+    ],
+    "limits": ["Windows native checks used Explorer HideFileExt=0", "MOV/SVG/WAV aliases verified by automated tests; no claim of native GUI testing every media format", "macOS/Linux native dialog behavior unchanged and not retested", "Earlier Lucas crop failure remains unlocalized and is not claimed fixed by this download patch"]
+  }
+}

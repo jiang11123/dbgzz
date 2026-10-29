@@ -1,0 +1,101 @@
+name: Windows depth runtime checks (not a release)
+
+on:
+  push:
+    branches:
+      - codex/windows-depth-runtime
+    paths:
+      - "backend/internal/depthruntime/**"
+      - "scripts/*depth-runtime-windows.ps1"
+      - "scripts/probe-depth-runtime-windows.ps1"
+      - "tools/depth-capture/**"
+      - ".github/workflows/depth-runtime-windows-check.yml"
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      store_packages:
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  windows-runtime:
+    name: windows-${{ matrix.variant }}
+    runs-on: windows-2022
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [cpu, cuda]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+      - name: Test installer on native Windows
+        working-directory: backend
+        run: |
+          go test ./internal/depthruntime -count=1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          go test ./internal/app -run 'Test.*Depth|TestChooseDepthDevice' -count=1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Package pinned FFmpeg and FFprobe
+        shell: powershell
+        run: |
+          ./scripts/package-media-runtime-windows.ps1 -Destination ./build/media-runtime
+          "DEPTH_FFMPEG_DIR=$((Resolve-Path ./build/media-runtime).Path)" >> $env:GITHUB_ENV
+      - name: Check media checksum rejection
+        shell: powershell
+        run: ./scripts/test-media-runtime-integrity-windows.ps1 -Runtime ./build/media-runtime
+      - name: Build and relocate ${{ matrix.variant }} runtime
+        shell: powershell
+        run: ./scripts/build-depth-runtime-windows.ps1 -Variant ${{ matrix.variant }} -FFmpegDir $env:DEPTH_FFMPEG_DIR -OutputDir ./build/depth-runtime
+      - name: Verify CUDA Release parts fit GitHub limits
+        if: matrix.variant == 'cuda'
+        shell: pwsh
+        run: |
+          $name = "beeftv-depth-runtime-v1-windows-amd64-cuda.zip"
+          $metadata = Get-Content -LiteralPath "./build/depth-runtime/$name.json" -Raw | ConvertFrom-Json
+          if ($metadata.parts.Count -lt 2) { throw "CUDA 运行包没有生成 Release 分片" }
+          $total = [long]0
+          foreach ($part in $metadata.parts) {
+            $path = Join-Path "./build/depth-runtime" $part.name
+            if ($part.size -ge 2GB -or (Get-Item -LiteralPath $path).Length -ne $part.size) { throw "Release 分片超限或大小不匹配" }
+            if ((Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant() -ne $part.sha256) { throw "Release 分片哈希不匹配" }
+            $total += [long]$part.size
+          }
+          if ($total -ne [long]$metadata.size) { throw "Release 分片总大小不匹配" }
+      - name: Probe pinned Small model on Windows CPU
+        if: matrix.variant == 'cpu'
+        shell: pwsh
+        run: |
+          $modelDir = Join-Path $env:RUNNER_TEMP "beeftv-depth-model\checkpoints"
+          New-Item -ItemType Directory -Path $modelDir -Force | Out-Null
+          $model = Join-Path $modelDir "video_depth_anything_vits.pth"
+          Invoke-WebRequest -Uri "https://github.com/glanderness/BeefTV/releases/download/v1.5.5/video_depth_anything_vits.pth" -OutFile $model
+          $zip = Resolve-Path ./build/depth-runtime/beeftv-depth-runtime-v1-windows-amd64-cpu.zip
+          $unpacked = Join-Path $env:RUNNER_TEMP "beeftv-depth-中文 path"
+          Expand-Archive -LiteralPath $zip -DestinationPath $unpacked
+          $env:PYTHONPATH = (Resolve-Path ./tools/depth-capture).Path
+          $env:PATH = "$unpacked\bin;$env:PATH"
+          & (Join-Path $unpacked ".python\python.exe") -m unittest discover -s ./tools/depth-capture/tests -v
+          if ($LASTEXITCODE -ne 0) { throw "Windows Python 单元测试失败" }
+          ./scripts/test-depth-runtime-windows.ps1 -Variant cpu -RuntimeRoot $unpacked -ModelRuntime (Split-Path $modelDir)
+      - name: Store verified runtime metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: depth-media-receipt-${{ matrix.variant }}
+          path: build/depth-runtime/*.json
+          if-no-files-found: error
+      - name: Store verified runtime packages
+        if: inputs.store_packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: depth-runtime-${{ matrix.variant }}
+          path: build/depth-runtime/*
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error

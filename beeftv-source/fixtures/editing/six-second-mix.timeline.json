@@ -1,0 +1,28 @@
+{
+  "timeline": {
+    "version": 2,
+    "durationMs": 6000,
+    "tracks": [
+      { "id": "video", "kind": "video" },
+      { "id": "voice", "kind": "audio" },
+      { "id": "bgm", "kind": "audio" },
+      { "id": "subtitle", "kind": "subtitle" }
+    ],
+    "clips": [
+      { "id": "v0", "kind": "video", "nodeId": "v0", "trackId": "video", "startMs": 0, "durationMs": 2000, "volume": 1, "directMedia": { "id": "v0", "kind": "video", "storageKey": "resource:v0" } },
+      { "id": "v1", "kind": "video", "nodeId": "v1", "trackId": "video", "startMs": 2000, "durationMs": 2000, "sourceStartMs": 0, "volume": 1, "directMedia": { "id": "v1", "kind": "video", "storageKey": "resource:v1" } },
+      { "id": "v2", "kind": "video", "nodeId": "v2", "trackId": "video", "startMs": 4000, "durationMs": 2000, "volume": 1, "directMedia": { "id": "v2", "kind": "video", "storageKey": "resource:v2" } },
+      { "id": "voice", "kind": "audio", "nodeId": "voice", "trackId": "voice", "startMs": 1000, "durationMs": 2000, "sourceStartMs": 500, "volume": 1, "directMedia": { "id": "voice", "kind": "audio", "storageKey": "resource:voice" } },
+      { "id": "bgm", "kind": "audio", "nodeId": "bgm", "trackId": "bgm", "startMs": 0, "durationMs": 6000, "volume": 0.2, "directMedia": { "id": "bgm", "kind": "audio", "storageKey": "resource:bgm" } },
+      { "id": "sub", "kind": "subtitle", "nodeId": "sub", "trackId": "subtitle", "startMs": 500, "durationMs": 5000, "text": "中文字幕完整性验证" }
+    ]
+  },
+  "sources": [
+    { "id": "v0", "hasAudio": true, "hasVideo": true, "durationMs": 2000 },
+    { "id": "v1", "hasAudio": true, "hasVideo": true, "durationMs": 2000 },
+    { "id": "v2", "hasAudio": true, "hasVideo": true, "durationMs": 2000 },
+    { "id": "voice", "hasAudio": true, "durationMs": 6000 },
+    { "id": "bgm", "hasAudio": true, "durationMs": 6000 }
+  ],
+  "options": { "width": 320, "height": 180, "fps": 30, "sampleRate": 44100, "burnSubtitles": true }
+}

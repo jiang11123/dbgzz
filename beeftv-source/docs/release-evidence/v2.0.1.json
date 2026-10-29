@@ -1,0 +1,369 @@
+{
+  "version": "v2.0.1",
+  "contractVersion": 3,
+  "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+  "baseRelease": "v2.0.0",
+  "baseCommit": "d8bcdbe2480777147ac7c38f68793dc9bb366171",
+  "includedMain": "d870963556d9a057449cc4db91e0a08e8fc1851f",
+  "includedPullRequests": [
+    214,
+    215,
+    216,
+    217,
+    218,
+    219
+  ],
+  "ownerException": {
+    "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+    "evidence": [
+      "docs/release-evidence/v2.0.1-owner-authorization.json"
+    ],
+    "scope": "v2.0.1-publish-before-testing-20261021",
+    "approvedBy": "Ender",
+    "instruction": "直接发吧 发布后在测试",
+    "authorizationSHA256": "ce234f2985fccf631e65096568ffb8c6b30c22d069983774fd117c3bc0b34120"
+  },
+  "liveMatrixStatus": "pending_after_release",
+  "agentAcceptanceStatus": "pending_after_release",
+  "acceptanceComplete": false,
+  "releaseComplete": false,
+  "releasePublished": false,
+  "cases": [],
+  "deferredAcceptance": {
+    "status": "pending_after_release",
+    "caseKeys": [
+      "1/text-image",
+      "1/image-image",
+      "1/image-video",
+      "1/text-video",
+      "1/video-video",
+      "1/multi-video",
+      "2/text-image",
+      "2/image-image",
+      "2/image-video",
+      "2/text-video",
+      "2/video-video",
+      "2/multi-video"
+    ],
+    "agentCheckIds": [
+      "canvas_read",
+      "asset_reference",
+      "canvas_mutation",
+      "multi_turn",
+      "proposal_decline",
+      "proposal_stale",
+      "proposal_idempotency",
+      "session_history",
+      "session_restart",
+      "cancel",
+      "conflict_undo",
+      "host_recovery",
+      "scope_isolation",
+      "budget",
+      "cli_mcp",
+      "durable_resume",
+      "native_video",
+      "native_audio",
+      "skill_version",
+      "skill_files",
+      "permission_modes",
+      "external_business",
+      "media_film_review"
+    ]
+  },
+  "agentChecks": {
+    "canvas_read": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "asset_reference": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "canvas_mutation": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "multi_turn": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "proposal_decline": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "proposal_stale": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "proposal_idempotency": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "session_history": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "session_restart": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "cancel": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "conflict_undo": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "host_recovery": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "scope_isolation": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "budget": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "cli_mcp": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "durable_resume": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "native_video": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "native_audio": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "skill_version": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "skill_files": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "permission_modes": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "external_business": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    },
+    "media_film_review": {
+      "status": "pending_after_release",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-owner-authorization.json"
+      ]
+    }
+  },
+  "costScope": "New paid media and in-application model tests for this release; external review estimates are not settled application billing.",
+  "newPaidBudgetCNY": 0,
+  "newPaidSubmissions": 0,
+  "newSpentCNY": 0,
+  "billingAttempts": [],
+  "externalReviewCashCost": {
+    "status": "not_verified",
+    "settledUSD": null
+  },
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "pendingCNY": null,
+    "evidence": [
+      "docs/release-evidence/v2.0.0.json"
+    ]
+  },
+  "priorReceiptSHA256": "838db078b0036ecfb5d74c4a54e381313f81876fdcd5d31875aefeddfc8bd434",
+  "knownLimitations": {
+    "carriedFromVersion": "v2.0.0",
+    "inheritedFailedCheckIds": [
+      "native_video",
+      "native_audio",
+      "media_film_review"
+    ],
+    "evidence": [
+      "docs/release-evidence/v2.0.0.json"
+    ],
+    "description": "Previous media understanding, transcription and automatic film review failures remain historical failures. No new complete media/assistant acceptance is claimed."
+  },
+  "review": {
+    "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+    "evidence": [
+      "docs/release-evidence/v2.0.1-review.json"
+    ],
+    "result": "approved",
+    "independent": true,
+    "reviewer": "Grok Companion",
+    "reviewedHead": "8c2b15af482ac71e577aec117d2185bf2737949f"
+  },
+  "upgrade": {
+    "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+    "evidence": [
+      ".github/workflows/release-desktop.yml",
+      "scripts/smoke-desktop-installer.py"
+    ],
+    "status": "pending_release_workflow",
+    "preservedData": null,
+    "requiredBeforePublish": true,
+    "note": "Native lifecycle script explicitly restricts execution to disposable GitHub runners; the local guard rejection is not a test pass."
+  },
+  "verification": {
+    "localReleaseGate": {
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "v2.0.1-package-20261021/local-build.log",
+        "v2.0.1-package-20261021/release-contract-tests-final.log"
+      ],
+      "status": "passed",
+      "method": "local-script",
+      "executedApplicationHead": "eec843c6730c46dfea7b3078298ae02b759cc190",
+      "sourceEquivalence": "Only the release receipt validator and its tests changed after the local app build. backend, web, VERSION and release-desktop.yml are identical; the changed validator tests were rerun (77/77)."
+    },
+    "workflowAndUpscale": {
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "v2.0.1-package-20261021/workflow-upscale-web.log",
+        "v2.0.1-package-20261021/upscale-ui-browser.log",
+        "v2.0.1-package-20261021/targeted-go-tests.log"
+      ],
+      "status": "passed",
+      "nativePaidTest": false,
+      "uiBrowserBackend": "simulated",
+      "localExecutionApplicationHead": "eec843c6730c46dfea7b3078298ae02b759cc190"
+    },
+    "diagnostics": {
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "v2.0.1-package-20261021/diagnostics-skills-go.log",
+        "v2.0.1-package-20261021/diagnostics-skills-web.log"
+      ],
+      "status": "passed",
+      "localExecutionApplicationHead": "eec843c6730c46dfea7b3078298ae02b759cc190"
+    },
+    "skills": {
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "v2.0.1-package-20261021/diagnostics-skills-go.log",
+        "v2.0.1-package-20261021/diagnostics-skills-web.log"
+      ],
+      "status": "passed",
+      "localExecutionApplicationHead": "eec843c6730c46dfea7b3078298ae02b759cc190"
+    },
+    "publisher": {
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "evidence": [
+        "v2.0.1-package-20261021/publisher-tests.log",
+        "v2.0.1-package-20261021/release-contract-tests-final.log"
+      ],
+      "status": "passed",
+      "localExecutionApplicationHead": "eec843c6730c46dfea7b3078298ae02b759cc190"
+    },
+    "ci": {
+      "status": "passed",
+      "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+      "head": "8c2b15af482ac71e577aec117d2185bf2737949f",
+      "evidence": [
+        "docs/release-evidence/v2.0.1-ci.json",
+        "https://github.com/glanderness/BeefTV/actions/runs/39610605752",
+        "https://github.com/glanderness/BeefTV/actions/runs/39610606525",
+        "https://github.com/glanderness/BeefTV/actions/runs/39610605666"
+      ]
+    }
+  },
+  "packages": {
+    "platforms": [
+      "darwin-arm64",
+      "darwin-amd64",
+      "windows-amd64",
+      "linux-amd64"
+    ],
+    "status": "pending_release_workflow",
+    "archives": null,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml"
+    ],
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "linuxNativeWindowBeforeUpload": true,
+    "signedManifestBeforePublish": true,
+    "publicReadbackAfterPublish": true,
+    "flagsMeaning": "These true fields are mandatory workflow requirements, not observed successful executions. Final package observations remain pending."
+  }
+}

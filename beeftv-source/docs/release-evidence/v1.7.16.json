@@ -1,0 +1,137 @@
+{
+  "version": "v1.7.16",
+  "sourceDigest": "be7c3504841682446ad848d6ff13a29f2060eaa6da2d7b2f318d0dc11f683e15",
+  "ownerException": {
+    "approvedBy": "Ender",
+    "instruction": "按建议专项验收后发布，本版豁免完整矩阵",
+    "scope": "asr-transcription-targeted-20261011",
+    "evidence": [
+      "docs/release-evidence/v1.7.16-asr-review.md#owner-授权"
+    ]
+  },
+  "paidSubmissionLimit": 1,
+  "newBudgetCNY": 1,
+  "newSpentCNY": 0.00132,
+  "newPendingCNY": 0,
+  "budgetCNY": null,
+  "spentCNY": null,
+  "pendingCNY": null,
+  "liveMatrixStatus": "not_run_owner_waived",
+  "agentAcceptanceStatus": "not_run_owner_waived",
+  "acceptanceComplete": false,
+  "releasePublished": false,
+  "releaseComplete": false,
+  "cases": [
+    {
+      "path": "audio-transcription",
+      "model": "hy-asr-3.0-preview",
+      "attempts": 1,
+      "status": "succeeded",
+      "method": "native",
+      "clientSubmitted": true,
+      "subtitleTextVerified": true,
+      "subtitleTimingVerified": true,
+      "subtitleSaved": true,
+      "subtitleReopened": true,
+      "srtExported": true,
+      "billing": "settled",
+      "costCNY": 0.00132,
+      "executedSourceDigest": "be7c3504841682446ad848d6ff13a29f2060eaa6da2d7b2f318d0dc11f683e15",
+      "clientVersion": "v1.7.16",
+      "taskId": "174d04e3f68155f2fbf8d395bdfb9584",
+      "providerRequestId": "202610110634305132990048268d9d6wbZ3IeAU",
+      "artifactSHA256": "22f4086312cfd092ece955adfdf8a4c96aca37ec8e5e9ee02255bf6039b267da",
+      "evidence": [
+        "docs/release-evidence/v1.7.16-asr-review.md#原生专项实测",
+        "docs/release-evidence/v1.7.16-asr-review.md#结算"
+      ]
+    }
+  ],
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.15",
+    "pendingCNY": null,
+    "evidence": [
+      "docs/release-evidence/v1.7.15.json"
+    ]
+  },
+  "review": {
+    "result": "approved",
+    "independent": true,
+    "reviewer": "/root/review_beeftv_asr",
+    "sourceDigest": "be7c3504841682446ad848d6ff13a29f2060eaa6da2d7b2f318d0dc11f683e15",
+    "evidence": [
+      "docs/release-evidence/v1.7.16-asr-review.md#代码与复审"
+    ]
+  },
+  "upgrade": {
+    "preservedData": true,
+    "sourceDigest": "be7c3504841682446ad848d6ff13a29f2060eaa6da2d7b2f318d0dc11f683e15",
+    "evidence": [
+      "docs/release-evidence/v1.7.16-asr-review.md#代码与复审"
+    ]
+  },
+  "verification": {
+    "asrCatalog": {
+      "status": "passed",
+      "sourceDigest": "be7c3504841682446ad848d6ff13a29f2060eaa6da2d7b2f318d0dc11f683e15",
+      "evidence": [
+        "docs/release-evidence/v1.7.16-asr-review.md#原生专项实测"
+      ]
+    },
+    "nativeSubtitleSave": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "be7c3504841682446ad848d6ff13a29f2060eaa6da2d7b2f318d0dc11f683e15",
+      "evidence": [
+        "docs/release-evidence/v1.7.16-asr-review.md#原生专项实测"
+      ]
+    },
+    "scopeIsolation": {
+      "status": "passed",
+      "sourceDigest": "be7c3504841682446ad848d6ff13a29f2060eaa6da2d7b2f318d0dc11f683e15",
+      "evidence": [
+        "docs/release-evidence/v1.7.16-asr-review.md#代码与复审"
+      ]
+    },
+    "noDuplicateSubmission": {
+      "status": "passed",
+      "sourceDigest": "be7c3504841682446ad848d6ff13a29f2060eaa6da2d7b2f318d0dc11f683e15",
+      "evidence": [
+        "docs/release-evidence/v1.7.16-asr-review.md#代码与复审"
+      ]
+    },
+    "localReleaseGate": {
+      "status": "passed",
+      "sourceDigest": "be7c3504841682446ad848d6ff13a29f2060eaa6da2d7b2f318d0dc11f683e15",
+      "evidence": [
+        "docs/release-evidence/v1.7.16-asr-review.md#代码与复审"
+      ]
+    },
+    "ci": {
+      "status": "passed",
+      "sourceDigest": "be7c3504841682446ad848d6ff13a29f2060eaa6da2d7b2f318d0dc11f683e15",
+      "evidence": [
+        "docs/release-evidence/v1.7.16-asr-review.md#代码与复审"
+      ]
+    }
+  },
+  "packages": {
+    "status": "pending_release_workflow",
+    "archives": null,
+    "platforms": [
+      "darwin-arm64",
+      "darwin-amd64",
+      "windows-amd64",
+      "linux-amd64"
+    ],
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "linuxNativeWindowBeforeUpload": true,
+    "signedManifestBeforePublish": true,
+    "publicReadbackAfterPublish": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml"
+    ]
+  }
+}

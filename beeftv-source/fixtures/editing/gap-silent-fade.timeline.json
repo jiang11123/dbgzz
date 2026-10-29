@@ -1,0 +1,23 @@
+{
+  "timeline": {
+    "version": 2,
+    "durationMs": 3000,
+    "tracks": [
+      { "id": "v", "kind": "video" },
+      { "id": "a", "kind": "audio" },
+      { "id": "s", "kind": "subtitle" }
+    ],
+    "clips": [
+      { "id": "tone", "kind": "video", "nodeId": "tone", "trackId": "v", "startMs": 0, "durationMs": 1000, "volume": 1, "directMedia": { "id": "tone", "kind": "video", "storageKey": "resource:tone" } },
+      { "id": "silent", "kind": "video", "nodeId": "silent", "trackId": "v", "startMs": 2000, "durationMs": 1000, "volume": 1, "directMedia": { "id": "silent", "kind": "video", "storageKey": "resource:silent" } },
+      { "id": "voice", "kind": "audio", "nodeId": "voice", "trackId": "a", "startMs": 0, "durationMs": 1000, "volume": 1, "fadeInMs": 800, "directMedia": { "id": "voice", "kind": "audio", "storageKey": "resource:voice" } },
+      { "id": "sub", "kind": "subtitle", "nodeId": "sub", "trackId": "s", "startMs": 0, "durationMs": 1000, "text": "中文" }
+    ]
+  },
+  "sources": [
+    { "id": "tone", "hasAudio": true, "hasVideo": true, "durationMs": 1000 },
+    { "id": "silent", "hasAudio": false, "hasVideo": true, "durationMs": 1000 },
+    { "id": "voice", "hasAudio": true, "durationMs": 2000 }
+  ],
+  "options": { "width": 320, "height": 180, "fps": 30, "sampleRate": 44100, "burnSubtitles": true }
+}

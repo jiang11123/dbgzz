@@ -1,0 +1,12 @@
+{
+  "legacyLayout": [
+    {"version":"v1.6.20","sha256":"c131d3549e7ddd8d7295f5cb2b5ab30c90e25e4a978047bd1cbcffe38b948ce4"},
+    {"version":"v1.6.21","sha256":"b89a53746ce4cd67c1822f1ee775f78551527769149f4569c6018eae9b50aa77"},
+    {"version":"v1.6.22","sha256":"d15cefa7f6f3ee573572b4b7d6e7d9d955664b2eed96a254df18a1c2ce32cd07"}
+  ],
+  "currentLayout": [
+    {"version":"v1.6.23","sha256":"2d21a40bcda15fd9c1e6a692012f760c93e710a82e64a4d123ba803d7d1f719d"},
+    {"version":"v1.7.1","sha256":"e4d280c7ea6a522317ad7e7db638594bd65369b286fb63d34c887cc1e14ef15d"},
+    {"version":"v1.7.2","sha256":"bb2cb4e152c7b2eb1d54adb7553c69d59aef755b242d2cbf0c14e7472a8b4f65"}
+  ]
+}

@@ -1,0 +1,31 @@
+/* Stable LibTV reference frame for the assets workspace. */
+.app-workspace-shell:has(.assets-library-page) { position: relative; padding-top: 0 !important; }
+.app-workspace-shell:has(.assets-library-page)::before { display: none !important; }
+.assets-library-source-rail { position: absolute; z-index: 2; top: 0; right: 0; bottom: 0; width: 240px; border-left: 1px solid var(--user-border); background: var(--user-page-bg); }
+.assets-library-source-rail-inner { display: flex; flex-direction: column; gap: 4px; padding: 14px 12px; }
+.generation-history-page .assets-library-hero { min-height: 92px !important; }
+.generation-history-page .assets-library-hero .app-page-header { height: 64px !important; min-height: 64px !important; gap: 0; padding-bottom: 0 !important; }
+.generation-history-content { width: 100%; padding: 28px 0 32px; overflow: auto; }
+.generation-history-badge { position: absolute; top: 6px; left: 6px; padding: 1px 5px; border: 1px solid rgba(255,255,255,.32); border-radius: 4px; background: rgba(30,30,30,.55); color: rgba(255,255,255,.78); font-size: 10px; line-height: 16px; }
+.generation-history-duration { position: absolute; bottom: 6px; left: 6px; padding: 1px 5px; border-radius: 4px; background: rgba(30,30,30,.72); color: #fff; font-size: 10px; line-height: 16px; }
+.assets-empty-workspace .assets-empty-copy { position: relative; top: -19px; width: auto; margin: 0; flex-direction: column; gap: 10px; }
+.assets-empty-workspace .assets-empty-icon { width: 32px; height: 32px; border: 0; border-radius: 0; background: transparent; }
+.assets-empty-workspace .assets-empty-icon svg { width: 26px; height: 26px; stroke-width: 1.5; }
+.assets-empty-workspace .assets-empty-copy strong { position: relative; top: 8px; font-size: 14px; font-weight: 500; }
+.assets-empty-workspace .assets-empty-primary { position: relative; top: -14px; }
+.generation-history-card { cursor: pointer; transition: border-color .16s ease, transform .16s ease; }
+.generation-history-card:hover, .generation-history-card:focus-visible { border-color: rgba(255,255,255,.28); outline: none; transform: translateY(-1px); }
+.generation-history-preview { display: grid; gap: 14px; }
+.generation-history-preview-media { width: 100%; max-height: 320px; object-fit: contain; border-radius: 8px; background: #1f1f1f; }
+.generation-history-preview-meta { display: grid; gap: 4px; }
+.generation-history-preview-meta strong { font-size: 15px; font-weight: 500; }
+.generation-history-preview-meta span { color: color-mix(in srgb, var(--foreground) 50%, transparent); font-size: 12px; }
+.canvas-history-drawer .ant-drawer-content-wrapper { width: 460px !important; }
+.assets-generation-preview-drawer .ant-drawer-content-wrapper { width: 440px !important; }
+.assets-header-compact-button[aria-label="筛选资产"] { width: 38px; margin-left: -2px; }
+.assets-new-button, .assets-new-button.ant-btn { background: #fff !important; background-color: #fff !important; color: #171717 !important; border-color: rgba(255,255,255,.82) !important; }
+.assets-new-button:hover { background: var(--user-ink) !important; color: #111 !important; }
+@media (max-width: 720px) {
+    .assets-library-source-rail { display: none; }
+    .assets-library-page > div:first-child { width: 100% !important; padding-right: 16px !important; padding-left: 16px !important; }
+}

@@ -1,0 +1,87 @@
+{
+  "version": "v1.7.10",
+  "sourceDigest": "69db4bb1017a8e733c9b39cf3d9c42f7d9abcf65528ba7dc06b02841802394e5",
+  "budgetCNY": 0,
+  "spentCNY": 0,
+  "newSpentCNY": 0,
+  "pendingCNY": 0,
+  "liveMatrixStatus": "not_run_owner_waived",
+  "cases": [],
+  "releaseComplete": false,
+  "liveTestWaiver": {
+    "approvedBy": "Ender",
+    "instruction": "beeftv本次豁免 直接上线",
+    "scope": "seedance-display-names-only",
+    "evidence": [
+      "docs/release-evidence/v1.7.10-targeted.md"
+    ]
+  },
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.9",
+    "pendingCNY": null,
+    "evidence": [
+      "docs/release-evidence/v1.7.9.json",
+      "docs/release-evidence/v1.7.9-acceptance.json"
+    ]
+  },
+  "review": {
+    "result": "approved",
+    "independent": true,
+    "reviewer": "Independent Codex naming review; root independent release-gate review",
+    "sourceDigest": "69db4bb1017a8e733c9b39cf3d9c42f7d9abcf65528ba7dc06b02841802394e5",
+    "evidence": [
+      "docs/release-evidence/v1.7.10-targeted.md"
+    ]
+  },
+  "upgrade": {
+    "preservedData": true,
+    "sourceDigest": "69db4bb1017a8e733c9b39cf3d9c42f7d9abcf65528ba7dc06b02841802394e5",
+    "evidence": [
+      "docs/release-evidence/v1.7.10-targeted.md"
+    ]
+  },
+  "verification": {
+    "displayNames": {
+      "status": "passed",
+      "sourceDigest": "69db4bb1017a8e733c9b39cf3d9c42f7d9abcf65528ba7dc06b02841802394e5",
+      "method": "test",
+      "evidence": [
+        "docs/release-evidence/v1.7.10-targeted.md"
+      ]
+    },
+    "nativeNames": {
+      "status": "passed",
+      "sourceDigest": "69db4bb1017a8e733c9b39cf3d9c42f7d9abcf65528ba7dc06b02841802394e5",
+      "method": "native",
+      "evidence": [
+        "docs/release-evidence/v1.7.10-targeted.md"
+      ]
+    },
+    "localReleaseGate": {
+      "status": "passed",
+      "sourceDigest": "69db4bb1017a8e733c9b39cf3d9c42f7d9abcf65528ba7dc06b02841802394e5",
+      "method": "test",
+      "evidence": [
+        "docs/release-evidence/v1.7.10-targeted.md"
+      ]
+    },
+    "ci": {
+      "status": "passed",
+      "sourceDigest": "69db4bb1017a8e733c9b39cf3d9c42f7d9abcf65528ba7dc06b02841802394e5",
+      "method": "test",
+      "evidence": [
+        "https://github.com/glanderness/BeefTV/actions/runs/37611643951",
+        "https://github.com/glanderness/BeefTV/actions/runs/37611643913"
+      ]
+    }
+  },
+  "packages": {
+    "status": "pending_release_workflow",
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml"
+    ]
+  }
+}

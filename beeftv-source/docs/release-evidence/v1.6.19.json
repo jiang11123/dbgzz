@@ -1,0 +1,41 @@
+{
+  "version": "v1.6.19",
+  "sourceCommit": "593c283",
+  "sourceDigest": "d30b10a16ba02e1ba7a66d8bcdc0c7c7b8ce5c81e4747555e776114b81bf69b6",
+  "budgetCNY": 50,
+  "spentCNY": 24.814388,
+  "pendingCNY": 0,
+  "priorSpentCNY": 24.254388,
+  "thisReleaseSpentCNY": 0.56,
+  "liveTestWaiver": {
+    "approvedBy": "Ender",
+    "instruction": "发布吧",
+    "approvedDate": "2026-10-01",
+    "scope": "Only v1.6.19 remaining paid generation matrix, following the explicit foreground acceptance versus release-waiver choice. No claim of twelve-case acceptance."
+  },
+  "cases": [{
+    "round": 1,
+    "path": "text-image",
+    "taskId": "dde6051e61dada4d7289d08934f14df2",
+    "providerRequestId": "evt-ZUIHCXWRIQZB",
+    "clientVersion": "v1.6.19",
+    "platform": "darwin-arm64",
+    "status": "succeeded",
+    "billing": "settled",
+    "costCNY": 0.56,
+    "note": "Submitted from candidate 7592b75 before matrix waiver; later changes only concern release gate and evidence. Not a complete matrix."
+  }],
+  "upgrade": {
+    "preservedData": true,
+    "retainedIDs": {"tasks": true, "canvas_projects": true, "resources": true}
+  },
+  "review": {"reviewer": "Independent Codex review_beeftv_video", "result": "approved"},
+  "verification": {
+    "localReleaseGate": "passed",
+    "errorRegression": "passed",
+    "goErrorTests": "generation and app delivery/quota/protocol error tests passed",
+    "webErrorTests": "63 tests passed, 746 assertions",
+    "realGenerationMatrix": "WAIVED, not completed",
+    "runtimeObservation": "Candidate started with existing data. Background automation encountered a 404 during parameter editing; restarted successfully. Cause was not established and full client matrix was not completed."
+  }
+}

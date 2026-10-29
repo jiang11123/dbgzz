@@ -1,90 +1,61 @@
-# 豆包工作站 2.0（dbgzz）
+# 豆奶画布 3.0
 
-<img src="build/icon.png" width="96" height="96" alt="奶蛙老师头像 Logo" />
+<img src="build/icon.png" width="112" height="112" alt="豆奶画布 · 奶蛙老师" />
 
-面向 Windows 的本地豆包多账号工作站，支持独立登录会话、统一文字聊天、图片/视频生成、素材管理，以及本地 OpenAI 兼容 API 网关。
+面向 Windows 的本地 AI 创作画布，把文字、图片、视频、素材和豆包多账号放在同一个工作区。由奶蛙课堂维护，基于 BeefTV 二次开发；非豆包或 BeefTV 官方产品。
 
-这是第三方桌面工具，非豆包官方产品。需要自行登录豆包，实际模型、额度和生成能力以登录账号的豆包页面为准。
+**[下载最新版](https://github.com/jiang11123/dbgzz/releases/latest) · [使用教程](docs/user-guide.md) · [更新记录](CHANGELOG.md) · [来源与许可](NOTICE.md)**
 
-**[下载安装包](https://github.com/jiang11123/dbgzz/releases) · [完整使用教程](docs/user-guide.md) · [更新记录](CHANGELOG.md)**
+## 下载安装
 
-## Dola 修复版（2.0.3）
+1. 打开 [Releases](https://github.com/jiang11123/dbgzz/releases/latest)，下载 `dounai-canvas-Setup-3.0.0-x64.exe`。
+2. 退出旧程序后运行安装包，从桌面打开“豆奶画布”。普通用户无需安装 Node.js、Go 或其他开发工具。
+3. 点击主页左上角的豆包账号按钮，选择“添加豆包账号（扫码）”，完成登录。
+4. 新建画布，添加原始文字、图片或视频节点，在模型选择器中选择豆包账号，或使用自行配置的 API 模型。
 
-[下载 Dola 修复验证版](https://github.com/jiang11123/dbgzz/releases/tag/v2.0.3)。恢复“添加账号 → 豆包 / Dola”平台选择，并将 Dola 文字对话接入现有统一聊天窗口、发送账号选择和历史会话。
+本次提供 Windows x64 安装版。安装包不包含作者的登录会话、密钥或项目数据，目前没有发布者代码签名。
 
-203 项测试及隔离测试站点的多轮聊天验证通过，最终程序启动检查通过。**真实 Dola 发送测试仍返回地区不可用，尚未取得真实模型回复。** Dola 图片、视频、附件及深度思考控制尚未接入；豆包原有媒体功能保留。本地 OpenAI 兼容 API 仍使用豆包账号。
+## 主要功能
 
-2.0.3 已正式发布，提供安装包和使用独立数据目录的便携版。详见 [2.0.3 发布说明](docs/releases/2.0.3.md) 和 [验证记录](docs/dola-2.0-verification.md)。
-
-## 2.0 功能
-
-| 功能 | 使用入口 |
+| 功能 | 使用方式 |
 | --- | --- |
-| 多账号独立登录、切换和管理 | 顶部账号标签、“添加账号”、“设置” |
-| 文字聊天、深度思考、流式 Markdown、历史会话 | “网关模式”聊天区 |
-| 图片生成与参考图片 | “图片模式”、添加文件按钮、图片资产栏 |
-| 视频生成、模型/比例/时长设置、确认与补充文字 | “视频模式”及当前会话输入框 |
-| 图片/视频保存及视频尾帧提取 | 生成结果卡片 |
-| 下载目录、账号快捷键 | “设置” |
-| 日间/夜间主题 | 顶部主题按钮 |
-| 本地文字及图片 API、账号池状态和日志 | “网关设置” |
+| 文字、图片、视频与素材画布 | 新建画布，添加节点并连接上下游 |
+| 豆包多账号 | 左上角账号管理中扫码添加、查看状态和管理账号 |
+| 原始节点调用豆包 | 在节点的模型选择器中选择“豆包账号” |
+| 独立豆包文字、图片、视频节点 | 默认隐藏；在添加豆包账号附近开启“显示独立豆包节点” |
+| 自定义 API 模型 | “模型配置”中添加渠道；豆包账号与 API 默认模型分开 |
+| 软件更新 | 正式安装版启动时及每 15 分钟检查，左下角下载并安装 |
 
-## 下载与安装
+豆包页面模型、额度、登录状态、验证码和网络都会影响生成。软件内标注“正在开发”的入口及上游模型不可用的能力，不代表已经支持。Grok 图片编辑可用性仍取决于所配上游权限。
 
-1. 从 [Releases](https://github.com/jiang11123/dbgzz/releases) 下载 `dbgzz-Setup-2.0.3-x64.exe`。
-2. 运行安装程序，选择目录，再从桌面打开“豆包工作站”。普通用户不需要安装 Node.js。
-3. 点击账号标签完成豆包登录，或点击“添加账号”创建独立会话。
-4. 切回“网关模式”开始文字聊天；按需启用图片或视频模式。
+## 升级与本地数据
 
-安装包不含作者的账号、登录状态或素材。目前安装包未签名，Windows 可能显示发布者未知，请确认下载来源。
+“豆奶画布”沿用原“豆包工作站”的应用标识和 `doubao-video-workspace` 数据目录。升级前请退出旧程序，备份用户数据目录与下载素材，再覆盖安装；不要先删除旧数据。
 
-旧版升级前请退出程序并备份完整用户数据目录及下载文件，然后运行新版安装包。不要先清除旧数据。见 [安装、升级与使用教程](docs/user-guide.md)。
+已经下载旧版的用户需先手动安装本版本，之后才能接收软件内的更新提示。更新需要联网连接 GitHub；发布者修改本地代码或仅推送源码不会触发客户端升级。[自动更新与发布说明](docs/automatic-updates.md)。
 
-## 本地 API 接入
+2.0 系列及 Dola 修复版保留在 [历史版本](https://github.com/jiang11123/dbgzz/releases)。3.0 的操作方式以 [当前教程](docs/user-guide.md) 为准；[2.0 教程归档](docs/archive/2.0-user-guide.md) 供历史版本使用。
 
-保持工作站运行且至少一个豆包账号正常登录。打开“网关设置”，复制实际地址和 API Key 到本机 OpenAI 兼容客户端：
+## 源码与构建
 
-| 配置 | 默认值 / 来源 |
-| --- | --- |
-| Base URL | `http://127.0.0.1:8788/v1`，以界面显示为准 |
-| API Key | 首次自动生成，从网关设置复制 |
-| 文字模型 | `doubao`；深度思考使用 `doubao-think` |
-| 模型列表 | `GET /v1/models` |
-| 文字对话 | `POST /v1/chat/completions`，支持流式 |
-| 图片生成 | `POST /v1/images/generations` |
+Electron 宿主位于 `src/`，对应的画布、Go 后端、Agent 和协议源码位于 `beeftv-source/`，无需从上游仓库取得另一个未发布分支。大型运行时和安装包通过 Releases 分发。
 
-这是部分 OpenAI 格式兼容接口，不保证全部接口或参数兼容。HTTP 视频生成尚未接入运行时回调，请用桌面“视频模式”。`doubao-pro`、`doubao-lite` 等是工具的模式别名，不表示独立官方模型权限。接入示例见 [教程](docs/user-guide.md#本地-api-接入)。
-
-## 从源码运行
-
-建议 Windows x64、Node.js 22 与 npm。原生依赖构建可能需要 Visual Studio Build Tools（C++ 桌面开发）及 Python。
+源码构建需要 Node.js 22、npm、Bun、Go 1.25+、支持 CGO 的 Windows C 编译器及 Agent/媒体运行时。阅读 [构建说明](docs/build-3.0.md)，普通使用者直接下载安装包即可。
 
 ```powershell
 git clone https://github.com/jiang11123/dbgzz.git
 cd dbgzz
 npm ci
-npm run rebuild
+cd beeftv-source/web
+bun install --frozen-lockfile
+cd ../..
+npm run build:beeftv
 npm run build
-npm start
+npm run local
 ```
 
-```powershell
-npm run dev          # 开发模式
-npm run typecheck    # 主进程与界面类型检查
-npm test             # 编译后运行主进程与界面测试
-npm run package:win  # 构建 release/ 下的 Windows x64 安装包
-```
+## 来源与反馈
 
-## 本地数据与限制
-
-- 登录会话、数据库、素材和设置保存在本机 Electron 用户数据目录，不随仓库和安装包分发。定位与备份见 [教程](docs/user-guide.md#备份与升级)。
-- API 网关默认仅监听本机 `127.0.0.1`；旧画布桥接使用本机 `3219`，尚未统一 API Key 鉴权，请勿通过代理或端口映射公开。
-- 网页结构、网络、验证码、额度和链接有效期可能影响运行，不能保证所有模型、时长、分辨率及无水印下载始终可用。Video2X 视频超分已移除。
-- 当前未附开源许可证；公开源码不等于授予任意再分发或商业使用许可。
-
-## 更新与反馈
-
-- [完整更新记录](CHANGELOG.md)：保留 0.1.x 历史和 2.0 更新。
-- [2.0.2 发布说明](docs/releases/2.0.2.md)：验证范围、已知限制及升级提醒。
-- [提交问题](https://github.com/jiang11123/dbgzz/issues)：提供版本、系统、步骤、错误文本和脱敏截图，请勿上传密码、Cookie、API Key 或完整数据目录。
-- [历史设计与执行记录](docs/2.0-execution-log.md)：供开发追溯，当前操作以使用教程为准。
+- [来源与修改说明](NOTICE.md)、[BeefTV 许可](beeftv-source/LICENSE)、[第三方许可](beeftv-source/THIRD_PARTY_NOTICES.md)。保留原有许可和署名，不扩大上游授予的权利。
+- [提交问题](https://github.com/jiang11123/dbgzz/issues)：提供版本、系统、操作步骤和脱敏截图，请勿上传密码、Cookie、API Key 或完整用户数据目录。
+- 本地网关供同机客户端使用，请勿将内部端口直接暴露到公网。

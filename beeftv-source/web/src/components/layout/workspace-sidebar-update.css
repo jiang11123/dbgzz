@@ -1,0 +1,371 @@
+.app-workspace-sidebar-utility-row {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+}
+
+.app-workspace-sidebar-contact-row {
+    display: flex;
+    min-height: 36px;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.app-workspace-sidebar-contact-row:not(.is-collapsed),
+.app-workspace-sidebar-utility-row:not(.is-collapsed) {
+    padding-inline: 2px 4px;
+}
+
+.app-workspace-sidebar-contact-row.is-collapsed {
+    justify-content: center;
+}
+
+.app-workspace-sidebar-utility-row:not(.is-collapsed) {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0;
+}
+
+.app-workspace-sidebar-utility-row:not(.is-collapsed) > .app-workspace-update {
+    grid-column: 1 / span 4;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+}
+
+.app-workspace-sidebar-utility-row:not(.is-collapsed) .app-workspace-update-version {
+    grid-column: 1 / span 3;
+    padding-left: 10px;
+}
+
+.app-workspace-sidebar-utility-row:not(.is-collapsed) .app-workspace-update-progress {
+    grid-column: 4;
+    justify-self: center;
+    margin-left: 0;
+}
+
+.app-workspace-sidebar-utility-row.is-collapsed {
+    flex-direction: column;
+}
+
+.app-workspace-social-links {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    justify-items: center;
+    align-items: center;
+}
+
+.app-workspace-sidebar-contact-row.is-collapsed .app-workspace-social-links {
+    display: flex;
+    width: auto;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.app-workspace-sidebar-utility-row:not(.is-collapsed) > .app-workspace-theme-action {
+    grid-column: 5;
+    justify-self: center;
+    align-self: start;
+    margin-top: 2px;
+}
+
+.app-workspace-update {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.app-workspace-update.is-collapsed {
+    flex: none;
+}
+
+.app-workspace-update-version {
+    display: inline-flex;
+    min-width: 0;
+    min-height: 36px;
+    align-items: center;
+    border: 0;
+    border-radius: var(--r-md);
+    padding: 0 8px;
+    background: transparent;
+    color: var(--user-ink-muted, var(--foreground));
+    cursor: pointer;
+    font-size: var(--fs-caption);
+    font-variant-numeric: tabular-nums;
+    text-align: left;
+}
+
+.app-workspace-update.is-collapsed .app-workspace-update-version {
+    display: none;
+}
+
+.app-workspace-update-version:hover,
+.app-workspace-update-version:focus-visible,
+.app-workspace-update-action:hover,
+.app-workspace-update-action:focus-visible,
+.app-workspace-social-action:hover,
+.app-workspace-social-action:focus-visible,
+.app-workspace-theme-action:hover,
+.app-workspace-theme-action:focus-visible {
+    background: var(--user-surface-hover, color-mix(in srgb, var(--foreground) 8%, transparent));
+    color: var(--user-ink, var(--foreground));
+}
+
+.app-workspace-update-progress {
+    position: relative;
+    display: flex;
+    flex: none;
+    margin-left: auto;
+}
+
+.app-workspace-update-action,
+.app-workspace-social-action,
+.app-workspace-theme-action {
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: var(--r-md);
+    padding: 0;
+    background: transparent;
+    color: var(--user-ink-muted, var(--foreground));
+    cursor: pointer;
+}
+
+.app-workspace-social-action svg {
+    width: 16px;
+    height: 16px;
+}
+
+.app-workspace-github-tooltip .ant-tooltip-inner {
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 7px 10px;
+    background: var(--popover);
+    box-shadow: var(--elevation-overlay);
+}
+
+.app-workspace-github-tooltip .ant-tooltip-arrow::before {
+    background: var(--popover);
+}
+
+.app-workspace-github-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--user-ink, var(--foreground));
+    font-size: var(--fs-caption);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.app-workspace-github-hint svg {
+    width: 13px;
+    height: 13px;
+    flex: none;
+    fill: currentColor;
+}
+
+.app-workspace-wechat-popover .ant-popover-inner {
+    padding: 8px;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.app-workspace-donation-popover .ant-popover-container {
+    padding: 12px;
+    border-radius: var(--r-lg);
+    background: var(--popover);
+    color: var(--foreground);
+}
+
+.app-workspace-wechat-popover .ant-popover-inner-content img {
+    display: block;
+    width: 180px;
+    height: 180px;
+}
+
+.app-workspace-donation-content {
+    width: 328px;
+    max-width: calc(100vw - 40px);
+    text-align: center;
+}
+
+.app-workspace-donation-content p {
+    margin: 4px 0 12px;
+    color: var(--foreground);
+    font-size: 14px;
+    line-height: 22px;
+}
+
+.app-workspace-donation-content img {
+    display: block;
+    width: 220px;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+}
+
+.app-workspace-update-action.has-update:not(.is-busy) {
+    color: var(--user-accent, var(--primary));
+}
+
+.app-workspace-update-action.is-busy {
+    cursor: default;
+}
+
+.app-workspace-update-version:focus-visible,
+.app-workspace-update-action:focus-visible,
+.app-workspace-social-action:focus-visible,
+.app-workspace-theme-action:focus-visible {
+    outline: 2px solid var(--user-accent, var(--ring));
+    outline-offset: 2px;
+}
+
+.app-workspace-update-progress-bar {
+    position: absolute;
+    right: 0;
+    bottom: -3px;
+    left: 0;
+    overflow: hidden;
+    height: 3px;
+    border-radius: var(--r-full);
+    background: var(--user-border, color-mix(in srgb, var(--foreground) 12%, transparent));
+}
+
+.app-workspace-update-progress-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--user-accent, var(--primary));
+    transition: width 160ms ease;
+}
+
+.app-workspace-update-progress-bar.is-paused > span {
+    background: var(--user-ink-soft, var(--muted-foreground));
+}
+
+.app-workspace-update-status {
+    grid-column: 1 / -1;
+    position: relative;
+    display: flex;
+    min-width: 0;
+    min-height: 36px;
+    flex: 1 0 100%;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1px;
+    padding: 4px 8px 7px;
+    color: var(--user-ink, var(--foreground));
+    cursor: default;
+    box-sizing: border-box;
+}
+
+.app-workspace-update-popover .ant-popover-container {
+    width: 208px;
+    max-width: calc(100vw - 24px);
+    padding: 4px;
+    background: var(--popover);
+    color: var(--foreground);
+}
+
+.app-workspace-update-status-title {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 5px;
+    font-size: var(--fs-caption);
+    line-height: 16px;
+}
+
+.app-workspace-update-diagnostics {
+    align-self: flex-start;
+    margin-top: 4px;
+    padding: 3px 0;
+    color: var(--user-accent, var(--primary));
+    font-size: var(--fs-caption);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.app-workspace-update-diagnostics:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+}
+
+.app-workspace-update-status-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.app-workspace-update-status-percent {
+    margin-left: auto;
+    color: var(--user-ink-muted, var(--muted-foreground));
+    font-variant-numeric: tabular-nums;
+}
+
+.app-workspace-update-status-detail {
+    color: var(--user-ink-muted, var(--muted-foreground));
+    font-size: var(--fs-label);
+    font-variant-numeric: tabular-nums;
+    line-height: 14px;
+    overflow-wrap: anywhere;
+    text-wrap: pretty;
+}
+
+.app-workspace-update-status.is-action {
+    border: 0;
+    border-radius: var(--r-md);
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.app-workspace-update-status.is-action:hover,
+.app-workspace-update-status.is-action:focus-visible {
+    background: var(--user-surface-hover, color-mix(in srgb, var(--foreground) 8%, transparent));
+}
+
+.app-workspace-update-status.is-action:focus-visible {
+    outline: 2px solid var(--user-accent, var(--ring));
+    outline-offset: 2px;
+}
+
+.app-workspace-update-status-icon {
+    width: 13px;
+    height: 13px;
+    flex: none;
+    color: var(--user-accent, var(--primary));
+}
+
+.app-workspace-update-status.is-paused .app-workspace-update-status-detail {
+    white-space: normal;
+    text-wrap: balance;
+}
+
+.app-workspace-update-status .app-workspace-update-progress-bar {
+    right: 8px;
+    bottom: 2px;
+    left: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-workspace-update-progress-bar > span,
+    .app-workspace-update-action .animate-spin {
+        animation: none;
+        transition: none;
+    }
+}

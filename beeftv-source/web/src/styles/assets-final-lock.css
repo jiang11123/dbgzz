@@ -1,0 +1,32 @@
+/* Final asset-page reference lock. This file intentionally owns only the
+   LibTV geometry and does not depend on the mutable global shell. */
+.app-workspace-shell:has(.assets-library-page) { position: relative; padding-top: 0 !important; }
+.app-workspace-shell:has(.assets-library-page)::before { display: none !important; }
+.app-workspace-shell:has(.assets-library-page) .app-workspace-main-row { position: relative; z-index: 1; }
+.app-workspace-shell:has(.assets-library-page) .app-workspace-stage,
+.app-workspace-shell:has(.assets-library-page) .app-user-content { background: var(--user-page-bg) !important; }
+.app-workspace-shell:has(.assets-library-page) .assets-library-source-rail { background: var(--user-page-bg) !important; border-left-color: var(--user-border) !important; }
+.app-workspace-shell:has(.assets-library-page) .assets-library-source-rail-item.is-active { background: var(--user-surface-hover) !important; }
+.assets-header-compact-button[aria-label="筛选资产"] { width: 38px; margin-left: -2px; }
+.assets-library-page .assets-library-grid:not(.is-list-view) {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+@media (max-width: 1199px) {
+    .assets-library-page .assets-library-grid:not(.is-list-view) {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+@media (max-width: 899px) {
+    .assets-library-page .assets-library-grid:not(.is-list-view) {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+@media (max-width: 559px) {
+    .assets-library-page .assets-library-grid:not(.is-list-view) {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}
+@media (max-width: 720px) {
+    .assets-library-source-rail { display: none; }
+    .assets-library-page > div:first-child { width: 100% !important; padding-right: 16px !important; padding-left: 16px !important; }
+}

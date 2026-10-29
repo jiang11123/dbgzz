@@ -1,0 +1,221 @@
+{
+  "version": "v1.7.18",
+  "sourceDigest": "b6b9a44482c0d6e6c43f125dc2acb04150f113e5105edfe3ec5b5e786e3e0b67",
+  "ownerException": {
+    "scope": "fal-h3-targeted-20261013",
+    "approvedBy": "Ender",
+    "instruction": "本版采用 H3 专项验收（推荐）",
+    "evidence": [
+      "docs/release-evidence/v1.7.18-targeted.md#owner-授权"
+    ]
+  },
+  "releaseAuthorization": {
+    "approvedBy": "Ender",
+    "instruction": "继续上线（推荐）；本版采用 H3 专项验收（推荐）",
+    "additionalHumanReplyRequired": false,
+    "scope": "v1.7.18 only"
+  },
+  "paidSubmissionLimit": 5,
+  "cases": [],
+  "billingAttempts": [],
+  "budgetCNY": null,
+  "spentCNY": null,
+  "pendingCNY": null,
+  "newSpentCNY": null,
+  "newPendingCNY": null,
+  "liveMatrixStatus": "not_run_owner_waived",
+  "agentAcceptanceStatus": "not_run_owner_waived",
+  "acceptanceComplete": false,
+  "priorH3Canaries": [
+    {
+      "id": "text-768p",
+      "method": "production-go-test",
+      "executedSourceDigest": "1eca0cde63aaa9d09431465f997c9959d523ca2cda60cb8dcf00e132a6f55f50",
+      "model": "minimax-h3-max-turbo",
+      "resolution": "768p",
+      "seconds": 3,
+      "status": "succeeded",
+      "providerRequestId": "01a1343d-8b34-7583-a06f-8bbec5ee2072",
+      "artifactSHA256": "deb570f12715ab57b1417cff9d8db68c4a9c144a7a81cacb15387ac12c47ca76",
+      "evidence": [
+        "docs/fal-h3-max-turbo.md",
+        "docs/release-evidence/v1.7.18-review.md#四条既有上游测试与预算"
+      ]
+    },
+    {
+      "id": "first-last-480p",
+      "method": "production-go-test",
+      "executedSourceDigest": "1eca0cde63aaa9d09431465f997c9959d523ca2cda60cb8dcf00e132a6f55f50",
+      "model": "minimax-h3-max-turbo",
+      "resolution": "480p",
+      "seconds": 3,
+      "status": "succeeded",
+      "providerRequestId": "01a1343e-0c99-78e2-a261-92f142c460b3",
+      "artifactSHA256": "05203144511a240014d4496dd3f0b2236e8bb39b5095d80216c4f167e8df5f61",
+      "evidence": [
+        "docs/fal-h3-max-turbo.md",
+        "docs/release-evidence/v1.7.18-review.md#四条既有上游测试与预算"
+      ]
+    },
+    {
+      "id": "last-only-1080p",
+      "method": "production-go-test",
+      "executedSourceDigest": "1eca0cde63aaa9d09431465f997c9959d523ca2cda60cb8dcf00e132a6f55f50",
+      "model": "minimax-h3-max-turbo",
+      "resolution": "1080p",
+      "seconds": 3,
+      "status": "succeeded",
+      "providerRequestId": "01a1343e-8652-7c43-a06a-3e01c6c3c490",
+      "artifactSHA256": "54a17150d428342b70df14563c698a01d516d74a247409bc5badcfa6368ce27e",
+      "evidence": [
+        "docs/fal-h3-max-turbo.md",
+        "docs/release-evidence/v1.7.18-review.md#四条既有上游测试与预算"
+      ]
+    },
+    {
+      "id": "pinned-audio-768p",
+      "method": "production-go-test",
+      "executedSourceDigest": "1eca0cde63aaa9d09431465f997c9959d523ca2cda60cb8dcf00e132a6f55f50",
+      "model": "minimax-h3-max-turbo",
+      "resolution": "768p",
+      "seconds": 3,
+      "status": "succeeded",
+      "providerRequestId": "01a1343f-048b-7a70-8f9a-41de9ebd56c0",
+      "artifactSHA256": "de386d3575afd7120dab4e186d0985fa18bec98de4b505dccfa7e33dedbde244",
+      "evidence": [
+        "docs/fal-h3-max-turbo.md",
+        "docs/release-evidence/v1.7.18-review.md#四条既有上游测试与预算"
+      ]
+    }
+  ],
+  "h3Funding": {
+    "budgetCNY": 20,
+    "reservedUpperCNY": 7.10326,
+    "supplierInvoiceConfirmed": false,
+    "supplierBillingReadHTTPStatus": 403,
+    "evidence": [
+      "docs/release-evidence/v1.7.18-review.md#四条既有上游测试与预算"
+    ],
+    "inferenceRequestIds": [
+      "01a1343d-8b34-7583-a06f-8bbec5ee2072",
+      "01a1343e-0c99-78e2-a261-92f142c460b3",
+      "01a1343e-8652-7c43-a06a-3e01c6c3c490",
+      "01a1343f-048b-7a70-8f9a-41de9ebd56c0",
+      "01a134e7-11e4-70c2-9633-066bc9bf0de2"
+    ]
+  },
+  "productionH3": {
+    "sourceDigest": "b6b9a44482c0d6e6c43f125dc2acb04150f113e5105edfe3ec5b5e786e3e0b67",
+    "evidence": [
+      "docs/release-evidence/v1.7.18-review.md#原生生产验证"
+    ],
+    "method": "native-cli",
+    "clientVersion": "v1.7.18",
+    "model": "minimax-h3-max-turbo",
+    "resolution": "768p",
+    "seconds": 3,
+    "status": "succeeded",
+    "billing": "settled",
+    "billingMarket": "enterprise",
+    "costCNY": 0.73239,
+    "canvasVerified": true,
+    "saved": true,
+    "reopened": true,
+    "mediaDecoded": true,
+    "mediaOpened": true,
+    "noDuplicateSubmission": true,
+    "taskId": "44bc325478c3545cbe26dd1e1568b299",
+    "gatewayTaskId": "task_HjRhMw3u0RzTydJfg6ggkwlMQuAClfIy",
+    "providerRequestId": "01a134e7-11e4-70c2-9633-066bc9bf0de2",
+    "artifactSHA256": "844d60c3d74d85f2c175ec0e7aa372abd37c2d1eed92de95893d35ff8081f1e5"
+  },
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.17",
+    "pendingCNY": null,
+    "evidence": [
+      "docs/release-evidence/v1.7.17.json"
+    ]
+  },
+  "review": {
+    "result": "approved",
+    "independent": true,
+    "reviewer": "Grok Companion",
+    "sourceDigest": "b6b9a44482c0d6e6c43f125dc2acb04150f113e5105edfe3ec5b5e786e3e0b67",
+    "evidence": [
+      "docs/release-evidence/v1.7.18-review.md#独立复核与确定性检查"
+    ]
+  },
+  "upgrade": {
+    "preservedData": true,
+    "sourceDigest": "b6b9a44482c0d6e6c43f125dc2acb04150f113e5105edfe3ec5b5e786e3e0b67",
+    "evidence": [
+      "docs/release-evidence/v1.7.18-review.md#原生生产验证"
+    ]
+  },
+  "verification": {
+    "h3Catalog": {
+      "status": "passed",
+      "sourceDigest": "b6b9a44482c0d6e6c43f125dc2acb04150f113e5105edfe3ec5b5e786e3e0b67",
+      "evidence": [
+        "docs/release-evidence/v1.7.18-review.md"
+      ]
+    },
+    "h3KeyframesAudio": {
+      "status": "passed",
+      "sourceDigest": "b6b9a44482c0d6e6c43f125dc2acb04150f113e5105edfe3ec5b5e786e3e0b67",
+      "evidence": [
+        "docs/release-evidence/v1.7.18-review.md"
+      ]
+    },
+    "nativeCanvasDelivery": {
+      "status": "passed",
+      "sourceDigest": "b6b9a44482c0d6e6c43f125dc2acb04150f113e5105edfe3ec5b5e786e3e0b67",
+      "evidence": [
+        "docs/release-evidence/v1.7.18-review.md"
+      ]
+    },
+    "noDuplicateSubmission": {
+      "status": "passed",
+      "sourceDigest": "b6b9a44482c0d6e6c43f125dc2acb04150f113e5105edfe3ec5b5e786e3e0b67",
+      "evidence": [
+        "docs/release-evidence/v1.7.18-review.md"
+      ]
+    },
+    "localReleaseGate": {
+      "status": "passed",
+      "sourceDigest": "b6b9a44482c0d6e6c43f125dc2acb04150f113e5105edfe3ec5b5e786e3e0b67",
+      "evidence": [
+        "docs/release-evidence/v1.7.18-review.md"
+      ]
+    },
+    "ci": {
+      "status": "passed",
+      "sourceDigest": "b6b9a44482c0d6e6c43f125dc2acb04150f113e5105edfe3ec5b5e786e3e0b67",
+      "evidence": [
+        "docs/release-evidence/v1.7.18-review.md"
+      ]
+    }
+  },
+  "packages": {
+    "platforms": [
+      "darwin-arm64",
+      "darwin-amd64",
+      "windows-amd64",
+      "linux-amd64"
+    ],
+    "status": "pending_release_workflow",
+    "archives": null,
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "linuxNativeWindowBeforeUpload": true,
+    "signedManifestBeforePublish": true,
+    "publicReadbackAfterPublish": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml",
+      "docs/release-evidence/v1.7.18-review.md#证据与发布边界"
+    ]
+  },
+  "releasePublished": false,
+  "releaseComplete": false
+}

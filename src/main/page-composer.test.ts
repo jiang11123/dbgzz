@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
-import { composerSettingsScript, clickComposerSend } from './page-composer';
+import { composerSettingsScript, videoDurationPanelScript, selectDoubaoVideoSettings, clickComposerSend } from './page-composer';
 
 for (const accepts of [true, false]) {
   test(`send chooses the real button over a sidebar title; accepted=${accepts}`, async () => {
@@ -102,4 +102,39 @@ test('an unknown skill chip reports other instead of guessing video', () => {
 test('video placeholder counts as video mode only without a skill chip', () => {
   assert.equal(settings({ placeholder: '描述你想要的视频' }).mode, 'video');
   assert.equal(settings({ chip: '图像生成', placeholder: '描述你想要的视频' }).mode, 'image');
+});
+
+
+test('reads duration and ratio from a combined native video toolbar label', () => {
+  const result = settings({chip:'视频生成',buttons:[{text:'16:9 · 5s'},{text:'模型 Seedance 2.0 Fast'}]});
+  assert.equal(result.duration,5); assert.equal(result.ratio,'16:9');
+});
+
+for (const ignoresKeys of [false,true]) {
+  test('native indexed slider applies and verifies 5 seconds; ignored='+ignoresKeys, async () => {
+    let index=6; const keys:string[]=[];
+    const view={webContents:{isDestroyed:()=>false,
+      executeJavaScript:async(script:string)=>{
+        if(script===videoDurationPanelScript)return {minSec:4,maxSec:15,minIndex:0,maxIndex:11,index,currentSec:index+4};
+        if(script===composerSettingsScript)return {mode:'video',duration:index+4,ratio:'16:9'};
+        return true;
+      },sendInputEvent:(event:{type:string;keyCode:string})=>{
+        if(event.type!=='keyDown')return;keys.push(event.keyCode);
+        if(!ignoresKeys&&event.keyCode==='Home')index=0;
+        if(!ignoresKeys&&event.keyCode==='Right')index++;
+      },
+    }};
+    const result=selectDoubaoVideoSettings(view as any,{duration:5});
+    if(ignoresKeys)await assert.rejects(result,/要求 5 秒，豆包实际为 10 秒/);
+    else {await result;assert.equal(index,1);}
+    assert.deepEqual(keys,['Home','Right','Escape']);
+  });
+}
+
+test('unsupported native duration stops rather than silently clamping', async () => {
+  const keys:string[]=[];
+  const view={webContents:{isDestroyed:()=>false,executeJavaScript:async()=>({minSec:4,maxSec:15,minIndex:0,maxIndex:11,index:6,currentSec:10}),
+    sendInputEvent:(e:{type:string;keyCode:string})=>{if(e.type==='keyDown')keys.push(e.keyCode);}}};
+  await assert.rejects(selectDoubaoVideoSettings(view as any,{duration:20}),/不支持 20 秒/);
+  assert.deepEqual(keys,['Escape']);
 });

@@ -1,0 +1,197 @@
+BeefTV licensing
+================
+
+Part A: BeefTV Source Available License 1.0
+-----------------------------------------
+
+Copyright (c) 2026 @beefnoode and BeefTV contributors
+Commercial authorization: lucas@bf-labs.cn
+
+1. Scope and existing rights
+
+This Part A applies to new, original BeefTV-authored material first made
+available under this license, starting with the commit that introduces it,
+and to subsequent original contributions submitted under it, unless an
+applicable file or component notice states otherwise. "Covered Material"
+means only those portions that their copyright holders are entitled to
+license under this Part A. A "Licensor" is a copyright holder or authorized
+representative granting rights in Covered Material.
+
+Material previously made available under MIT remains available under MIT.
+This includes the existing material in commits
+a96baf082f478901ed558c91a80bc29dfade523c and
+2327ee2d80282b10dd8bef0f26b48990d46f5c3b, as well as any other material
+previously published under MIT. The original MIT text and copyright notices
+are retained in Part B. Part A does not revoke, replace, or restrict those
+existing permissions, even when that material is included in a later release.
+In a file containing both historical material and new original additions,
+Part A applies only to eligible new additions, not the historical material.
+
+Third-party code, dependencies, models, fonts, assets, and other independently
+licensed material are excluded from Covered Material and retain their own
+terms. Material whose distribution must be governed by GPL or another
+incompatible license is also excluded. This exclusion does not by itself
+establish that a combined distribution is compatible: distributors must
+satisfy all applicable licenses and must not make incompatible combinations
+without obtaining the necessary compatible permissions. See NOTICE and
+THIRD_PARTY_NOTICES.md.
+
+2. Definitions
+
+"Your Organization" means your own legal entity and persons acting solely
+for its internal purposes under its direction. Customers, affiliates, and
+other independent entities are not automatically part of Your Organization.
+
+"Derivative Work" means a work that is legally a derivative of Covered
+Material. Independent implementations, mere API compatibility, and outputs
+do not become Derivative Works solely because they interact with BeefTV.
+
+"External Service" means giving a third party access to operate, interact
+with, or invoke Covered Material or a Derivative Work, including through a
+hosted application, managed service, remote desktop, or API. Delivering
+creative outputs alone is not an External Service.
+
+3. Permitted use
+
+Subject to these terms, each Licensor grants you a worldwide, non-exclusive,
+royalty-free copyright license to use, copy, and modify Covered Material for
+personal use, study, research, and Your Organization's internal work,
+including commercial work and creative work performed for clients.
+
+You may self-host and privately modify it for those purposes. This Part A
+does not require publication of internal modifications; independent
+third-party license obligations still apply.
+
+You may commercially use and deliver your creative outputs, including videos,
+images, audio, and other content. The Licensors claim no ownership of your
+original content merely because you used BeefTV. This does not grant rights
+in pre-existing software, templates, models, or third-party material included
+in an output, or determine whether an AI output is protected by copyright.
+
+4. Community distribution
+
+You may distribute Covered Material and Derivative Works, in source or binary
+form, without commercial consideration, provided that you:
+
+(a) include this license and applicable copyright, source, and third-party
+    notices;
+(b) provide the covered portions under this same Part A, without removing
+    recipients' rights under it;
+(c) identify your changes and distinguish modified versions from official
+    releases; and
+(d) do not carry out an activity requiring authorization under section 5.
+
+This does not change the license of separable independent work or excluded
+material. It does not require your private modifications to be published.
+
+5. Activities requiring separate written authorization
+
+Unless separately authorized in writing by the relevant rights holders or
+their authorized representatives, you may not:
+
+(a) sell, rent, license for a fee, or otherwise supply Covered Material or a
+    Derivative Work for commercial consideration, whether standalone,
+    rebranded, white-labeled, embedded, or bundled with another offering;
+(b) charge a third party for installing, deploying, migrating, customizing
+    and delivering, or operating a system containing Covered Material or a
+    Derivative Work for that third party; or
+(c) provide an External Service, whether paid or free, whether single-tenant
+    or multi-tenant, and whether operated for profit or on a nonprofit basis.
+
+Commercial consideration includes direct or indirect payment for these
+activities. Describing software as free, bundling it as a gift, charging
+installation or maintenance fees instead, or using an intermediary does not
+exempt an activity that is substantively covered by this section.
+
+These restrictions apply only to Covered Material and Derivative Works, not
+to creative outputs, independent work, or independently licensed historical
+or third-party material. Section 1 continues to govern the scope.
+
+6. Independent education and advice
+
+You may charge for independent tutorials, training, and general technical
+advice about BeefTV, including demonstrations and guidance for lawful
+self-deployment. If an offering also includes software resale, paid system
+deployment or delivery, or an External Service, those parts still require
+authorization under section 5. A course bundled with a deployed system is
+not exempt merely because the payment is described as a course fee.
+
+7. Attribution and project identity
+
+Preserve applicable copyright and license notices. Do not misrepresent a
+modified version as an official BeefTV release or claim official endorsement
+without permission. This license grants no trademark or certification rights;
+truthful identification of the software's origin is permitted. It does not
+require a logo or watermark on your creative outputs.
+
+8. Contributions and separate permissions
+
+Unless explicitly agreed otherwise before acceptance, an original
+contribution intentionally submitted for inclusion under Part A is provided
+under Part A. For that contribution, the contributor also grants the
+maintainers of the official glanderness/BeefTV repository a worldwide,
+non-exclusive, perpetual, irrevocable, royalty-free copyright license to
+reproduce, modify, distribute, and
+sublicense it under Part A or separate commercial terms. The contributor
+retains copyright. This grant applies only to rights the contributor can
+grant and does not extend to historical contributions or third-party work.
+
+Separate commercial permissions must specify their scope. Merely requesting
+authorization or receiving general advice is not a grant of permission.
+No maintainer can authorize rights they do not hold or represent. Contact
+lucas@bf-labs.cn for requests.
+
+9. Compliance and license versions
+
+The rights granted by this Part A are conditional on compliance with it.
+A material breach terminates the rights granted to the breaching user under
+Part A. For a first breach, those rights are reinstated if the user fully
+cures it within 30 days after receiving notice from a Licensor. Rights of
+recipients who remain in compliance are not terminated by an upstream breach.
+This does not terminate independent rights under Part B or third-party terms.
+
+Future license changes do not retroactively alter the terms granted for a
+version you already received. Apart from termination for breach, the grant
+for that version continues for the duration of the applicable copyright.
+
+10. Disclaimer and limitation of liability
+
+To the extent permitted by applicable law, Covered Material is provided
+"AS IS", without warranties of any kind, express or implied, including
+merchantability, fitness for a particular purpose, and noninfringement.
+The Licensors are not liable for claims, damages, or other liability arising
+from its use or distribution, whether in contract, tort, or otherwise.
+Nothing here excludes liability that applicable law does not allow to be
+excluded, or overrides an express obligation in a separate written agreement.
+
+Part B: Historical and upstream MIT material
+-------------------------------------------
+
+The following original license remains applicable to previously MIT-licensed
+material, including the historical and upstream portions identified above
+and in NOTICE. It is not an alternative MIT license for new Covered Material
+licensed only under Part A.
+
+MIT License
+
+Copyright (c) 2026 @beefnoode and BeefTV contributors
+Copyright (c) 2026 basketikun
+Copyright (c) 2026 ddcat
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

@@ -1,0 +1,13 @@
+{
+  "version": "v2.0.1",
+  "approvedBy": "Ender",
+  "date": "2026-10-21",
+  "initialInstruction": "再打包一版吧 看看有什么改动",
+  "platformInstruction": "四平台打包并正式发布",
+  "instruction": "直接发吧 发布后在测试",
+  "scopeClarification": "我说的是lucas的超分相关的UI",
+  "deferredAcceptance": true,
+  "newPaidBudgetCNY": 0,
+  "scope": "Publish v2.0.1 from the six already merged PRs; retain final-package, upgrade, rollback, signature and public readback checks. The twelve media cases and 23 assistant checks remain pending after publication. No paid budget was granted in this conversation.",
+  "source": "Direct human messages in the release conversation on 2026-10-21; this file records authorization, not test success."
+}

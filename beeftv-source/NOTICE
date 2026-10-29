@@ -1,0 +1,71 @@
+BeefTV
+Copyright (C) 2026 BeefTV contributors
+
+BeefTV uses scoped licensing. New original material first introduced under
+the BeefTV Source Available License 1.0 is governed by Part A of LICENSE
+only to the extent its copyright holders can license it under those terms.
+Previously MIT-licensed material remains under MIT, whose complete original
+text and copyright notices are preserved in Part B of LICENSE.
+
+The transition begins with the commit introducing Part A. All previously
+MIT-licensed material is excluded from the new restrictions, including the
+existing material in commits a96baf082f478901ed558c91a80bc29dfade523c and
+2327ee2d80282b10dd8bef0f26b48990d46f5c3b. These examples do not limit the
+preservation of other historical MIT grants. In mixed files, new eligible
+original additions and historical portions retain their respective terms.
+There is no retroactive restriction on existing MIT permissions.
+
+Project scope
+-------------
+
+BeefTV is a local-first, single-user desktop workspace for AI-assisted video
+creation. The desktop application uses a React user interface embedded by
+Wails and a Go backend that listens on loopback. Projects, canvas state,
+generated assets, model-channel settings, and durable task state are stored in
+the user's local workspace. Requests leave the device only when a user invokes
+an externally configured model provider or another explicitly networked tool.
+
+Upstream source
+---------------
+
+This repository contains code derived from:
+
+  Infinite Canvas
+  https://github.com/basketikun/infinite-canvas
+  Base version: v0.5.0
+  Base commit: 568f0f1838df8de31fe885a4e130e2f346dd14ab
+
+The upstream project is maintained under the basketikun account. Upstream
+authors and contributors retain copyright in their respective contributions.
+The upstream project was relicensed to MIT in commit
+890ba95858bbb13496d23978003716656109abb2. Its copyright and permission notice
+are preserved in Part B of LICENSE. The new source-available restrictions do
+not replace the upstream license or the upstream authors' rights.
+
+BeefTV changes
+--------------
+
+BeefTV adds and maintains the local Go application layer, SQLite and local
+asset persistence, durable generation tasks, provider and protocol adapters,
+the Wails desktop shell, media workflows, timeline tools, the local Agent, and
+substantial canvas and workspace UI changes.
+
+Third-party software and assets
+-------------------------------
+
+Dependencies and bundled assets remain subject to the licenses and notices of
+their respective authors. Important runtime components include Wails,
+FFmpeg.wasm, Excalidraw, MediaPipe, React, Gin, GORM, and SQLite bindings.
+Provider and product names are used only to identify compatible protocols or
+services and do not imply affiliation or endorsement.
+
+GPL-governed material and material whose distribution must use an
+incompatible license are outside Part A. An exclusion alone does not resolve
+the licensing of a combined work; distributors must comply with all
+applicable terms and must not distribute incompatible combinations without
+the necessary compatible permissions.
+
+See THIRD_PARTY_NOTICES.md for dependency and bundled-asset notices. This
+inventory and its name-coverage audit are not a complete compatibility or
+corresponding-source audit. See docs/content/docs/overview/licensing.mdx for
+the practical scope of the source-available policy.

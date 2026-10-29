@@ -1,0 +1,152 @@
+---
+title: 本地开发
+description: 在宿主机启动BeefTV前后端开发服务
+---
+
+# 本地开发
+
+## 一键启动（Windows PowerShell）
+
+在仓库根目录执行：
+
+```powershell
+.\scripts\start-local.ps1
+```
+
+脚本会：
+
+- 使用 `.local/project-workbench-debug` 作为后端 SQLite 开发数据目录；
+- 创建 `.local/cache/go-build` 和 `.local/cache/go-mod` 缓存目录；
+- 首次启动时，如果 `web/node_modules` 不存在，执行 `bun install --frozen-lockfile`；
+- 打开两个 PowerShell 窗口，分别运行后端和前端；
+- 将前端 `/api` 请求代理到 `http://127.0.0.1:8080`。
+
+启动后访问 [http://localhost:3000](http://localhost:3000)。后端健康检查地址是 [http://127.0.0.1:8080/api/health](http://127.0.0.1:8080/api/health)。
+
+脚本使用固定的本地开发端口：前端 `3000`，后端 `8080`。如果端口被占用，脚本会先退出，不会关闭已有进程。请分别在两个开发窗口中按 `Ctrl+C` 停止服务。
+
+如果 PowerShell 的执行策略阻止脚本运行，可以只对当前进程临时放行：
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\scripts\start-local.ps1
+```
+
+## 手工启动
+
+后端：
+
+```bash
+mkdir -p .local/project-workbench-debug .local/cache/go-build .local/cache/go-mod
+cd backend
+CANVAS_BACKEND_ADDR=127.0.0.1:8080 \
+CANVAS_BACKEND_DATA_DIR=../.local/project-workbench-debug \
+GOCACHE=../.local/cache/go-build \
+GOMODCACHE=../.local/cache/go-mod \
+go run ./cmd/server
+```
+
+前端另开终端：
+
+```bash
+cd web
+bun install --frozen-lockfile
+bun run dev
+```
+
+`web/` 只使用 `bun.lock`。不要用 pnpm 或 npm 往同一套 `node_modules` 里再装一遍。
+
+前端默认监听 `0.0.0.0:3000`，Vite 将 `/api` 和 OAuth 回调代理到 `127.0.0.1:8080`。如需修改代理目标，可设置 `VITE_API_PROXY_TARGET`。
+
+`cmd/server` 在未设置 `CANVAS_BACKEND_ADDR` 时只监听 `127.0.0.1:8080`。服务端 profile 没有桌面启动令牌，默认不把工作区 API 暴露到局域网。需要同一台机器上的其他网卡、局域网客户端，或容器网络访问时，显式设置 `CANVAS_BACKEND_ADDR=:8080` 或 `0.0.0.0:8080`。只给本机用时保持 `127.0.0.1:8080`。镜像默认也是容器内回环；Compose 文件里的 `:8080` 是给同网络的 web 容器用的，不要把后端 `8080` 发布到宿主机的所有网卡。
+
+## 时间线字幕转写（whisper.cpp）
+
+时间线“字幕转写”由**本地 whisper.cpp server** 执行：后端将片段音频预处理为 16k mono wav 后，POST 到 `CANVAS_WHISPER_BASE_URL/inference`（whisper server 原生接口，`response_format=verbose_json`）。未配置该地址时，转写任务会立即明确失败，提示“撰写失败未配置本地转写服务”。
+
+### 安装 whisper-server
+
+```bash
+brew install whisper-cpp
+```
+
+### 下载模型
+
+仓库脚本将模型放在 `.local/whisper-models/`（已被 `.gitignore` 忽略）。多语言模型（含中文）用 `ggml-base.bin`（约 141MB）；网络受限时可用 aifasthub 镜像：
+
+```bash
+mkdir -p .local/whisper-models
+curl -fL -o .local/whisper-models/ggml-base.bin \
+  https://aifasthub.com/ggerganov/whisper.cpp/resolve/main/ggml-base.bin
+```
+
+### 启动服务
+
+```bash
+scripts/start-whisper-local.sh
+```
+
+脚本默认以 `ggml-base.bin` 监听 `127.0.0.1:8082`（`-l auto` 自动识别语言）。需要换模型或端口时：`WHISPER_MODEL=ggml-small.bin WHISPER_PORT=8083 scripts/start-whisper-local.sh`。
+
+### 让后端指向该服务
+
+后端不读取 `.env` 文件，环境变量必须由启动 shell 注入（在手工启动命令基础上追加）：
+
+```bash
+cd backend
+CANVAS_BACKEND_DATA_DIR=../.local/project-workbench-debug \
+CANVAS_WHISPER_BASE_URL=http://127.0.0.1:8082 \
+go run ./cmd/server
+```
+
+### 验证
+
+```bash
+# 服务就绪：返回 200/404 即可
+curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8082/
+# 冒烟：20 秒语音 → verbose_json 字幕段
+curl -s -X POST http://127.0.0.1:8082/inference \
+  -F 'file=@sample.wav' -F 'response_format=verbose_json'
+```
+
+## 外部客户端连接本机工作区
+
+`beeftv` CLI 与 `beeftv mcp serve` 连接的是同一个本机工作区，凭据从环境变量读取：
+
+| 变量 | 用途 |
+| --- | --- |
+| `BEEFTV_BASE_URL` | 本机工作区地址，默认 `http://127.0.0.1:8080/api`；只接受回环主机 |
+| `BEEFTV_OWNER_TOKEN` | owner 凭据：可执行写操作、登记客户端；运行时会把它写到数据目录下 0600 的文件 |
+| `BEEFTV_CLIENT_ID` / `BEEFTV_CLIENT_TOKEN` | 已登记客户端凭据：能力模式由服务端登记决定，不能自我提升 |
+| `BEEFTV_DESKTOP_TOKEN` | 仅供桌面管理操作（如登记客户端）通过入口守卫；不要交给外部 Agent |
+
+两条边界：
+
+- 已登记的外部客户端只需自身凭据，即可访问同一个桌面工作区的 `/api/ops` 和 `/api/ops/:op`。它不能访问其他桌面 API、登记客户端或签发 UI 写会话。不要向外部 Agent 分发 owner 或桌面壳凭据。
+- 内置 UI 通过 Wails 绑定获得独立的短期引导凭据，再签发 UI 会话；单独出示桌面启动令牌不能取得助手写会话。
+- 客户端登记（`beeftv client register`）按合同需要 owner 凭据；桌面形态下同时需要桌面启动令牌。令牌值只在本机进程环境与本机 0600 文件里流转，不写入日志、不写进文档示例。
+
+桌面发行包自带内置助手及 Node 24.22.1，无需用户安装 Node。macOS 的运行时位于 `BeefTV.app/Contents/Resources/agent-host/runtime/bin/node`，Windows 位于 `BeefTV.exe` 同级的 `agent-host/runtime/node.exe`。桌面后端直接启动随包 Node 与 `server.mjs`；更新系统 Node 不会替换发行包内置的运行时。
+
+构建发行包前必须设置 `BEEFTV_NODE_RUNTIME`：macOS 指向包含 `bin/node` 的官方 Node 目录，Windows 指向包含 `node.exe` 的官方 Node 目录。运行时版本、平台或架构不匹配都会终止构建；macOS 还会拒绝依赖 Homebrew 等非系统动态库的 Node。GitHub Actions 为每个平台准备固定版本运行时。
+
+打包脚本在临时目录使用 Bun 和 `agent-host/bun.lock` 安装冻结的 production 依赖，再以随包 Node 验证 SDK 导入。它不会复制开发目录中的 `node_modules`，也不会在缺少运行时时回退到系统 Node。两个发行入口分别为 `scripts/build-beeftv-release.sh` 和 `scripts/build-beeftv-windows-release.ps1`。
+
+## Docker 开发
+
+需要容器化热更新时，在仓库根目录执行：
+
+```bash
+LOCAL_UID=$(id -u) LOCAL_GID=$(id -g) \
+  docker compose -f docker-compose.dev.yml up --build
+```
+
+Docker 开发编排也使用 `.local/project-workbench-debug`。前端宿主机端口默认 `3000`。后端在容器内监听所有接口，供同网络的 web 容器访问；宿主机只把 `127.0.0.1:${CANVAS_BACKEND_HOST_PORT:-8080}` 转到容器。端口冲突时，可通过 `CANVAS_WEB_HOST_PORT` 和 `CANVAS_BACKEND_HOST_PORT` 调整宿主机端口。
+
+### 时间线成片完整性
+
+服务端时间线渲染需要 `ffmpeg`、`ffprobe`，字幕烧录另需 FFmpeg 的 `subtitles`（libass）滤镜和覆盖字幕字符的字体。可见的视频/图片按时间顺序拼接，真实时间空隙补黑场；独立配音和 BGM 按 `startMs` 混入，源内裁剪使用 `sourceStartMs`。视频源短于片段计划时长时保持最后一帧，音频补静音，后续片段仍按计划时间开始。音量缺省为 1，显式 0 与轨道静音必须保持静音，淡入淡出在片段时间内应用。
+
+可见字幕烧录进 MP4，同时保留结果中的 `subtitleSrt`。缺失引用、资源不可读、音轨探测失败、独立音频无音轨、字幕滤镜或字体失败都使任务失败，不以黑场、静音或无字幕产物冒充成功。当前服务端不支持重叠的视频/图片合成，会明确拒绝；独立音轨可以重叠。
+
+无需数据库或外部请求的本地成片验收：在 `backend/` 运行 `go test ./internal/app -run 'TestBuildRender|TestMediaResource|TestRenderContracts|TestRenderFFmpeg|TestRenderSubtitleFontFailure' -count=1 -v`。FFmpeg 集成测试生成三段共六秒素材，解码验证原声、定时配音、低音量 BGM、静音与中文字幕像素，并覆盖损坏媒体和缺字幕失败。未安装 FFmpeg/ffprobe 时该集成测试会跳过。

@@ -1,0 +1,315 @@
+{
+  "schemaVersion": 1,
+  "id": "ffmpeg-wasm",
+  "version": "0.12.10",
+  "license": "GPL-2.0-or-later",
+  "binaryHashes": {
+    "wasm": "9f57947a5bd530d8f00c5b3f2cb2a3492faa7e5d823315342d6a8656d0a6b7b7",
+    "javascript": "67a48f11645f85439f3fde4f2119042c16b374b910206b7a7a24f342e28dcae3"
+  },
+  "upstreamPackage": {
+    "url": "https://registry.npmjs.org/@ffmpeg/core/-/core-0.12.10.tgz",
+    "sha256": "d00089ce82e1bdf637ddbe42e0c3d41a1ba8cf4c9e825e7fa4d0bb970e844bd4",
+    "publishedAt": "2025-01-07T10:13:14.328Z"
+  },
+  "provenance": {
+    "status": "upstream-release-materials",
+    "sourceReleaseCommit": "71aa99d37c02a7b4c435275ca9ef50e612f6efa1",
+    "refResolutionDate": "2026-10-20",
+    "evidence": [
+      "https://github.com/ffmpegwasm/ffmpeg.wasm/commit/71aa99d37c02a7b4c435275ca9ef50e612f6efa1",
+      "https://registry.npmjs.org/@ffmpeg/core/0.12.10"
+    ],
+    "observed": [
+      "All upstream dependency refs resolve to commits dated before the npm publication.",
+      "The published core reports FFmpeg 5.1.4 and the production configure flags from the source release.",
+      "The published core reports Emscripten 3.1.40 commit 5c27e79dd0a9c4e27ef2326841698cdd4f6b5784, matching the archived toolchain source.",
+      "The x264 4-cores branch tip is the locked 2022-08-22 commit; no reachable post-publication commits were found. Published H.264 SEI reports core 164, matching X264_BUILD.",
+      "The lame master branch has only the locked 2020-10-29 root commit. Published MP3 output reports LAME3.100, matching its release version macros.",
+      "All 21 source archives were downloaded and their SHA-256 values verified."
+    ],
+    "limitations": [
+      "The npm publisher did not provide a signed build attestation. Correspondence is based on its release recipe, dependency history and observed runtime versions.",
+      "The original Dockerfile used an emsdk image tag and unpinned apt packages. The preserved offline recipe records a new toolchain environment and does not claim byte-for-byte reproduction of the published npm files."
+    ],
+    "rebuildStatus": "not-verified"
+  },
+  "toolchain": {
+    "image": "emscripten/emsdk@sha256:c1e807a6e03ac5bd5b37bae2ace3c46c08579e2ddeb951037a3b8dac7067f2cc",
+    "version": "3.1.40",
+    "platform": "linux/amd64",
+    "note": "Digest resolved on 2026-10-20. This is a candidate rebuild toolchain, not proof of the historical publication environment."
+  },
+  "submodules": [
+    {
+      "sourceId": "googletest",
+      "parentId": "zimg",
+      "path": "test/extra/googletest"
+    }
+  ],
+  "sources": [
+    {
+      "id": "ffmpeg-wasm",
+      "repository": "ffmpegwasm/ffmpeg.wasm",
+      "revision": "71aa99d37c02a7b4c435275ca9ef50e612f6efa1",
+      "upstreamRef": "core-0.12.10 release commit",
+      "url": "https://codeload.github.com/ffmpegwasm/ffmpeg.wasm/tar.gz/71aa99d37c02a7b4c435275ca9ef50e612f6efa1",
+      "filename": "ffmpeg-wasm-71aa99d37c02a7b4c435275ca9ef50e612f6efa1.tar.gz",
+      "sha256": "53c5842f160cece0e39345876f9483b56aa84b966637ff6f624353a0fa884219",
+      "licensePaths": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "ffmpeg",
+      "repository": "FFmpeg/FFmpeg",
+      "revision": "4729204c17f756e186d622060088371d10b34f7e",
+      "upstreamRef": "n5.1.4",
+      "url": "https://codeload.github.com/FFmpeg/FFmpeg/tar.gz/4729204c17f756e186d622060088371d10b34f7e",
+      "filename": "ffmpeg-4729204c17f756e186d622060088371d10b34f7e.tar.gz",
+      "sha256": "0d7ad57d4dd851d577fc6c19e5cec5b6e5faaeb2dbd52ab76127e3c3763fec6d",
+      "licensePaths": [
+        "COPYING.GPLv2",
+        "COPYING.GPLv3",
+        "COPYING.LGPLv2.1",
+        "COPYING.LGPLv3",
+        "LICENSE.md"
+      ]
+    },
+    {
+      "id": "x264",
+      "repository": "ffmpegwasm/x264",
+      "revision": "33cac6b77d5b9259c552156013a817ab23119612",
+      "upstreamRef": "4-cores",
+      "url": "https://codeload.github.com/ffmpegwasm/x264/tar.gz/33cac6b77d5b9259c552156013a817ab23119612",
+      "filename": "x264-33cac6b77d5b9259c552156013a817ab23119612.tar.gz",
+      "sha256": "75434a5a1f2d7d4314821c6054dd300731d69e2fa73314ba4a5ec9df38d4ec80",
+      "licensePaths": [
+        "COPYING"
+      ]
+    },
+    {
+      "id": "x265",
+      "repository": "ffmpegwasm/x265",
+      "revision": "2bb5520e9596f361bf0ed81b3b8da0d7fd999069",
+      "upstreamRef": "3.4",
+      "url": "https://codeload.github.com/ffmpegwasm/x265/tar.gz/2bb5520e9596f361bf0ed81b3b8da0d7fd999069",
+      "filename": "x265-2bb5520e9596f361bf0ed81b3b8da0d7fd999069.tar.gz",
+      "sha256": "e5254828f5db7bc375d385e31247861d25facee87b43fa2d08ea3ab5569672ab",
+      "licensePaths": [
+        "COPYING"
+      ]
+    },
+    {
+      "id": "libvpx",
+      "repository": "ffmpegwasm/libvpx",
+      "revision": "10b9492dcf05b652e2e4b370e205bd605d421972",
+      "upstreamRef": "v1.13.1",
+      "url": "https://codeload.github.com/ffmpegwasm/libvpx/tar.gz/10b9492dcf05b652e2e4b370e205bd605d421972",
+      "filename": "libvpx-10b9492dcf05b652e2e4b370e205bd605d421972.tar.gz",
+      "sha256": "12181ed27342415e8b01bf09abfbf1dfa27a6a32f302fb78b48bd70efe50f702",
+      "licensePaths": [
+        "LICENSE",
+        "PATENTS"
+      ]
+    },
+    {
+      "id": "lame",
+      "repository": "ffmpegwasm/lame",
+      "revision": "2badea1974ae36cb8312afe99cff1e6b3b5decee",
+      "upstreamRef": "master",
+      "url": "https://codeload.github.com/ffmpegwasm/lame/tar.gz/2badea1974ae36cb8312afe99cff1e6b3b5decee",
+      "filename": "lame-2badea1974ae36cb8312afe99cff1e6b3b5decee.tar.gz",
+      "sha256": "0d97ba0776988f5730e0ce1fa936e7c5d6836c757993ba55073513fe89cf410a",
+      "licensePaths": [
+        "COPYING",
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "ogg",
+      "repository": "ffmpegwasm/Ogg",
+      "revision": "bada45718453ac27b56773ae663f7e65112f6a6e",
+      "upstreamRef": "v1.3.4",
+      "url": "https://codeload.github.com/ffmpegwasm/Ogg/tar.gz/bada45718453ac27b56773ae663f7e65112f6a6e",
+      "filename": "ogg-bada45718453ac27b56773ae663f7e65112f6a6e.tar.gz",
+      "sha256": "4d61f8dfa248276c42bd5404b1a87ae9d8a0d58791f55e20018c7b39b38d8823",
+      "licensePaths": [
+        "COPYING"
+      ]
+    },
+    {
+      "id": "theora",
+      "repository": "ffmpegwasm/theora",
+      "revision": "7ffd8b2ecfc2d93ae5e16028e7528e609266bfbf",
+      "upstreamRef": "v1.1.1",
+      "url": "https://codeload.github.com/ffmpegwasm/theora/tar.gz/7ffd8b2ecfc2d93ae5e16028e7528e609266bfbf",
+      "filename": "theora-7ffd8b2ecfc2d93ae5e16028e7528e609266bfbf.tar.gz",
+      "sha256": "c38e6a3fb19566a44dcb283323c48311dd484f1416f3f34676d3e7fd252dfbc5",
+      "licensePaths": [
+        "COPYING",
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "opus",
+      "repository": "ffmpegwasm/opus",
+      "revision": "e85ed7726db5d677c9c0677298ea0cb9c65bdd23",
+      "upstreamRef": "v1.3.1",
+      "url": "https://codeload.github.com/ffmpegwasm/opus/tar.gz/e85ed7726db5d677c9c0677298ea0cb9c65bdd23",
+      "filename": "opus-e85ed7726db5d677c9c0677298ea0cb9c65bdd23.tar.gz",
+      "sha256": "c6d574b17d70b8c289d997a8ac81314cf1fd8c52237c421b2ee34e69cea85bf8",
+      "licensePaths": [
+        "COPYING",
+        "LICENSE_PLEASE_READ.txt"
+      ]
+    },
+    {
+      "id": "vorbis",
+      "repository": "ffmpegwasm/vorbis",
+      "revision": "7798164043197d7e33f02de4353ce2aa5b248225",
+      "upstreamRef": "v1.3.3",
+      "url": "https://codeload.github.com/ffmpegwasm/vorbis/tar.gz/7798164043197d7e33f02de4353ce2aa5b248225",
+      "filename": "vorbis-7798164043197d7e33f02de4353ce2aa5b248225.tar.gz",
+      "sha256": "69b87cafe2815d02609886a63b9d4c0b7461e1e2f6ecf3960ede04053da6e96a",
+      "licensePaths": [
+        "COPYING"
+      ]
+    },
+    {
+      "id": "zlib",
+      "repository": "ffmpegwasm/zlib",
+      "revision": "cacf7f1d4e3d44d871b605da3b647f07d718623f",
+      "upstreamRef": "v1.2.11",
+      "url": "https://codeload.github.com/ffmpegwasm/zlib/tar.gz/cacf7f1d4e3d44d871b605da3b647f07d718623f",
+      "filename": "zlib-cacf7f1d4e3d44d871b605da3b647f07d718623f.tar.gz",
+      "sha256": "6d4d6640ca3121620995ee255945161821218752b551a1a180f4215f7d124d45",
+      "licensePaths": [
+        "zlib.h"
+      ]
+    },
+    {
+      "id": "libwebp",
+      "repository": "ffmpegwasm/libwebp",
+      "revision": "ca332209cb5567c9b249c86788cb2dbf8847e760",
+      "upstreamRef": "v1.3.2",
+      "url": "https://codeload.github.com/ffmpegwasm/libwebp/tar.gz/ca332209cb5567c9b249c86788cb2dbf8847e760",
+      "filename": "libwebp-ca332209cb5567c9b249c86788cb2dbf8847e760.tar.gz",
+      "sha256": "1676107dc385f9bf6cb4c2b94d4a9359d1fd95ab6309cb587191a742df292fe2",
+      "licensePaths": [
+        "COPYING",
+        "PATENTS"
+      ]
+    },
+    {
+      "id": "freetype2",
+      "repository": "ffmpegwasm/freetype2",
+      "revision": "6a2b3e4007e794bfc6c91030d0ed987f925164a8",
+      "upstreamRef": "VER-2-10-4",
+      "url": "https://codeload.github.com/ffmpegwasm/freetype2/tar.gz/6a2b3e4007e794bfc6c91030d0ed987f925164a8",
+      "filename": "freetype2-6a2b3e4007e794bfc6c91030d0ed987f925164a8.tar.gz",
+      "sha256": "09acceb42508c65b7b744cc2ad01d7548868ca57babc39f7683ec3c0f7541e8c",
+      "licensePaths": [
+        "docs/LICENSE.TXT",
+        "docs/FTL.TXT",
+        "docs/GPLv2.TXT"
+      ]
+    },
+    {
+      "id": "fribidi",
+      "repository": "fribidi/fribidi",
+      "revision": "f9e8e71a6fbf4a4619481284c9f484d10e559995",
+      "upstreamRef": "v1.0.9",
+      "url": "https://codeload.github.com/fribidi/fribidi/tar.gz/f9e8e71a6fbf4a4619481284c9f484d10e559995",
+      "filename": "fribidi-f9e8e71a6fbf4a4619481284c9f484d10e559995.tar.gz",
+      "sha256": "65ff6fb1a478c4d90ae16825da8c97b8a63e2674f8a2d6dae8800f89089640ba",
+      "licensePaths": [
+        "COPYING"
+      ]
+    },
+    {
+      "id": "harfbuzz",
+      "repository": "harfbuzz/harfbuzz",
+      "revision": "4a1d891c6317d2c83e5f3c2607ec5f5ccedffcde",
+      "upstreamRef": "5.2.0",
+      "url": "https://codeload.github.com/harfbuzz/harfbuzz/tar.gz/4a1d891c6317d2c83e5f3c2607ec5f5ccedffcde",
+      "filename": "harfbuzz-4a1d891c6317d2c83e5f3c2607ec5f5ccedffcde.tar.gz",
+      "sha256": "69ba7c7a42643a3654781242016dd09245cab7353fc2a02cecb710e479c9a881",
+      "licensePaths": [
+        "COPYING"
+      ]
+    },
+    {
+      "id": "libass",
+      "repository": "libass/libass",
+      "revision": "d149636f502f5774ae1a8fb4c554b122674393b2",
+      "upstreamRef": "0.15.0",
+      "url": "https://codeload.github.com/libass/libass/tar.gz/d149636f502f5774ae1a8fb4c554b122674393b2",
+      "filename": "libass-d149636f502f5774ae1a8fb4c554b122674393b2.tar.gz",
+      "sha256": "5cfe23562fa623a3b209d156ad469aeb2e31f69bf6b256ea737d87d9ed89301d",
+      "licensePaths": [
+        "COPYING"
+      ]
+    },
+    {
+      "id": "zimg",
+      "repository": "sekrit-twc/zimg",
+      "revision": "e5b0de6bebbcbc66732ed5afaafef6b2c7dfef87",
+      "upstreamRef": "release-3.0.5",
+      "url": "https://codeload.github.com/sekrit-twc/zimg/tar.gz/e5b0de6bebbcbc66732ed5afaafef6b2c7dfef87",
+      "filename": "zimg-e5b0de6bebbcbc66732ed5afaafef6b2c7dfef87.tar.gz",
+      "sha256": "3ab062eff30067799997bc3e911c0108a5b8cbcd6e0ef14053f17ff0ecd0add8",
+      "licensePaths": [
+        "COPYING"
+      ]
+    },
+    {
+      "id": "googletest",
+      "repository": "google/googletest",
+      "revision": "703bd9caab50b139428cea1aaff9974ebee5742e",
+      "upstreamRef": "zimg/test/extra/googletest gitlink",
+      "url": "https://codeload.github.com/google/googletest/tar.gz/703bd9caab50b139428cea1aaff9974ebee5742e",
+      "filename": "googletest-703bd9caab50b139428cea1aaff9974ebee5742e.tar.gz",
+      "sha256": "d17b1b83a57b3933565a6d0616fe261107326d47de20288d0949ed038e1c342d",
+      "licensePaths": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "sdl2",
+      "repository": "libsdl-org/SDL",
+      "revision": "55b03c7493a7abed33cf803d1380a40fa8af903f",
+      "upstreamRef": "release-2.24.2",
+      "url": "https://codeload.github.com/libsdl-org/SDL/tar.gz/55b03c7493a7abed33cf803d1380a40fa8af903f",
+      "filename": "sdl2-55b03c7493a7abed33cf803d1380a40fa8af903f.tar.gz",
+      "sha256": "a726e31f8ad9443a2a9a649f12751442d8ca5ea78a84fde14f760c81706b4127",
+      "licensePaths": [
+        "LICENSE.txt"
+      ]
+    },
+    {
+      "id": "emscripten",
+      "repository": "emscripten-core/emscripten",
+      "revision": "5c27e79dd0a9c4e27ef2326841698cdd4f6b5784",
+      "upstreamRef": "3.1.40",
+      "url": "https://codeload.github.com/emscripten-core/emscripten/tar.gz/5c27e79dd0a9c4e27ef2326841698cdd4f6b5784",
+      "filename": "emscripten-5c27e79dd0a9c4e27ef2326841698cdd4f6b5784.tar.gz",
+      "sha256": "3eb9ea2d69052a491296eb466dbcda5fbc1c0fed4e475c58545a83558fb47d10",
+      "licensePaths": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "emsdk",
+      "repository": "emscripten-core/emsdk",
+      "revision": "ae245715ef50e036b68a2412a323129676bf8300",
+      "upstreamRef": "3.1.40",
+      "url": "https://codeload.github.com/emscripten-core/emsdk/tar.gz/ae245715ef50e036b68a2412a323129676bf8300",
+      "filename": "emsdk-ae245715ef50e036b68a2412a323129676bf8300.tar.gz",
+      "sha256": "74ca62e60359fb946e297001913a1f10dbd77271ab86671f5e5c2bd1f5b89b3a",
+      "licensePaths": [
+        "LICENSE"
+      ]
+    }
+  ]
+}

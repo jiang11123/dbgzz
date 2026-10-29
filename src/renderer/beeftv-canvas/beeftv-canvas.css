@@ -1,0 +1,719 @@
+/* ==========================================================================
+   BeefTV 原生布局与全套无限节点工作台样式 (Dark Studio Pro)
+   ========================================================================== */
+
+:root {
+  --beeftv-bg: #0d0f12;
+  --beeftv-surface: #14171d;
+  --beeftv-surface-card: #1a1e26;
+  --beeftv-surface-card-hover: #222732;
+  --beeftv-border: rgba(255, 255, 255, 0.08);
+  --beeftv-border-active: rgba(232, 108, 54, 0.5);
+  --beeftv-accent: #e86c36;
+  --beeftv-accent-hover: #f97316;
+  --beeftv-ink: #f3f4f6;
+  --beeftv-ink-muted: #9ca3af;
+  --beeftv-ink-soft: #6b7280;
+}
+
+.beeftv-app-shell {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--beeftv-bg);
+  color: var(--beeftv-ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  user-select: none;
+}
+
+/* --------------------------------------------------------------------------
+   1. 左侧原生 BeefTV 侧边栏 (Sidebar)
+   -------------------------------------------------------------------------- */
+.beeftv-sidebar {
+  width: 200px;
+  height: 100%;
+  background: var(--beeftv-surface);
+  border-right: 1px solid var(--beeftv-border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  z-index: 60;
+  transition: width 0.2s ease;
+}
+
+.beeftv-sidebar.is-collapsed {
+  width: 58px;
+}
+
+.beeftv-sidebar-header {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--beeftv-border);
+}
+
+.beeftv-logo-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--beeftv-accent), #f97316);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.beeftv-logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.beeftv-logo-text b {
+  font-size: 14px;
+  letter-spacing: -0.2px;
+  color: #ffffff;
+}
+
+.beeftv-logo-text span {
+  font-size: 11px;
+  color: var(--beeftv-accent);
+  font-weight: 600;
+}
+
+.beeftv-sidebar-nav {
+  flex: 1;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: var(--beeftv-ink-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+  text-align: left;
+}
+
+.sidebar-nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.sidebar-nav-item.active {
+  background: rgba(232, 108, 54, 0.14);
+  color: var(--beeftv-accent);
+  font-weight: 600;
+}
+
+.sidebar-badge {
+  background: var(--beeftv-accent);
+  color: #ffffff;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.sidebar-badge.secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--beeftv-ink-muted);
+}
+
+.beeftv-sidebar-footer {
+  padding: 8px;
+  border-top: 1px solid var(--beeftv-border);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-footer-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: var(--beeftv-ink-muted);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sidebar-footer-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.sidebar-toggle-btn {
+  margin-top: 4px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--beeftv-ink-soft);
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.sidebar-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   2. 主工作区与顶部工具栏 (Main Canvas Area)
+   -------------------------------------------------------------------------- */
+.beeftv-main-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.beeftv-topbar {
+  height: 52px;
+  background: rgba(18, 20, 26, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--beeftv-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 50;
+  flex-shrink: 0;
+}
+
+.beeftv-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.beeftv-badge {
+  background: linear-gradient(135deg, var(--beeftv-accent), #f97316);
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.beeftv-topbar-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.beeftv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--beeftv-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--beeftv-ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.beeftv-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.beeftv-btn-primary {
+  background: var(--beeftv-accent);
+  border-color: #ea580c;
+  color: #ffffff;
+}
+
+.beeftv-btn-primary:hover {
+  background: var(--beeftv-accent-hover);
+  border-color: var(--beeftv-accent-hover);
+}
+
+.beeftv-topbar-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--beeftv-border);
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+}
+
+.status-dot.warning {
+  background: #f59e0b;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+}
+
+/* --------------------------------------------------------------------------
+   3. 无限画布视口 (Infinite Canvas Viewport)
+   -------------------------------------------------------------------------- */
+.beeftv-canvas-container {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: calc(100% - 52px);
+  overflow: hidden;
+  background-color: var(--beeftv-bg);
+  background-image: 
+    radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 24px 24px, 120px 120px;
+}
+
+.beeftv-viewport {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* SVG 贝塞尔连线 */
+.beeftv-connections-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.beeftv-connection-path {
+  fill: none;
+  stroke: rgba(232, 108, 54, 0.6);
+  stroke-width: 2.5;
+  stroke-dasharray: 6 3;
+  animation: flowLine 25s linear infinite;
+}
+
+.beeftv-connection-path.relay {
+  stroke: var(--beeftv-accent);
+  stroke-width: 3;
+}
+
+@keyframes flowLine {
+  to { stroke-dashoffset: -1000; }
+}
+
+/* --------------------------------------------------------------------------
+   4. 节点卡片 (Node Card)
+   -------------------------------------------------------------------------- */
+.beeftv-node {
+  position: absolute;
+  width: 320px;
+  background: var(--beeftv-surface-card);
+  border: 1px solid var(--beeftv-border);
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+  cursor: grab;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.beeftv-node.is-selected {
+  border-color: var(--beeftv-accent);
+  box-shadow: 0 0 0 2px rgba(232, 108, 54, 0.4), 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+
+.beeftv-node-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--beeftv-border);
+  border-top-left-radius: 9px;
+  border-top-right-radius: 9px;
+}
+
+.node-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.node-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.node-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--beeftv-ink-muted);
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.node-action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.beeftv-node-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.beeftv-textarea {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--beeftv-border);
+  border-radius: 6px;
+  color: #f3f4f6;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 60px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.beeftv-textarea:focus {
+  border-color: var(--beeftv-accent);
+}
+
+.node-params-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.node-param-pill {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--beeftv-border);
+  padding: 3px 8px;
+  border-radius: 4px;
+  color: var(--beeftv-ink-muted);
+}
+
+.node-preview-box {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--beeftv-border);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.node-preview-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.node-placeholder {
+  color: var(--beeftv-ink-soft);
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.node-progress-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.node-progress-bar {
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.node-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--beeftv-accent), #f97316);
+  transition: width 0.3s ease;
+}
+
+.node-status-text {
+  font-size: 11px;
+  color: var(--beeftv-ink-muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+.node-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+/* 端口 */
+.node-port {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--beeftv-surface-card);
+  border: 2px solid var(--beeftv-accent);
+  cursor: crosshair;
+  z-index: 25;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.node-port:hover {
+  transform: scale(1.35);
+  background: var(--beeftv-accent);
+}
+
+.node-port.port-in {
+  top: 50%;
+  left: -7px;
+  transform: translateY(-50%);
+}
+
+.node-port.port-out {
+  top: 50%;
+  right: -7px;
+  transform: translateY(-50%);
+}
+
+/* 底部浮动控制台 */
+.beeftv-controls-float {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 23, 29, 0.94);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--beeftv-border);
+  border-radius: 30px;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  z-index: 40;
+}
+
+.controls-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--beeftv-border);
+}
+
+/* --------------------------------------------------------------------------
+   5. 右侧可折叠抽屉 (Drawer)
+   -------------------------------------------------------------------------- */
+.beeftv-drawer {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  bottom: 0;
+  width: 340px;
+  background: var(--beeftv-surface);
+  border-left: 1px solid var(--beeftv-border);
+  display: flex;
+  flex-direction: column;
+  z-index: 45;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.drawer-header {
+  height: 48px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--beeftv-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.drawer-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.drawer-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--beeftv-ink-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.drawer-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.drawer-empty {
+  color: var(--beeftv-ink-soft);
+  font-size: 12px;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.storyboard-card {
+  background: var(--beeftv-surface-card);
+  border: 1px solid var(--beeftv-border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.storyboard-card:hover {
+  border-color: var(--beeftv-accent);
+  background: var(--beeftv-surface-card-hover);
+}
+
+.storyboard-card-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.storyboard-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--beeftv-accent);
+}
+
+.status-tag {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--beeftv-ink-muted);
+}
+
+.status-tag.completed {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+}
+
+.status-tag.processing {
+  background: rgba(232, 108, 54, 0.15);
+  color: var(--beeftv-accent);
+}
+
+.storyboard-prompt {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--beeftv-ink-muted);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.storyboard-preview {
+  margin-top: 8px;
+  border-radius: 6px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.storyboard-preview video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.task-queue-card {
+  background: var(--beeftv-surface-card);
+  border: 1px solid var(--beeftv-border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.account-manage-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--beeftv-surface-card);
+  border: 1px solid var(--beeftv-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}

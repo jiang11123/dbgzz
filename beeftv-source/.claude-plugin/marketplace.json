@@ -1,0 +1,12 @@
+{
+  "name": "beeftv",
+  "owner": { "name": "BeefTV" },
+  "plugins": [
+    {
+      "name": "beeftv-skills",
+      "source": "./plugins/beeftv-skills",
+      "description": "查找创作技能并协助作者准备投稿。",
+      "version": "0.1.0"
+    }
+  ]
+}

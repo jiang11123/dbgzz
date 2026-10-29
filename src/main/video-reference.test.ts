@@ -19,7 +19,11 @@ const empty={count:0,ready:0,loading:false,failed:false};
 const ready={count:1,ready:1,loading:false,failed:false};
 function fake(states:typeof empty[],attached=false) {
   let index=0,detach=0;const calls:{method:string;params:Record<string,unknown>}[]=[];
-  const wc={isDestroyed:()=>false,executeJavaScript:async()=>({value:states[Math.min(index++,states.length-1)]}),debugger:{
+  const wc={isDestroyed:()=>false,executeJavaScript:async(script:string)=>{
+    // 清理脚本（以 return cleared 结尾）：模拟点掉一个附件，并推进状态序列。
+    if(script.includes('return cleared'))return {value:1};
+    return {value:states[Math.min(index++,states.length-1)]};
+  },debugger:{
     isAttached:()=>attached,attach:()=>{attached=true;},detach:()=>{attached=false;detach++;},
     sendCommand:async(method:string,params:Record<string,unknown>={})=>{
       calls.push({method,params});
@@ -50,10 +54,54 @@ test('failed upload rejects rather than falling back to text sending',async t=>{
   assert.equal(f.calls.filter(c=>c.method==='DOM.setFileInputFiles').length,1);
   assert.equal(f.detaches(),1);
 });
-test('existing draft blocks all file mutation',async t=>{
-  const {image}=localFiles(t);const f=fake([ready]);
-  await assert.rejects(uploadVideoReferences(f.view,[image]),/已有附件/);
-  assert.equal(f.calls.length,0);
+test('existing draft is auto-cleared, then files upload',async t=>{
+  const {image}=localFiles(t);const f=fake([ready,empty,{...ready,ready:0},ready,ready,ready]);
+  await uploadVideoReferences(f.view,[image],{pollMs:1,timeoutMs:100});
+  assert.equal(f.calls.filter(c=>c.method==='DOM.setFileInputFiles').length,1);
+});
+test('unclearable draft rejects with manual guidance',async t=>{
+  const {image}=localFiles(t);
+  const stuck={view:{webContents:{isDestroyed:()=>false,executeJavaScript:async(script:string)=>{
+    if(script.includes('return cleared'))return {value:0};
+    return {value:{...ready,ready:1}};
+  },debugger:{isAttached:()=>true,attach:()=>{},detach:()=>{},sendCommand:async()=>({})}}} as unknown as BrowserView};
+  // 宽限窗（约 1s）内连续点不到删除按钮才会报"无法自动清理"，
+  // 所以这里的超时预算必须大于宽限窗。
+  await assert.rejects(uploadVideoReferences(stuck.view,[image],{pollMs:1,timeoutMs:2000}),/无法自动清理/);
+});
+test('delayed delete-button render does not abort clearing',async t=>{
+  const {image}=localFiles(t);
+  let clicks=0,uploaded=false;
+  const wc={isDestroyed:()=>false,executeJavaScript:async(script:string)=>{
+    if(script.includes('return cleared')){clicks+=1;return {value:clicks>=4?1:0};}
+    if(uploaded)return {value:{count:1,ready:1,loading:false,failed:false}};
+    return {value:clicks>=4?empty:{...ready,ready:1}};
+  },debugger:{isAttached:()=>true,attach:()=>{},detach:()=>{},sendCommand:async(method:string)=>{
+    if(method==='DOM.setFileInputFiles')uploaded=true;
+    if(method==='Runtime.evaluate')return {result:{objectId:'input-object'}};
+    if(method==='DOM.requestNode')return {nodeId:7};return {};
+  }}};
+  // 前 3 轮删除按钮未渲染（点击数 0），第 4 轮才出现：不应立刻报"无法自动清理"。
+  await uploadVideoReferences({webContents:wc} as unknown as BrowserView,[image],{pollMs:1,timeoutMs:500});
+  assert.ok(clicks>=4);
+});
+test('residual upload-failed banner without cards waits for it to clear',async t=>{
+  const {image}=localFiles(t);
+  let polls=0,uploaded=false;
+  const wc={isDestroyed:()=>false,executeJavaScript:async(script:string)=>{
+    if(script.includes('return cleared'))return {value:0};
+    polls+=1;
+    if(uploaded)return {value:{count:1,ready:1,loading:false,failed:false}};
+    return {value:{count:0,ready:0,loading:false,failed:polls<=5}};
+  },debugger:{isAttached:()=>true,attach:()=>{},detach:()=>{},sendCommand:async(method:string)=>{
+    if(method==='DOM.setFileInputFiles')uploaded=true;
+    if(method==='Runtime.evaluate')return {result:{objectId:'input-object'}};
+    if(method==='DOM.requestNode')return {nodeId:7};return {};
+  }}};
+  // count=0 且只剩"上传失败"文案残留：应等待文案消失后正常上传，而不是报
+  // "已有 0 个残留附件且无法自动清理"这类自相矛盾的错误。
+  await uploadVideoReferences({webContents:wc} as unknown as BrowserView,[image],{pollMs:1,timeoutMs:500});
+  assert.ok(uploaded);
 });
 test('disappearing or duplicated attachments reject',async t=>{
   const {image}=localFiles(t);
@@ -104,13 +152,18 @@ app.disableHardwareAcceleration();
    'if(window.mode==="preview")return;'+
    'if(window.mode==="uploading"){const bar=document.createElement("div");bar.setAttribute("role","progressbar");bar.setAttribute("aria-valuenow","70");card.append(bar);return;}'+
    'if(window.mode==="failed"){const note=document.createElement("span");note.textContent="上传失败";card.append(note);return;}'+
-   'setTimeout(()=>{const done=document.createElement("button");done.setAttribute("data-testid","attachment-delete-btn");card.append(done);},180);};void 0;');
+   'setTimeout(()=>{const done=document.createElement("button");done.setAttribute("data-testid","attachment-delete-btn");done.onclick=()=>card.remove();card.append(done);},180);};void 0;');
  }
  const results=[];
- for(const mode of ['ignored','preview','uploading','failed','success','token']){
-  await reset(mode);const start=Date.now();let rejected=false;
-  try{await uploadVideoReferences(view,[image],{timeoutMs:650,pollMs:25});}catch(e){rejected=true;if(mode==='success'||mode==='token')throw e;}
-  assert.equal(rejected,!['success','token'].includes(mode));
+ for(const mode of ['ignored','preview','uploading','failed','success','token','preexisting']){
+  await reset(mode);
+  if(mode==='preexisting'){
+   // 模拟上次任务残留：composer 里已有一张可删除的附件卡片，新任务应自动清掉再上传。
+   await wc.executeJavaScript('(function(){const card=document.createElement("div");card.setAttribute("data-testid","attachment-image-card");card.setAttribute("data-kind","image");const img=document.createElement("img");img.src="data:image/png;base64,iVBORw0KGgo=";const done=document.createElement("button");done.setAttribute("data-testid","attachment-delete-btn");done.onclick=()=>card.remove();card.append(img);card.append(done);document.querySelector("#cards").append(card);})()');
+  }
+  const start=Date.now();let rejected=false;
+  try{await uploadVideoReferences(view,[image],{timeoutMs:650,pollMs:25});}catch(e){rejected=true;if(['success','token','preexisting'].includes(mode))throw e;}
+  assert.equal(rejected,!['success','token','preexisting'].includes(mode));
   const state=await wc.executeJavaScript(videoReferenceStateScript);
   const counters=await wc.executeJavaScript('({submits:window.submits,changes:window.changes,wrong:window.wrong})');
   assert.deepEqual(counters,{submits:0,changes:1,wrong:0});
@@ -139,4 +192,20 @@ test('isolated Electron executes real upload scripts without network or submit',
   assert.equal(child.status,0,child.stdout+'\n'+child.stderr);
   assert.match(child.stdout,/VIDEO_REFERENCE_FIXTURE/);
   console.log(child.stdout.trim());
+});
+
+
+test('waits for composer remount after video settings change before uploading', async t => {
+  const {image}=localFiles(t);
+  const missing={...empty,error:'视频参考图：未找到作曲器输入框'};
+  const f=fake([missing,missing,empty,ready,ready,ready,ready]);
+  await uploadVideoReferences(f.view,[image],{pollMs:1,timeoutMs:500});
+  assert.equal(f.calls.filter(c=>c.method==='DOM.setFileInputFiles').length,1);
+});
+
+test('persistent missing composer times out without attaching or sending', async t => {
+  const {image}=localFiles(t);
+  const f=fake([{...empty,error:'视频参考图：未找到作曲器输入框'} as typeof empty]);
+  await assert.rejects(uploadVideoReferences(f.view,[image],{pollMs:1,timeoutMs:15}),/未找到作曲器输入框/);
+  assert.equal(f.calls.length,0);
 });

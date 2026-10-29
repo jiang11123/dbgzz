@@ -1,0 +1,684 @@
+{
+  "version": "v1.6.21",
+  "sourceDigest": "c61a822c641e2482351c4836c3db70c1dbdb43fb9c5bac1e77626bee60ec35ae",
+  "budgetCNY": 100,
+  "spentCNY": 28.92442,
+  "pendingCNY": 0.0,
+  "upgrade": {
+    "preservedData": true,
+    "generationVerified": true,
+    "backup": "beeftv-before-copy-fix-20261001.db",
+    "counts": {
+      "canvas_projects": {
+        "before": 7,
+        "after": 8,
+        "missing": 0
+      },
+      "tasks": {
+        "before": 30,
+        "after": 48,
+        "missing": 0
+      },
+      "resources": {
+        "before": 72,
+        "after": 107,
+        "missing": 0
+      }
+    },
+    "restartRetainedNodes": 10,
+    "migrationCoverage": "CI database tests cover legacy v2 diagnostics and occupied preview v3/v6"
+  },
+  "fixtures": {
+    "image-1.jpg": "93701f45cf50d48de5ba452cd26eeafeba40a2fceef2e50fb98940ccb919250f",
+    "image-2.jpg": "5946874132e3e82d7c1ed74db2a97e39b08f58ba7dc3fa9129adffcdd714af84",
+    "reference.mp4": "282ef9563a8dbad86470368bef7afa9fcfd1df7791cf38f4f5e803c9d535da60"
+  },
+  "fixtureDigestMethod": "SHA256 of sorted compact JSON filename-to-SHA256 map",
+  "cases": [
+    {
+      "round": 1,
+      "path": "text-image",
+      "taskId": "4ec80c2fc8ac51b8938a726ccab06417",
+      "providerRequestId": "evt-LYKCAOBUNLHY",
+      "billingRequestId": "202610011507501746873178268d9d6RqxaoxTH",
+      "clientVersion": "v1.6.21",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "beefapi::gpt-image-2.5-flare",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 0.49,
+      "artifactSHA256": "65ac9de772c492e9ec0bc69b636b13a10b1912e79331e8d2f4550a1b039f0505",
+      "actualMedia": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "png",
+            "codec_type": "video",
+            "width": 1254,
+            "height": 1254,
+            "r_frame_rate": "25/1"
+          }
+        ],
+        "format": {
+          "size": "2035399"
+        }
+      },
+      "requestParameters": null
+    },
+    {
+      "round": 1,
+      "path": "text-video",
+      "taskId": "e1e1c469a97d9eb4fb54c219e93b2179",
+      "providerRequestId": "task_QAK4n4qFkFLjvNpYqxHlO5byXfmGlCCo",
+      "billingRequestId": "202610011508258342614968268d9d6odC1RdLq",
+      "clientVersion": "v1.6.21",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.139354,
+      "artifactSHA256": "ba54fe56fbc5db3aaa1c25aef0a5dbc52332e0e6dfef228a22690a321ffe79ed",
+      "actualMedia": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 864,
+            "height": 496,
+            "r_frame_rate": "24/1",
+            "duration": "5.041667"
+          }
+        ],
+        "format": {
+          "duration": "5.041667",
+          "size": "1184841"
+        }
+      },
+      "requestParameters": {
+        "quota": 569677,
+        "ratio": "16:9",
+        "status": "SUCCESS",
+        "task_id": "task_QAK4n4qFkFLjvNpYqxHlO5byXfmGlCCo",
+        "duration": 5,
+        "references": [],
+        "request_id": "202610011508258342614968268d9d6odC1RdLq",
+        "resolution": "480p",
+        "generate_audio": false,
+        "upstream_model": "seedance-2.0-fast"
+      }
+    },
+    {
+      "round": 1,
+      "path": "image-image",
+      "taskId": "9a855834f6d6831b199eb1f160f9bbd4",
+      "providerRequestId": "evt-ZBRXRCRBLNDZ",
+      "billingRequestId": "202610011513241773676718268d9d6P3xIhimL",
+      "clientVersion": "v1.6.21",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "beefapi::gpt-image-2.5-flare",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 0.49,
+      "artifactSHA256": "e900ff946730e945d95cf4936e8f3ed595c97bc42574f16a7be50b1f8d5a71c3",
+      "actualMedia": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "png",
+            "codec_type": "video",
+            "width": 1254,
+            "height": 1254,
+            "r_frame_rate": "25/1"
+          }
+        ],
+        "format": {
+          "size": "2027790"
+        }
+      },
+      "requestParameters": null
+    },
+    {
+      "round": 1,
+      "path": "image-video",
+      "taskId": "42fb8d6cb29647fa68e4c672a74acd26",
+      "providerRequestId": "task_izibHFpCCwS1XoU1KmtL8OWRkZ049Pup",
+      "billingRequestId": "202610011514255709274038268d9d6SgM5wlYm",
+      "clientVersion": "v1.6.21",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.139354,
+      "artifactSHA256": "8166f652ed05e5734846c3ab3cc0b96f329c6cbc4642839a20365308f6e19adc",
+      "actualMedia": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 864,
+            "height": 496,
+            "r_frame_rate": "24/1",
+            "duration": "5.041667"
+          }
+        ],
+        "format": {
+          "duration": "5.041667",
+          "size": "1195901"
+        }
+      },
+      "requestParameters": {
+        "quota": 569677,
+        "ratio": null,
+        "status": "SUCCESS",
+        "task_id": "task_izibHFpCCwS1XoU1KmtL8OWRkZ049Pup",
+        "duration": 5,
+        "references": [
+          {
+            "type": "image_url",
+            "https": true,
+            "named_path": true
+          }
+        ],
+        "request_id": "202610011514255709274038268d9d6SgM5wlYm",
+        "resolution": "480p",
+        "generate_audio": false,
+        "upstream_model": "seedance-2.0-fast"
+      }
+    },
+    {
+      "round": 1,
+      "path": "video-video",
+      "taskId": "ee012855d6a5e099539cd84790485072",
+      "providerRequestId": "task_VHGTC42hZoe3quoZtatYJMYGa6GU0dGq",
+      "billingRequestId": "202610011518357458280148268d9d6v0xHAX0Q",
+      "clientVersion": "v1.6.21",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.225988,
+      "artifactSHA256": "3da24ea8224ec241d695f54a718567f04325269e98fca0f74585c0774838baf9",
+      "actualMedia": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 864,
+            "height": 496,
+            "r_frame_rate": "24/1",
+            "duration": "5.041667"
+          }
+        ],
+        "format": {
+          "duration": "5.041667",
+          "size": "1632351"
+        }
+      },
+      "requestParameters": {
+        "quota": 612994,
+        "ratio": "16:9",
+        "status": "SUCCESS",
+        "task_id": "task_VHGTC42hZoe3quoZtatYJMYGa6GU0dGq",
+        "duration": 5,
+        "references": [
+          {
+            "type": "video_url",
+            "https": true,
+            "named_path": true
+          }
+        ],
+        "request_id": "202610011518357458280148268d9d6v0xHAX0Q",
+        "resolution": "480p",
+        "generate_audio": false,
+        "upstream_model": "seedance-2.0-fast"
+      }
+    },
+    {
+      "round": 1,
+      "path": "multi-video",
+      "taskId": "93d1dd6fa45023b00d078c2195e9d36c",
+      "providerRequestId": "task_J2pX0CG6dutTQ6pluwcjW1ObMAAqXGlQ",
+      "billingRequestId": "202610011526196763025778268d9d6PML3vZVh",
+      "clientVersion": "v1.6.21",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.225988,
+      "artifactSHA256": "2df8403eae5c80f50c543dc900d722e4c7087b53c88bb3e1afaa356fa5f82366",
+      "actualMedia": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 864,
+            "height": 496,
+            "r_frame_rate": "24/1",
+            "duration": "5.041667"
+          }
+        ],
+        "format": {
+          "duration": "5.041667",
+          "size": "719969"
+        }
+      },
+      "requestParameters": {
+        "quota": 612994,
+        "ratio": "16:9",
+        "status": "SUCCESS",
+        "task_id": "task_J2pX0CG6dutTQ6pluwcjW1ObMAAqXGlQ",
+        "duration": 5,
+        "references": [
+          {
+            "type": "image_url",
+            "https": true,
+            "named_path": true
+          },
+          {
+            "type": "image_url",
+            "https": true,
+            "named_path": true
+          },
+          {
+            "type": "video_url",
+            "https": true,
+            "named_path": true
+          }
+        ],
+        "request_id": "202610011526196763025778268d9d6PML3vZVh",
+        "resolution": "480p",
+        "generate_audio": false,
+        "upstream_model": "seedance-2.0-fast"
+      }
+    },
+    {
+      "round": 2,
+      "path": "text-image",
+      "taskId": "73e759f40c2ceb8685bfd8ae47040205",
+      "providerRequestId": "evt-FKZFHRIGDCVP",
+      "billingRequestId": "202610011528097987130358268d9d6cNwFIq1G",
+      "clientVersion": "v1.6.21",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "beefapi::gpt-image-2.5-flare",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 0.49,
+      "artifactSHA256": "2152e9971b5cfd0656145737a34357ef949e20ed015a6b4b2020f42f1859248e",
+      "actualMedia": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "png",
+            "codec_type": "video",
+            "width": 1254,
+            "height": 1254,
+            "r_frame_rate": "25/1"
+          }
+        ],
+        "format": {
+          "size": "2035922"
+        }
+      },
+      "requestParameters": null
+    },
+    {
+      "round": 2,
+      "path": "text-video",
+      "taskId": "387f8d5b1d522f5746675c90dad926e3",
+      "providerRequestId": "task_Nkx9KKkVFZ9dDDMywpsSD0d0xgO6inZT",
+      "billingRequestId": "202610011529277981015668268d9d6eUHzEIpK",
+      "clientVersion": "v1.6.21",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.139354,
+      "artifactSHA256": "f8f5349f90d610e5bccf0c57dd3491260f7d2c8709a7d1fb29ea0c68a3b18eb8",
+      "actualMedia": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 864,
+            "height": 496,
+            "r_frame_rate": "24/1",
+            "duration": "5.041667"
+          }
+        ],
+        "format": {
+          "duration": "5.041667",
+          "size": "1037490"
+        }
+      },
+      "requestParameters": {
+        "quota": 569677,
+        "ratio": "16:9",
+        "status": "SUCCESS",
+        "task_id": "task_Nkx9KKkVFZ9dDDMywpsSD0d0xgO6inZT",
+        "duration": 5,
+        "references": [],
+        "request_id": "202610011529277981015668268d9d6eUHzEIpK",
+        "resolution": "480p",
+        "generate_audio": false,
+        "upstream_model": "seedance-2.0-fast"
+      }
+    },
+    {
+      "round": 2,
+      "path": "image-image",
+      "taskId": "6beb37c37f67f10568a52c7a65f88e17",
+      "providerRequestId": "evt-JOTLJNMYOQSO",
+      "billingRequestId": "202610011530439628561278268d9d6PL5Njt4g",
+      "clientVersion": "v1.6.21",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "beefapi::gpt-image-2.5-flare",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 0.49,
+      "artifactSHA256": "56acb2078ad7b4683ebabbd07bdb0ee21d84f43d4d777f8bde7cf2f9f8b66f19",
+      "actualMedia": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "png",
+            "codec_type": "video",
+            "width": 1254,
+            "height": 1254,
+            "r_frame_rate": "25/1"
+          }
+        ],
+        "format": {
+          "size": "1916767"
+        }
+      },
+      "requestParameters": null
+    },
+    {
+      "round": 2,
+      "path": "image-video",
+      "taskId": "195fa5e1d0151297d4fbeff3ad8adda6",
+      "providerRequestId": "task_gIq2UxMwy2cirbwu5BKflPqUyCXur8y4",
+      "billingRequestId": "202610011532208804641538268d9d65uSgkqUt",
+      "clientVersion": "v1.6.21",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.139354,
+      "artifactSHA256": "ecc31baa86245272b6fe8cdb4ae1882f30eb6cdbd116fea0e2510c7771edf988",
+      "actualMedia": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 864,
+            "height": 496,
+            "r_frame_rate": "24/1",
+            "duration": "5.041667"
+          }
+        ],
+        "format": {
+          "duration": "5.041667",
+          "size": "883847"
+        }
+      },
+      "requestParameters": {
+        "quota": 569677,
+        "ratio": null,
+        "status": "SUCCESS",
+        "task_id": "task_gIq2UxMwy2cirbwu5BKflPqUyCXur8y4",
+        "duration": 5,
+        "references": [
+          {
+            "type": "image_url",
+            "https": true,
+            "named_path": true
+          }
+        ],
+        "request_id": "202610011532208804641538268d9d65uSgkqUt",
+        "resolution": "480p",
+        "generate_audio": false,
+        "upstream_model": "seedance-2.0-fast"
+      }
+    },
+    {
+      "round": 2,
+      "path": "video-video",
+      "taskId": "a726fa9c3cf382748bc5914c8b826b9e",
+      "providerRequestId": "task_xsxkZdhAkZrkfp9QudDB0TMrWvQNtY2k",
+      "billingRequestId": "202610011534595832036528268d9d6b9xeGdjZ",
+      "clientVersion": "v1.6.21",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.225988,
+      "artifactSHA256": "dd3691903691396239041c99d21a9bc814d949bef09e2f1b92a2a7beda7d56a6",
+      "actualMedia": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 864,
+            "height": 496,
+            "r_frame_rate": "24/1",
+            "duration": "5.041667"
+          }
+        ],
+        "format": {
+          "duration": "5.041667",
+          "size": "807383"
+        }
+      },
+      "requestParameters": {
+        "quota": 612994,
+        "ratio": "16:9",
+        "status": "SUCCESS",
+        "task_id": "task_xsxkZdhAkZrkfp9QudDB0TMrWvQNtY2k",
+        "duration": 5,
+        "references": [
+          {
+            "type": "video_url",
+            "https": true,
+            "named_path": true
+          }
+        ],
+        "request_id": "202610011534595832036528268d9d6b9xeGdjZ",
+        "resolution": "480p",
+        "generate_audio": false,
+        "upstream_model": "seedance-2.0-fast"
+      }
+    },
+    {
+      "round": 2,
+      "path": "multi-video",
+      "taskId": "55443e18c975aaa44ed7f32077b62eef",
+      "providerRequestId": "task_X4aLBVrCfVkfLJDEUsiTiOunJ3OGYvti",
+      "billingRequestId": "202610011537072092171558268d9d6WoQxHOf3",
+      "clientVersion": "v1.6.21",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "2714dc3b18420b1b9b266fef54883611185a71b2afb8fe78db13885fac07e2c6",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.225988,
+      "artifactSHA256": "39bfa95ceb73c5bc7bb1e1608198d9f80c8adf6aea5f81b95dac06046f57ceed",
+      "actualMedia": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 864,
+            "height": 496,
+            "r_frame_rate": "24/1",
+            "duration": "5.041667"
+          }
+        ],
+        "format": {
+          "duration": "5.041667",
+          "size": "806413"
+        }
+      },
+      "requestParameters": {
+        "quota": 612994,
+        "ratio": "16:9",
+        "status": "SUCCESS",
+        "task_id": "task_X4aLBVrCfVkfLJDEUsiTiOunJ3OGYvti",
+        "duration": 5,
+        "references": [
+          {
+            "type": "image_url",
+            "https": true,
+            "named_path": true
+          },
+          {
+            "type": "image_url",
+            "https": true,
+            "named_path": true
+          },
+          {
+            "type": "video_url",
+            "https": true,
+            "named_path": true
+          }
+        ],
+        "request_id": "202610011537072092171558268d9d6WoQxHOf3",
+        "resolution": "480p",
+        "generate_audio": false,
+        "upstream_model": "seedance-2.0-fast"
+      }
+    }
+  ],
+  "copyRegression": {
+    "taskId": "0851a18ca6a4062cb2429d9270cea608",
+    "providerRequestId": "task_O1jErSxc288Trns4t08g9SZqE7ErsB1B",
+    "status": "succeeded",
+    "sourceNodeId": "video-1790865673282-ynuth",
+    "copiedNodeId": "video-1790870431214-0-yz354",
+    "sourceRetained": true,
+    "copyRetainedAfterRestart": true,
+    "mediaOpened": true,
+    "mediaDecoded": true,
+    "artifactSHA256": "380211140cb5744074e2a7afffb4b32bb697f7ab31cb2416d141b6adebaf0367",
+    "actualMedia": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 1280,
+          "height": 720,
+          "r_frame_rate": "24/1",
+          "duration": "5.041667"
+        }
+      ],
+      "format": {
+        "duration": "5.041667",
+        "size": "2017701"
+      }
+    },
+    "billing": "settled",
+    "costCNY": 2.45025,
+    "billingRequestId": "202610011602023188757138268d9d6KUmrqlha"
+  },
+  "billing": {
+    "baselineSpentCNY": 15.052802,
+    "includesPriorDiagnostics": true,
+    "ledgerHasMore": false,
+    "allRequestsSettled": true
+  },
+  "review": {
+    "result": "approved",
+    "canvasReview": "20261001-222928-review-bccf7f3a",
+    "seedanceReview": "20261001-223828-continue-737c0f6d",
+    "ciRuns": [
+      "36880971697",
+      "36880971865"
+    ]
+  },
+  "notes": [
+    "Two rounds use the original fixtures; second round regenerates the same nodes.",
+    "Seedance 480p output is actually 864x496, 24fps, 5.041667s, without audio; no postprocessing applied.",
+    "70 MiB preupload was separately verified; 200 MiB was not live-tested."
+  ]
+}

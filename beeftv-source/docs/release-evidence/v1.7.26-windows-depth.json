@@ -1,0 +1,21 @@
+{
+  "scope": "native Windows console-process lifecycle only",
+  "sourceFile": "backend/internal/depthcapture/process_windows.go",
+  "sourceSHA256": "1eb10124e94fb7b2c593d457ae965fd6e9e528fbc2b1af55a721699bd54f0f8b",
+  "platform": "Windows 11 amd64 10.0.26200",
+  "goVersion": "go1.26.0 windows/amd64",
+  "productionSourceCopiedWithoutChanges": true,
+  "normalExitConsoleWindow": false,
+  "positiveControlDetectedHiddenConsole": true,
+  "cancelParentConsoleWindow": false,
+  "cancelGrandchildConsoleWindow": false,
+  "matchingTopLevelWindows": 0,
+  "cancelledProcessTreeExited": true,
+  "cancellationMilliseconds": 194,
+  "temporaryDirectoryRemoved": true,
+  "remainingProcesses": 0,
+  "actualDepthInferenceExecuted": false,
+  "gpuInferenceExecuted": false,
+  "installedDesktopPackageTested": false,
+  "result": "passed"
+}

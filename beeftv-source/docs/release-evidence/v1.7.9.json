@@ -1,0 +1,612 @@
+{
+  "version": "v1.7.9",
+  "contractVersion": 2,
+  "sourceDigest": "109df656d676b27aef4967ab5941a279939ab407b4639ca3c5b7ecda2eccece3",
+  "releaseComplete": false,
+  "ownerException": {
+    "scope": "portrait-release-evidence-20261007",
+    "approvedBy": "Ender",
+    "instruction": "上线吧",
+    "date": "2026-10-07",
+    "precedingQuestion": "是否仅对 v1.7.9 接受以下已披露的验收缺口后继续发布：①沿用目录修复前已成功的十二条生成及未受影响功能测试（保留真实执行版本）；②保留两次首次聊天超时、部分供应商采购币种和逐笔结算未知；③素材托盘拖入画布、干净 Mac 首次打开尚未验证。当前新版的两条真人生成、报价与重启已通过；独立 review、正式包检查、Windows 升级和上线后读回仍照常执行。",
+    "carryForward": true,
+    "financialGaps": true,
+    "assetTrayDrag": "unverified",
+    "cleanMacFirstLaunch": "unverified",
+    "evidence": [
+      "docs/release-evidence/v1.7.9-acceptance.json#ownerDecision"
+    ]
+  },
+  "budgetCNY": null,
+  "spentCNY": null,
+  "pendingCNY": null,
+  "financialUncertainty": {
+    "status": "unresolved",
+    "evidence": [
+      "docs/release-evidence/v1.7.9-acceptance.json#financialUncertainty"
+    ]
+  },
+  "liveMatrixStatus": "passed_on_prior_candidate_owner_accepted",
+  "scenario": {
+    "id": "national-day-homeward-travel-memories-20261007",
+    "title": "国庆返程：湖畔旅行回忆与归途列车",
+    "source": "https://www.news.cn/politics/20261006/1b027029739c445a9a30c98b6177dbcd/c.html",
+    "queryDate": "2026-10-07",
+    "fixtures": {
+      "image-1.jpg": "eaa6db30a3aad163bfba5b9d2ded29c5747527c1e2237b139ae0c1d9ade68ed0",
+      "image-2.jpg": "8615845aa13614479faa8687bba57057cf60a9b8f5e86b09f65e7ad95f680ce0",
+      "reference.mp4": "3eb9914fa51700246f3885c705487b93b2f7b7175e7e07f9fe7b6e2b960717e1"
+    }
+  },
+  "cases": [
+    {
+      "round": 1,
+      "path": "image-image",
+      "taskId": "6bc717e51218e63a6fa65658b0f9c39b",
+      "providerRequestId": "evt-UKJQKQREIMHJ",
+      "clientVersion": "v1.7.9",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "80b193e10711b29cf44645e49227db13b82986d78fb777db30dc766caac18484",
+      "model": "beefapi::gpt-image-2.5-flare",
+      "status": "succeeded",
+      "mediaDecoded": true,
+      "artifactSHA256": "08797f1d25b87e756f2698b7e0bc0c94f35074e7ffa19df473b204b30731aecf",
+      "entrypoint": "assistant",
+      "proposalId": "gp-bd69c92ae3676668",
+      "operationId": "proposal:gp-bd69c92ae3676668:node-dlydse4jqxsw-e388c654a5",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 0.49,
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "confirmed": true,
+      "sessionId": "01a114fa-8153-73b5-8cd4-268621b2f8f0",
+      "turnId": "34f830361e52e450a829c8f2",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#matrix"
+      ],
+      "billingCorrelation": "unique_account_endpoint_time_window"
+    },
+    {
+      "round": 1,
+      "path": "image-video",
+      "taskId": "96af0ecab1df3046441d3fa99f2e5b75",
+      "providerRequestId": "task_eCX68XtfA2phyJENj9dxlsBsQ9WnP9j3",
+      "clientVersion": "v1.7.9",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "80b193e10711b29cf44645e49227db13b82986d78fb777db30dc766caac18484",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "mediaDecoded": true,
+      "artifactSHA256": "213a23fc293ee96c5deefb6ba8a74a732b08deee559d8ed5bca7c3a9ee81a3fe",
+      "entrypoint": "assistant",
+      "proposalId": "gp-c159f43f3ffafaf9",
+      "operationId": "proposal:gp-c159f43f3ffafaf9:node-dlydse4jr1ns-bc634a8b1f",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.139354,
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "confirmed": true,
+      "sessionId": "01a114fa-8153-73b5-8cd4-268621b2f8f0",
+      "turnId": "5a0155ee0050ddb2f573275d",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#matrix"
+      ],
+      "billingCorrelation": "exact_gateway_task_id"
+    },
+    {
+      "round": 1,
+      "path": "multi-video",
+      "taskId": "d505f20c052c1e2877d4b1f016a6df0b",
+      "providerRequestId": "task_jB9GV7ObzvRiedY5pIkWcS13Bew68r3e",
+      "clientVersion": "v1.7.9",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "80b193e10711b29cf44645e49227db13b82986d78fb777db30dc766caac18484",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "mediaDecoded": true,
+      "artifactSHA256": "9085b67e81385821b288847d3bf5efd690185029a4d9d5ef20c542613c181266",
+      "entrypoint": "assistant",
+      "proposalId": "gp-c159f43f3ffafaf9",
+      "operationId": "proposal:gp-c159f43f3ffafaf9:node-dlydse4jr3z4-424af877fe",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.225988,
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "confirmed": true,
+      "sessionId": "01a114fa-8153-73b5-8cd4-268621b2f8f0",
+      "turnId": "5a0155ee0050ddb2f573275d",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#matrix"
+      ],
+      "billingCorrelation": "exact_gateway_task_id"
+    },
+    {
+      "round": 1,
+      "path": "text-image",
+      "taskId": "d5763cb7990fa77f36c05cb43fb5fe29",
+      "providerRequestId": "evt-JKLXWWGNIVXY",
+      "clientVersion": "v1.7.9",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "80b193e10711b29cf44645e49227db13b82986d78fb777db30dc766caac18484",
+      "model": "beefapi::gpt-image-2.5-flare",
+      "status": "succeeded",
+      "mediaDecoded": true,
+      "artifactSHA256": "9478e08daaaacc235518eb0fbe1a76e8d406803d066b19243bdeb2c0750e38cd",
+      "entrypoint": "assistant",
+      "proposalId": "gp-bd69c92ae3676668",
+      "operationId": "proposal:gp-bd69c92ae3676668:node-dlydse4jqvhk-51aee0fed3",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 0.49,
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "confirmed": true,
+      "sessionId": "01a114fa-8153-73b5-8cd4-268621b2f8f0",
+      "turnId": "34f830361e52e450a829c8f2",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#matrix"
+      ],
+      "billingCorrelation": "unique_account_endpoint_time_window"
+    },
+    {
+      "round": 1,
+      "path": "text-video",
+      "taskId": "c2d75b51ece435dacefc84235589b169",
+      "providerRequestId": "task_kXsDZHzWzqQV2RgasJMlC6AM6mA7D5uS",
+      "clientVersion": "v1.7.9",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "80b193e10711b29cf44645e49227db13b82986d78fb777db30dc766caac18484",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "mediaDecoded": true,
+      "artifactSHA256": "358c9279b8cae72ea86675011369948d9ab2fc7609e9b43907ff480a2b272c11",
+      "entrypoint": "assistant",
+      "proposalId": "gp-c159f43f3ffafaf9",
+      "operationId": "proposal:gp-c159f43f3ffafaf9:node-dlydse4jr048-68f240be20",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.139354,
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "confirmed": true,
+      "sessionId": "01a114fa-8153-73b5-8cd4-268621b2f8f0",
+      "turnId": "5a0155ee0050ddb2f573275d",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#matrix"
+      ],
+      "billingCorrelation": "exact_gateway_task_id"
+    },
+    {
+      "round": 1,
+      "path": "video-video",
+      "taskId": "0e1b4fab13a54cc6a9769898f65a9c69",
+      "providerRequestId": "task_FhAb5OpuTAbnsgjgNeY7CLyXd7bXZZK1",
+      "clientVersion": "v1.7.9",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "80b193e10711b29cf44645e49227db13b82986d78fb777db30dc766caac18484",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "mediaDecoded": true,
+      "artifactSHA256": "b0f068fc24851784ca92f3162b49c5b1c589c3fab6a69149063a75adfa9ed41f",
+      "entrypoint": "assistant",
+      "proposalId": "gp-c159f43f3ffafaf9",
+      "operationId": "proposal:gp-c159f43f3ffafaf9:node-dlydse4jr37c-8528080809",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.225988,
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "confirmed": true,
+      "sessionId": "01a114fa-8153-73b5-8cd4-268621b2f8f0",
+      "turnId": "5a0155ee0050ddb2f573275d",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#matrix"
+      ],
+      "billingCorrelation": "exact_gateway_task_id"
+    },
+    {
+      "round": 2,
+      "path": "image-image",
+      "taskId": "f0c22429c86d8ffa60120dc9219f04cb",
+      "providerRequestId": "evt-XDVLUZPKHRLR",
+      "clientVersion": "v1.7.9",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "80b193e10711b29cf44645e49227db13b82986d78fb777db30dc766caac18484",
+      "model": "beefapi::gpt-image-2.5-flare",
+      "status": "succeeded",
+      "mediaDecoded": true,
+      "artifactSHA256": "bacc8ffd9895126ab63038853b58843ff7c6ceaf8cc99240d07b2d4659e15e78",
+      "entrypoint": "assistant",
+      "proposalId": "gp-4cac63c04f00437d",
+      "operationId": "proposal:gp-4cac63c04f00437d:node-dlydse4jqxsw-e388c654a5",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 0.49,
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "confirmed": true,
+      "sessionId": "01a114fa-8153-73b5-8cd4-268621b2f8f0",
+      "turnId": "db7a2bb97d5641f0a5a65e03",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#matrix"
+      ],
+      "billingCorrelation": "unique_account_endpoint_time_window"
+    },
+    {
+      "round": 2,
+      "path": "image-video",
+      "taskId": "e41e3b60a517b3cb3b244e0708dc569b",
+      "providerRequestId": "task_3Q7nfO43cfOAglDpkLY5k6Y6cpx7lnX2",
+      "clientVersion": "v1.7.9",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "80b193e10711b29cf44645e49227db13b82986d78fb777db30dc766caac18484",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "mediaDecoded": true,
+      "artifactSHA256": "8ba0d0c7328db28766200da85e6c0d5596df924fb19b7badea17c76b119bbcf8",
+      "entrypoint": "assistant",
+      "proposalId": "gp-58a78806f4692d3b",
+      "operationId": "proposal:gp-58a78806f4692d3b:node-dlydse4jr1ns-bc634a8b1f",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.139354,
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "confirmed": true,
+      "sessionId": "01a114fa-8153-73b5-8cd4-268621b2f8f0",
+      "turnId": "01b14ce75930fd66f9bfa83f",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#matrix"
+      ],
+      "billingCorrelation": "exact_gateway_task_id"
+    },
+    {
+      "round": 2,
+      "path": "multi-video",
+      "taskId": "6a570c75ad6e51a5512d1c67c62e72b1",
+      "providerRequestId": "task_2qvc5cGS01MvrKTW2lbz7m91pSO3eLHa",
+      "clientVersion": "v1.7.9",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "80b193e10711b29cf44645e49227db13b82986d78fb777db30dc766caac18484",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "mediaDecoded": true,
+      "artifactSHA256": "5d66e6170fcf96891b6a27c45925bf707578471c8e30adaa42d35d8c77444004",
+      "entrypoint": "assistant",
+      "proposalId": "gp-58a78806f4692d3b",
+      "operationId": "proposal:gp-58a78806f4692d3b:node-dlydse4jr3z4-424af877fe",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.225988,
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "confirmed": true,
+      "sessionId": "01a114fa-8153-73b5-8cd4-268621b2f8f0",
+      "turnId": "01b14ce75930fd66f9bfa83f",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#matrix"
+      ],
+      "billingCorrelation": "exact_gateway_task_id"
+    },
+    {
+      "round": 2,
+      "path": "text-image",
+      "taskId": "fbcaa3ac56be8db0c9afde9502e2895d",
+      "providerRequestId": "evt-NPYBXCZBBHUK",
+      "clientVersion": "v1.7.9",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "80b193e10711b29cf44645e49227db13b82986d78fb777db30dc766caac18484",
+      "model": "beefapi::gpt-image-2.5-flare",
+      "status": "succeeded",
+      "mediaDecoded": true,
+      "artifactSHA256": "f9d8b81beb8649549a7cd830b791271269ccc7ff407b38752e3f8f26660a9798",
+      "entrypoint": "assistant",
+      "proposalId": "gp-4cac63c04f00437d",
+      "operationId": "proposal:gp-4cac63c04f00437d:node-dlydse4jqvhk-51aee0fed3",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 0.49,
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "confirmed": true,
+      "sessionId": "01a114fa-8153-73b5-8cd4-268621b2f8f0",
+      "turnId": "db7a2bb97d5641f0a5a65e03",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#matrix"
+      ],
+      "billingCorrelation": "unique_account_endpoint_time_window"
+    },
+    {
+      "round": 2,
+      "path": "text-video",
+      "taskId": "099f624545dfd06c1bd463b2da666c9b",
+      "providerRequestId": "task_yZITXaqbjSkyPQYNJImGQVlK0S8uWq82",
+      "clientVersion": "v1.7.9",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "80b193e10711b29cf44645e49227db13b82986d78fb777db30dc766caac18484",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "mediaDecoded": true,
+      "artifactSHA256": "3a7db9cc16a29c601f70cc66b14024079016a3728da122770a61cf282d1264f6",
+      "entrypoint": "assistant",
+      "proposalId": "gp-58a78806f4692d3b",
+      "operationId": "proposal:gp-58a78806f4692d3b:node-dlydse4jr048-68f240be20",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.139354,
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "confirmed": true,
+      "sessionId": "01a114fa-8153-73b5-8cd4-268621b2f8f0",
+      "turnId": "01b14ce75930fd66f9bfa83f",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#matrix"
+      ],
+      "billingCorrelation": "exact_gateway_task_id"
+    },
+    {
+      "round": 2,
+      "path": "video-video",
+      "taskId": "9e598c73715a7aad839f22ae9d3a3216",
+      "providerRequestId": "task_Hj9skk59bjYoaLYIxILLE02peVzlbnXT",
+      "clientVersion": "v1.7.9",
+      "platform": "darwin-arm64",
+      "fixtureDigest": "80b193e10711b29cf44645e49227db13b82986d78fb777db30dc766caac18484",
+      "model": "beefapi::seedance-2.0-fast",
+      "status": "succeeded",
+      "mediaDecoded": true,
+      "artifactSHA256": "c10783db4f7dab7c14775368853fc4814f2a51055dc32cd9b08b4a34837ffd05",
+      "entrypoint": "assistant",
+      "proposalId": "gp-58a78806f4692d3b",
+      "operationId": "proposal:gp-58a78806f4692d3b:node-dlydse4jr37c-8528080809",
+      "clientSubmitted": true,
+      "canvasVerified": true,
+      "mediaOpened": true,
+      "billing": "settled",
+      "costCNY": 1.225988,
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "confirmed": true,
+      "sessionId": "01a114fa-8153-73b5-8cd4-268621b2f8f0",
+      "turnId": "01b14ce75930fd66f9bfa83f",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#matrix"
+      ],
+      "billingCorrelation": "exact_gateway_task_id"
+    }
+  ],
+  "agentChecks": {
+    "canvas_read": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "status": "passed",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#agentChecks/canvas_read"
+      ]
+    },
+    "asset_reference": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "status": "passed",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#agentChecks/asset_reference"
+      ]
+    },
+    "canvas_mutation": {
+      "method": "native",
+      "executedCommit": "e1054ab1224caf3254179d424e2d4bf2613a5bee",
+      "executedSourceDigest": "1e2eac4b8ada72c080b02e101b96b4726fba6869a5c0ff445d4ba094109a9326",
+      "status": "passed",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#agentChecks/canvas_mutation"
+      ]
+    },
+    "multi_turn": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "status": "passed",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#agentChecks/multi_turn"
+      ]
+    },
+    "proposal_decline": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "status": "passed",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#agentChecks/proposal_decline"
+      ]
+    },
+    "proposal_stale": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "status": "passed",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#agentChecks/proposal_stale"
+      ]
+    },
+    "proposal_idempotency": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "status": "passed",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#agentChecks/proposal_idempotency"
+      ]
+    },
+    "session_history": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "status": "passed",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#agentChecks/session_history"
+      ]
+    },
+    "session_restart": {
+      "method": "native",
+      "executedCommit": "7e707983e087b4913245236ccd27b69c47849fe8",
+      "executedSourceDigest": "3f2489a9fa52e45d0e0f0771c22c2430e939ad1f14443b3ecb5a6e0475f5e40c",
+      "status": "passed",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#agentChecks/session_restart"
+      ]
+    },
+    "cancel": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "status": "passed",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#agentChecks/cancel"
+      ]
+    },
+    "conflict_undo": {
+      "method": "deterministic",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "status": "passed",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#agentChecks/conflict_undo"
+      ]
+    },
+    "host_recovery": {
+      "method": "deterministic",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "status": "passed",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#agentChecks/host_recovery"
+      ]
+    },
+    "scope_isolation": {
+      "method": "deterministic",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "status": "passed",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#agentChecks/scope_isolation"
+      ]
+    },
+    "budget": {
+      "method": "deterministic",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "status": "passed",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#agentChecks/budget"
+      ]
+    },
+    "cli_mcp": {
+      "method": "native",
+      "executedCommit": "4219b283f8c1737ed6226a5de3281808cbfd8563",
+      "executedSourceDigest": "914efc252b2f83c023aca42634930f544d206c561264ea16e90e7b5e594f181e",
+      "status": "passed",
+      "evidence": [
+        "docs/release-evidence/v1.7.9-acceptance.json#agentChecks/cli_mcp"
+      ]
+    }
+  },
+  "review": {
+    "result": "approved",
+    "independent": true,
+    "sourceDigest": "109df656d676b27aef4967ab5941a279939ab407b4639ca3c5b7ecda2eccece3",
+    "reviewer": "Independent Codex /root/tv_release_audit",
+    "evidence": [
+      "docs/release-evidence/v1.7.9-acceptance.json#review"
+    ]
+  },
+  "upgrade": {
+    "preservedData": true,
+    "generationVerified": true,
+    "executedSourceDigest": "3f2489a9fa52e45d0e0f0771c22c2430e939ad1f14443b3ecb5a6e0475f5e40c",
+    "evidence": [
+      "docs/release-evidence/v1.7.9-acceptance.json#restart"
+    ]
+  },
+  "testedSourceObjects": {
+    "backend": "a1f5381fd1c1c5ac6d38f4569bf021069dfbaf43",
+    "web": "b5b2bd7f3ac28321bd820864306515fe9d07bb88",
+    "agent-host": "6447cb5e4aa37d40d77b0b81dcf12d0548f4c4ad",
+    "plugin-packages": "59a2884410cecb95974264406e1b82d4e5748d81",
+    "assets/app-icon.png": "332a19fc1eb9971c4f04908f900b32b4a0f32c86",
+    "VERSION": "976791665163f991be305ee61f3f99ae887e39be",
+    ".github/workflows": "62f77a1e7a6af8f53e22275a16c5a16b39eda933"
+  },
+  "packages": {
+    "status": "pending_release_workflow",
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml"
+    ]
+  },
+  "portraitAcceptance": {
+    "budgetCNY": 20,
+    "spentCNY": 15.231452,
+    "pendingCNY": 0,
+    "executedSourceDigest": "3f2489a9fa52e45d0e0f0771c22c2430e939ad1f14443b3ecb5a6e0475f5e40c",
+    "cases": [
+      {
+        "model": "seedance-2.0-portrait",
+        "taskId": "f63c892df105ba844535ef2e9723ccd6",
+        "providerRequestId": "task_fs9Ho0wc0JJbsRS9lnygc7RxPPOYkEzQ",
+        "status": "succeeded",
+        "attempts": 1,
+        "billing": "settled",
+        "costCNY": 6.022112,
+        "mediaOpened": true,
+        "mediaDecoded": true,
+        "artifactSHA256": "4acad53f2d19e4adea304820026f71322cb7b7c93676b59862a35f4d1997888b",
+        "evidence": [
+          "docs/release-evidence/v1.7.9-acceptance.json#portraitAcceptance"
+        ]
+      },
+      {
+        "model": "seedance-2.5-portrait",
+        "taskId": "4a253b28b201a461ca1fbaefdddccbf3",
+        "providerRequestId": "task_3hZWEcH5nveEJUmSxm0NvBKMxcZlbvpV",
+        "status": "succeeded",
+        "attempts": 1,
+        "billing": "settled",
+        "costCNY": 9.20934,
+        "mediaOpened": true,
+        "mediaDecoded": true,
+        "artifactSHA256": "5db861ae5302d20fce28628d2e917b7b7c6cce741dd57e0c76a3429388f9e60f",
+        "evidence": [
+          "docs/release-evidence/v1.7.9-acceptance.json#portraitAcceptance"
+        ]
+      }
+    ]
+  }
+}

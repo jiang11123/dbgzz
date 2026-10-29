@@ -1,0 +1,742 @@
+{
+  "version": "v1.7.22",
+  "sourceCommit": "dbffa9510441be0e1c1bd3b0189db674c7a13294",
+  "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+  "preparedStatus": "ready_for_root_independent_receipt_review",
+  "newPaidSubmissions": 0,
+  "freshGeneration": false,
+  "allModelsLiveTested": false,
+  "identifierRoles": {
+    "nativeTaskId": "ee1291b1f8313491528acc2c585e67e1",
+    "nativeProviderRequestId": "task_NwgS6TK7jjgg1cax74tGdEQ43T71Cb7r",
+    "gatewayTaskId": "task_NwgS6TK7jjgg1cax74tGdEQ43T71Cb7r",
+    "nativeProviderRequestIdRole": "当前原生任务保存的网关任务 ID，可用于查询同一原任务。",
+    "priorV1721ProviderRequestIdRole": "旧 v1.7.21 公开回执的 providerRequestId 字段是上游供应商任务 ID；本回执不将该字段当作原生保存的网关 ID。",
+    "priorReceiptUnchanged": true,
+    "resourceId": "e104520550e682a1710e2f8d4eb46c24"
+  },
+  "originalGeneration": {
+    "status": "recorded",
+    "commit": "7685a7c8a8bd4576bce6e2822a5ea2b8db525af6",
+    "sourceDigest": "eb664aef1a07681a4e4b7fdf6106dca9540a1849126c90610a928fac312fa77c",
+    "evidence": [
+      "docs/release-evidence/v1.7.21.json",
+      "docs/release-evidence/v1.7.22-proof.json"
+    ],
+    "clientVersion": "v1.7.21",
+    "createdAtUTC": "2026-10-14T05:02:10.004597Z",
+    "commitProvenance": "原始生成 guard/click 摘要与生成之前已更新 canonical 客户端的 7685 构建日志相符；对该 commit 的源码树重新只读计算摘要一致。未用后来 review 或 squash 提交推定生成来源。",
+    "originalBuildLogSHA256": "87de5dfabe16fef588ba9776b681f742bb803eb8c1b03ad926cefb27b1828d56",
+    "originalGuardSHA256": "f302ad815ec449b7d7690b4f9cfa58098ca0b0a9a217721c05baeee5a08a6997",
+    "originalClickSHA256": "4d43887ac1c9e73048ac27ea89f4cb684a43674563b819e80d034c649582f094"
+  },
+  "currentBuild": {
+    "sourceCommit": "dbffa9510441be0e1c1bd3b0189db674c7a13294",
+    "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+    "startedAt": "2026-10-14T13:23:20.289507+00:00",
+    "endedAt": "2026-10-14T13:25:27.192207+00:00",
+    "exitCode": 0,
+    "sourceUnchanged": true,
+    "localGatePassed": true,
+    "isolatedBindingsDataDirectory": true,
+    "paidSubmissions": 0
+  },
+  "currentBuildAloneWasNotNativeGUIProof": true,
+  "currentOriginalTaskPrimaryDownload": {
+    "probe": "same-owned-task-primary-direct-download",
+    "startedAtUTC": "2026-10-14T13:31:08.993982Z",
+    "retrievalStartedAt": "2026-10-14T13:31:09.008331Z",
+    "downloadCompletedAt": "2026-10-14T13:31:24.748071Z",
+    "savedAt": "2026-10-14T13:31:24.750018Z",
+    "retrievalElapsedMs": 15739,
+    "downloadElapsedMs": 14923,
+    "nativeTaskId": "ee1291b1f8313491528acc2c585e67e1",
+    "providerTaskId": "task_NwgS6TK7jjgg1cax74tGdEQ43T71Cb7r",
+    "deployedAPICommit": "acb9737f3218e1f5ab7cf1c98c71760eda3103f4",
+    "executedSourceCommit": "dbffa9510441be0e1c1bd3b0189db674c7a13294",
+    "executedSourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+    "initialSourceClass": "public_upstream",
+    "downloadedBytes": 743509,
+    "artifactSHA256": "b1aa95b1c98c8fed4ec36edf70b903fde7c1f3296b078fb3cc50315a23b0a85f",
+    "nativeBytes": 743509,
+    "nativeSHA256": "b1aa95b1c98c8fed4ec36edf70b903fde7c1f3296b078fb3cc50315a23b0a85f",
+    "identicalBytes": true,
+    "mimeType": "video/mp4",
+    "wireGETsIncludingRedirects": 2,
+    "sharedDownloaderRequests": [
+      {
+        "method": "GET",
+        "hostClass": "official_same_task_backup",
+        "httpStatus": 200,
+        "bytes": 1421
+      },
+      {
+        "method": "GET",
+        "hostClass": "external",
+        "httpStatus": 200,
+        "bytes": 743509
+      }
+    ],
+    "nonGETObserved": false,
+    "paidSubmissions": 0,
+    "passed": true,
+    "ownedGETMayEnsureExistingArchive": true
+  },
+  "currentOriginalTaskCOSRenewal": {
+    "probe": "same-owned-task-COS-signature-renewal",
+    "startedAtUTC": "2026-10-14T13:33:09.265407Z",
+    "completedAtUTC": "2026-10-14T13:33:14.874932Z",
+    "downloadElapsedMs": 1216,
+    "nativeTaskId": "ee1291b1f8313491528acc2c585e67e1",
+    "providerTaskId": "task_NwgS6TK7jjgg1cax74tGdEQ43T71Cb7r",
+    "deployedAPICommit": "acb9737f3218e1f5ab7cf1c98c71760eda3103f4",
+    "executedSourceCommit": "dbffa9510441be0e1c1bd3b0189db674c7a13294",
+    "executedSourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+    "initialBackupStatus": 302,
+    "initialBackupTargetClass": "cos",
+    "signatureFixture": "one altered AWS SigV4 signature nibble; actual expiration not simulated",
+    "anonymousObjectHTTPStatus": 403,
+    "signedRangeHTTPStatus": 206,
+    "signedRangeBytes": 16,
+    "signedRangeMatchesNative": true,
+    "backupBytes": 743509,
+    "backupSHA256": "b1aa95b1c98c8fed4ec36edf70b903fde7c1f3296b078fb3cc50315a23b0a85f",
+    "nativeBytes": 743509,
+    "nativeSHA256": "b1aa95b1c98c8fed4ec36edf70b903fde7c1f3296b078fb3cc50315a23b0a85f",
+    "identicalBytes": true,
+    "mimeType": "video/mp4",
+    "wireGETsIncludingRedirects": 6,
+    "sharedDownloaderRequests": [
+      {
+        "method": "GET",
+        "hostClass": "cos",
+        "httpStatus": 403,
+        "bytes": 1128
+      },
+      {
+        "method": "GET",
+        "hostClass": "official_same_task_backup",
+        "httpStatus": 200,
+        "bytes": 743509
+      }
+    ],
+    "nonGETObserved": false,
+    "paidSubmissions": 0,
+    "passed": true,
+    "ownedGETMayEnsureExistingArchive": true,
+    "timingLimitation": "已有 COS 副本的同原任务坏签名403后续签下载；不是实际等到过期，也未计新生成或上传/复制，不能与直链耗时作速度比较。"
+  },
+  "currentFullDecode": {
+    "sourceCommit": "dbffa9510441be0e1c1bd3b0189db674c7a13294",
+    "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+    "startedAtUTC": "2026-10-14T13:33:00.692276+00:00",
+    "completedAtUTC": "2026-10-14T13:33:01.620732+00:00",
+    "fullDecode": true,
+    "processExitCode": 0,
+    "stderrBytes": 0,
+    "artifactSHA256": "b1aa95b1c98c8fed4ec36edf70b903fde7c1f3296b078fb3cc50315a23b0a85f",
+    "artifactBytes": 743509,
+    "passed": true,
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-xerror",
+      "-i",
+      "owned-downloaded-result",
+      "-f",
+      "null",
+      "-"
+    ],
+    "rawOutputPersisted": false,
+    "newPaidSubmissions": 0
+  },
+  "currentNativeWitness": {
+    "sourceCommit": "dbffa9510441be0e1c1bd3b0189db674c7a13294",
+    "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+    "clientVersion": "v1.7.22",
+    "originalTaskId": "ee1291b1f8313491528acc2c585e67e1",
+    "providerRequestId": "task_NwgS6TK7jjgg1cax74tGdEQ43T71Cb7r",
+    "resourceId": "e104520550e682a1710e2f8d4eb46c24",
+    "canvasId": "xUKCLzklWN9fpissRAOCy",
+    "freshSubmission": false,
+    "submissionCount": 0,
+    "nativeVerified": true,
+    "timingLimitation": "Original-task download and native existing-resource canvas are separate operations; deliberate observation gaps and no precise first-paint claim.",
+    "canvasOpenedAt": "2026-10-14T13:33:35.854Z",
+    "previewObservedAt": "2026-10-14T13:33:51.203Z",
+    "firstPlayStartedAt": "2026-10-14T13:33:51.394Z",
+    "firstFrameObservedAt": "2026-10-14T13:34:36.315Z",
+    "canvasFirstFrame": true,
+    "firstPlayEndObservedAt": "2026-10-14T13:34:36.492Z",
+    "playbackVerified": true,
+    "firstPlayEndAX": {
+      "position": "0:04",
+      "duration": "0:04",
+      "playing": false,
+      "progressPercent": 100
+    },
+    "leftCanvasAt": "2026-10-14T13:36:04.416Z",
+    "reopenedAt": "2026-10-14T13:37:06.949Z",
+    "reopenPreviewObservedAt": "2026-10-14T13:37:08.102Z",
+    "reopenPlayStartedAt": "2026-10-14T13:37:15.507Z",
+    "reopenFirstFrameObservedAt": "2026-10-14T13:37:16.143Z",
+    "reopenPlayEndObservedAt": "2026-10-14T13:37:57.455Z",
+    "reopened": true,
+    "reopenPlaybackVerified": true,
+    "reopenEndAX": {
+      "position": "0:04",
+      "duration": "0:04",
+      "playing": false,
+      "progressPercent": 100
+    },
+    "singleVideoPanObservedAt": "2026-10-14T13:39:02.360Z",
+    "singleVideoPanRestoredAt": "2026-10-14T13:39:16.297Z",
+    "mediaOpened": true,
+    "canvasVerified": true,
+    "noGenerateOrRetryClicked": true,
+    "singleVideoPanVerified": true,
+    "multiVideoPanVerified": false,
+    "sameExistingResourceAfterUpgrade": true,
+    "newResourceBindingClaim": false,
+    "firstFrameTiming": "observation_upper_bound",
+    "screenshotsPersisted": false,
+    "completedAt": "2026-10-14T13:39:40.806Z",
+    "observedBy": "Codex root actual native app AX and screenshots; database/proof preparer did not operate GUI",
+    "imageEvidence": "Actual native screenshots returned inline, no persisted PNG claim."
+  },
+  "currentPostNativeDatabaseReadback": {
+    "observedAtUTC": "2026-10-14T13:41:28.589964+00:00",
+    "phase": "post-current-native-playback-and-reopen",
+    "sourceCommit": "dbffa9510441be0e1c1bd3b0189db674c7a13294",
+    "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+    "readOnly": true,
+    "readOnlyMechanism": "SQLite mode=ro/query_only=ON/read transaction rolled back; materialized node with scalar output only",
+    "nativeUIObservedByDatabaseReader": false,
+    "nativeUIWitnessObservedBy": "Codex root via actual native app AX and screenshots",
+    "nativeUIWitnessPlaybackEndedAt": "2026-10-14T13:37:57.455Z",
+    "originalTaskId": "ee1291b1f8313491528acc2c585e67e1",
+    "originalProviderRequestId": "task_NwgS6TK7jjgg1cax74tGdEQ43T71Cb7r",
+    "resourceId": "e104520550e682a1710e2f8d4eb46c24",
+    "countsBefore": {
+      "projects": 0,
+      "tasks": 198,
+      "resources": 415
+    },
+    "countsObserved": {
+      "tasks": 198,
+      "resources": 415,
+      "projects": 0
+    },
+    "taskIDsDigestMethod": "SHA256 ordered ascending IDs joined newline without trailing newline",
+    "taskIDsDigestBefore": "f2c7bd586faf8bc5b45da6d1b9138dd27ef7cbeefc7dfe94d2bc5c226a0242db",
+    "taskIDsDigestObserved": "f2c7bd586faf8bc5b45da6d1b9138dd27ef7cbeefc7dfe94d2bc5c226a0242db",
+    "allTaskIDsPreserved": true,
+    "allResourceIDsPreserved": "not_claimed",
+    "resourceCountUnchanged": true,
+    "resourceIDsPreFinalSampleObservedAtUTC": "2026-10-14T08:52:22.342092+00:00",
+    "resourceIDsPreFinalSampleDigest": "2e2535ddd36a537a0e84f634100386f3e6614d1be72e128aa3dfbf4554a04b9a",
+    "resourceIDsDigestObserved": "2e2535ddd36a537a0e84f634100386f3e6614d1be72e128aa3dfbf4554a04b9a",
+    "preFinalResourceSamplePreserved": true,
+    "fullResourceIDBaselineBeforeOriginalUpgradeAvailable": false,
+    "originalArtifact": {
+      "bytes": 743509,
+      "sha256": "b1aa95b1c98c8fed4ec36edf70b903fde7c1f3296b078fb3cc50315a23b0a85f"
+    },
+    "beforeAfterComparison": {
+      "counts": true,
+      "taskIDsDigest": true,
+      "originalTaskId": true,
+      "originalProviderRequestId": true,
+      "originalCreatedAt": true,
+      "originalCompletedAt": true,
+      "originalTaskStatus": true,
+      "originalResultIds": true,
+      "resultResourceIDExact": true,
+      "resultOwnedResourceFileURLExact": true,
+      "resourceFields": true,
+      "originalCanvasId": true,
+      "originalNodeId": true,
+      "originalNodeTaskId": true,
+      "taskCanvasAssociation": true,
+      "owners": true,
+      "originalNodeStorageAssociation": true,
+      "originalArtifact": true,
+      "currentNativeWitness": true
+    },
+    "passed": true,
+    "newPaidSubmissions": 0,
+    "databaseMutations": 0,
+    "GUIActions": 0,
+    "sourceWrites": 0,
+    "credentialsReadOrDecrypted": false,
+    "rawURLsPromptsPayloadsKeysPersisted": false,
+    "privateUserIDPersisted": false,
+    "domainProjectCountIsNotCanvasCount": true,
+    "resourceIDLimitation": "No full resource-ID baseline exists from before the original upgrade; only the actual 08:52 pre-final sample is compared. allResourceIDsPreserved remains not_claimed."
+  },
+  "currentPostNativeBillingReadback": {
+    "observedAtUTC": "2026-10-14T13:41:29.699Z",
+    "phase": "post-current-native-playback-and-reopen",
+    "sourceCommit": "dbffa9510441be0e1c1bd3b0189db674c7a13294",
+    "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+    "readOnly": "on",
+    "readOnlyMechanism": "PostgreSQL read-only session; exact owned user/task/submission/ledger materialized CTE; scalar whitelist only",
+    "nativeTaskId": "ee1291b1f8313491528acc2c585e67e1",
+    "gatewayTaskId": "task_NwgS6TK7jjgg1cax74tGdEQ43T71Cb7r",
+    "nativeUIWitnessPlaybackEndedAt": "2026-10-14T13:37:57.455Z",
+    "task": {
+      "taskId": "task_NwgS6TK7jjgg1cax74tGdEQ43T71Cb7r",
+      "market": "enterprise",
+      "status": "SUCCESS",
+      "quota": 202970,
+      "submitTime": 1791954132,
+      "finishTime": 1791954219,
+      "billingState": "settled",
+      "originalReservedQuota": "213125",
+      "walletPreConsumed": "213125",
+      "billingAppliedDelta": "-10155",
+      "billingShortfallQuota": null,
+      "videoSubmitAttempt": null,
+      "upstreamIdentityMatchesOriginal": true,
+      "fundingIdentityMatchesOriginal": true
+    },
+    "submission": {
+      "count": 1,
+      "requestedCount": 1,
+      "reservedQuota": 213125,
+      "acceptedQuota": 213125,
+      "states": [
+        "accepted"
+      ]
+    },
+    "ledger": {
+      "count": 2,
+      "matchesOriginalRows": true,
+      "rawAbsoluteQuotaSum": 223280,
+      "netQuota": null,
+      "netQuotaClaimed": false
+    },
+    "sameOriginalTaskFields": {
+      "taskId": true,
+      "market": true,
+      "status": true,
+      "quota": true,
+      "submitTime": true,
+      "finishTime": true,
+      "billingState": true,
+      "originalReservedQuota": true,
+      "walletPreConsumed": true,
+      "billingAppliedDelta": true,
+      "billingShortfallQuota": true,
+      "videoSubmitAttempt": true,
+      "upstreamIdentity": true,
+      "fundingIdentity": true,
+      "originalLedgerRows": true,
+      "ledgerCount": true,
+      "submissionCount": true,
+      "requestedCount": true,
+      "authoritativeSettledTaskQuota": true
+    },
+    "billingBefore": {
+      "status": "settled",
+      "costCNY": 0.40594
+    },
+    "billingAfter": {
+      "status": "settled",
+      "costCNY": 0.40594
+    },
+    "billingProof": {
+      "status": "passed",
+      "settledQuota": 202970,
+      "quotaPerCNY": 500000,
+      "settledCostCNY": "0.40594",
+      "unchangedActualQuotaAndLedgerNotNewPriceEstimate": true,
+      "quotaAuthority": "owned task.quota with billingState=settled; actual runtime quota_per_unit",
+      "ledgerNetQuota": null,
+      "ledgerNetQuotaClaimed": false
+    },
+    "productionBuild": {
+      "version": "codex-20261014-acb9737f32",
+      "build_commit": "acb9737f3218e1f5ab7cf1c98c71760eda3103f4",
+      "build_time": "2026-10-14T10:56:35Z",
+      "build_source": "github-actions-self-hosted-grok-bot",
+      "quota_per_unit": 500000
+    },
+    "downloadEnvironmentAPICommit": "acb9737f3218e1f5ab7cf1c98c71760eda3103f4",
+    "productionBuildMatchesDownloadEnvironment": true,
+    "privateAccountIdentityMatchedWithoutOutput": true,
+    "originalTaskBillingUnchanged": true,
+    "passed": true,
+    "newPaidSubmissions": 0,
+    "productionMutations": 0,
+    "newKeys": 0,
+    "databaseMutations": 0,
+    "rawURLsPromptsPayloadsKeysBalancesRequestIDsPersisted": false,
+    "privateUserIDPersisted": false,
+    "readerProjectionCorrection": {
+      "initialProjectionStatus": "failed_retained",
+      "originalFailedReceiptSHA256": "29403d386f8ca4312dc26889865926582148c7325df2afc15dde055d2e499da9",
+      "firstFailureWasReaderAssumption": true,
+      "APICommit": "acb9737f3218e1f5ab7cf1c98c71760eda3103f4",
+      "sourceFiles": [
+        "model/log.go",
+        "service/task_billing.go"
+      ],
+      "logContract": "consume type2 / refund type6; refund log stores positive absolute quota, raw sum is not net spend.",
+      "rawAbsoluteQuotaSum": 223280,
+      "ledgerNetQuota": null,
+      "ledgerNetQuotaClaimed": false,
+      "actualCostAuthority": "unchanged authoritative settled task.quota=202970 and actual runtime quota_per_unit=500000 give 0.40594 CNY",
+      "currentCompleteOriginalLedgerRowsHashMatched": true,
+      "originalLedgerRowCount": 2,
+      "originalSubmissionCount": 1,
+      "productionRequeriesForCorrection": 0,
+      "productionOrProductChangesForCorrection": 0,
+      "snapshotObservedAtUTC": "2026-10-14T13:41:29.699Z"
+    }
+  },
+  "currentSourceIndependentReview": {
+    "status": "approved_source_only",
+    "independent": true,
+    "currentCommit": "dbffa9510441be0e1c1bd3b0189db674c7a13294",
+    "currentSourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+    "jobId": "20261014-212353-continue-98e62d9d",
+    "reviewer": "Grok Build",
+    "scope": "actual ten PR149 frontend files and their task/result/cancel/playback callers; unchanged backend confirmed",
+    "verdict": "No blocker",
+    "newReceiptApprovedByThisSourceReview": false,
+    "priorDeliveryCodeReview": {
+      "status": "approved",
+      "reviewer": "Grok Build",
+      "independent": true,
+      "currentCommit": "5fe11cbb978a0506f4761b4f5ad127b750339e94",
+      "currentSourceDigest": "0dd71f0bc45f1e4df74e3cb0c6b699f91839d2946608575e06c6c38fc837c4c0",
+      "currentJobId": "20261014-200449-continue-7d36348f",
+      "currentScope": "4d0ecbd 到 5fe11cbb 的测试计数同步增量；其余已审核实现沿生产等价和先前增量审核链保留。",
+      "chain": [
+        {
+          "jobId": "20261014-190647-continue-f0b0fca9",
+          "commit": "1bf0bf8ff6d4bf85bb998d8d6c47c0c7cc5860d8",
+          "sourceDigest": "a4dab07f2f33c7ee8841fac46e43a92a00305e6164ba50905983790683654a28",
+          "verdict": "PASS",
+          "scope": "实际三处交付问题修复复审及 12 个窄回归；不替代 native 或发布包验收。"
+        },
+        {
+          "jobId": "20261014-193316-continue-8fb6f566",
+          "commit": "4d0ecbd317175015d6e24b44b603c09d14c167cb",
+          "sourceDigest": "b3f0bd49acce3941b6ed8fb1d1d5e6c854bf83f11f9fb1276cce1feb114ec2e3",
+          "verdict": "PASS",
+          "scope": "文案增量；后端字节未变。"
+        },
+        {
+          "jobId": "20261014-200449-continue-7d36348f",
+          "commit": "5fe11cbb978a0506f4761b4f5ad127b750339e94",
+          "sourceDigest": "0dd71f0bc45f1e4df74e3cb0c6b699f91839d2946608575e06c6c38fc837c4c0",
+          "verdict": "approved",
+          "scope": "atomic fixture 计数同步；断言与请求阈值保持。"
+        }
+      ],
+      "noRemainingActualFindings": true,
+      "runtimeTestsNotInferredFromReview": true,
+      "newPublicEvidenceFilesReviewedInThesePriorJobs": false
+    },
+    "coverageComposition": "prior delivery-code approval + exact unchanged backend/protocol scope + independently inspected current frontend increment"
+  },
+  "currentReceiptIndependentReview": {
+    "status": "pending_root_independent_review",
+    "notPreApproved": true
+  },
+  "exactByteEquivalenceForPriorBackendTests": {
+    "previousCommit": "5fe11cbb978a0506f4761b4f5ad127b750339e94",
+    "previousSourceDigest": "0dd71f0bc45f1e4df74e3cb0c6b699f91839d2946608575e06c6c38fc837c4c0",
+    "currentCommit": "dbffa9510441be0e1c1bd3b0189db674c7a13294",
+    "currentSourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+    "trees": {
+      "backend": {
+        "executedAt5fe": "c6efb692825bee71ca42e342b7f171f093bbf03a",
+        "current": "c6efb692825bee71ca42e342b7f171f093bbf03a"
+      },
+      "plugin-packages": {
+        "executedAt5fe": "abfe4b8487d64d4a5b2fc1a205dec1c5f2b6eef3",
+        "current": "abfe4b8487d64d4a5b2fc1a205dec1c5f2b6eef3"
+      },
+      "scripts": {
+        "executedAt5fe": "1445a15acfb4983b810189b97640cfc670b62cea",
+        "current": "1445a15acfb4983b810189b97640cfc670b62cea"
+      },
+      ".github/workflows": {
+        "executedAt5fe": "a1c02a93a85c2c38c9ff2b4ca5f2a296cd3c28df",
+        "current": "a1c02a93a85c2c38c9ff2b4ca5f2a296cd3c28df"
+      }
+    },
+    "wholeBackendTreeEqual": true,
+    "protocolAndScriptsUnchanged": true,
+    "newFrontendSourceFileCount": 10,
+    "frontendChangedPaths": [
+      "web/src/components/canvas/canvas-node.tsx",
+      "web/src/lib/canvas/canvas-project-generation.ts",
+      "web/src/pages/canvas/canvas-image-generation-executor.ts",
+      "web/src/pages/canvas/canvas-media-generation-executors.ts",
+      "web/src/pages/canvas/project.tsx",
+      "web/src/pages/canvas/use-canvas-generation-executor.ts",
+      "web/src/pages/canvas/use-canvas-render-model.ts",
+      "web/src/services/local-workspace-repository.ts",
+      "web/src/styles/globals.css",
+      "web/test/canvas-node-copy.test.ts"
+    ],
+    "onlyEvidenceDocumentsAdditionallyChanged": true,
+    "oldReceiptsNotOverwrittenOrRelabeled": true
+  },
+  "priorBackendRaceApplicableViaExactBytes": {
+    "actualExecutionCommit": "5fe11cbb978a0506f4761b4f5ad127b750339e94",
+    "actualExecutionSourceDigest": "0dd71f0bc45f1e4df74e3cb0c6b699f91839d2946608575e06c6c38fc837c4c0",
+    "method": "targeted four-package race fixtures",
+    "passed": true,
+    "passedPackageCount": 4,
+    "passedTestAndSubtestCount": 734,
+    "skippedTests": [
+      "TestBeefAPIH3FamilyProductionCanary",
+      "TestBeefAPIH3LiveCanary",
+      "TestBeefAPIH3RealMediaDeliverySurvivesRestart"
+    ],
+    "paidLiveCanariesSkipped": true,
+    "registeredVideoProtocols": [
+      "agnes-video",
+      "agnes-video-v20",
+      "autodl-comfyui",
+      "baidu-video",
+      "dashscope-wan-video",
+      "fal-queue-video",
+      "full-video",
+      "gemini-veo",
+      "kling-video",
+      "luma-dream-machine",
+      "minimax-video",
+      "newapi",
+      "newapi-channel-1",
+      "newapi-channel-2",
+      "novita-video",
+      "pika-via-fal",
+      "pixverse-video",
+      "replicate-prediction-video",
+      "rolldek-wan-video",
+      "runninghub-workflow",
+      "runway-video",
+      "seedance-videos-compatible",
+      "tencent-hunyuan-video",
+      "vertex-veo",
+      "vidu-video",
+      "volcengine-ark-agent-plan-video",
+      "volcengine-ark-video",
+      "volcengine-jimeng-video",
+      "xai-video",
+      "zhipu-cogvideox"
+    ],
+    "testedVideoProtocols": [
+      "agnes-video",
+      "agnes-video-v20",
+      "autodl-comfyui",
+      "baidu-video",
+      "dashscope-wan-video",
+      "fal-queue-video",
+      "full-video",
+      "gemini-veo",
+      "kling-video",
+      "luma-dream-machine",
+      "minimax-video",
+      "newapi",
+      "newapi-channel-1",
+      "newapi-channel-2",
+      "novita-video",
+      "pika-via-fal",
+      "pixverse-video",
+      "replicate-prediction-video",
+      "rolldek-wan-video",
+      "runninghub-workflow",
+      "runway-video",
+      "seedance-videos-compatible",
+      "tencent-hunyuan-video",
+      "vertex-veo",
+      "vidu-video",
+      "volcengine-ark-agent-plan-video",
+      "volcengine-ark-video",
+      "volcengine-jimeng-video",
+      "xai-video",
+      "zhipu-cogvideox"
+    ],
+    "registeredProtocolCount": 30,
+    "handwrittenAndWorkflowDelivery": true,
+    "logSHA256": "0ffe8926c08077fe112654474af8d44fc144e07ea167a326e64a5d9d1db3ce01",
+    "priorExecutionNotRelabeled": true,
+    "currentApplicability": "same complete backend/test, protocol-package and script/workflow git trees; current source CI independently ran full Go"
+  },
+  "priorPhysicalIdleApplicableViaExactBytes": {
+    "actualExecutionCommit": "5fe11cbb978a0506f4761b4f5ad127b750339e94",
+    "actualExecutionSourceDigest": "0dd71f0bc45f1e4df74e3cb0c6b699f91839d2946608575e06c6c38fc837c4c0",
+    "test": "TestThirdPartyVideoStallRenewsSameTask",
+    "passed": true,
+    "physicalElapsedSeconds": 10.01,
+    "productionIdleTimeoutSeconds": 10,
+    "skipped": false,
+    "race": true,
+    "logSHA256": "473a9c258d00a7c1143bfc25b0406d20e6697a93e60c23733301f3cb65d63a90",
+    "priorExecutionNotRelabeled": true,
+    "currentApplicability": "entire tested backend and script/protocol scope is byte-identical; physical 10-second wait was performed on the recorded 5fe execution, not repeated on dbffa"
+  },
+  "currentSourceFullCI": {
+    "observedAtUTC": "2026-10-14T13:47:01.379853+00:00",
+    "head": "dbffa9510441be0e1c1bd3b0189db674c7a13294",
+    "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+    "status": "passed",
+    "runs": [
+      {
+        "runId": 38571403444,
+        "head": "dbffa9510441be0e1c1bd3b0189db674c7a13294",
+        "attempt": 1,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/glanderness/BeefTV/actions/runs/38571403444"
+      },
+      {
+        "runId": 38571403542,
+        "head": "dbffa9510441be0e1c1bd3b0189db674c7a13294",
+        "attempt": 1,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/glanderness/BeefTV/actions/runs/38571403542"
+      },
+      {
+        "runId": 38571403474,
+        "head": "dbffa9510441be0e1c1bd3b0189db674c7a13294",
+        "attempt": 1,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/glanderness/BeefTV/actions/runs/38571403474"
+      }
+    ],
+    "currentHeadActualFullGoExecuted": true,
+    "backendJobId": 115877255878,
+    "actualFullGoStep": {
+      "name": "Run Go tests",
+      "number": 9,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-14T13:24:31Z",
+      "completedAt": "2026-10-14T13:27:41Z"
+    },
+    "passedGoPackageCount": 58,
+    "cachedGoPackageCount": 13,
+    "noTestGoPackageCount": 3,
+    "packageCountVerified": true,
+    "rawJobLogSHA256": "b270f09ab4d6449e4b3e8d633a071f93b2565e211f11e0c39ff26cadb21291db",
+    "rawJobLogPersisted": false,
+    "prior5feReceiptReusedAsCurrent": false,
+    "prManualDesktopGatesCountedAsPassed": false,
+    "officialFourPlatformPublishVerifiedByThisRead": false,
+    "skippedJobs": [
+      {
+        "runId": 38571403444,
+        "jobId": 115877258233,
+        "name": "SQLite and runtime (${{ matrix.os }})",
+        "conclusion": "skipped"
+      },
+      {
+        "runId": 38571403444,
+        "jobId": 115877258730,
+        "name": "Published Windows upgrade and rollback",
+        "conclusion": "skipped"
+      }
+    ]
+  },
+  "currentLocalReleaseGate": {
+    "sourceCommit": "dbffa9510441be0e1c1bd3b0189db674c7a13294",
+    "sourceDigest": "029b10ed52510dcda70c7fbb187c63c3211e4ef1a39374f75c09e97dc3d7df18",
+    "startedAt": "2026-10-14T13:22:21.019670+00:00",
+    "paidSubmissions": 0,
+    "endedAt": "2026-10-14T13:23:16.507650+00:00",
+    "exitCode": 0,
+    "sourceUnchanged": true
+  },
+  "priorFullLocalGoRun": {
+    "executedCommit": "1bf0bf8ff6d4bf85bb998d8d6c47c0c7cc5860d8",
+    "executedSourceDigest": "a4dab07f2f33c7ee8841fac46e43a92a00305e6164ba50905983790683654a28",
+    "exitCode": 0,
+    "passedPackageCount": 58,
+    "executedAtCurrentHead": false,
+    "notRelabeledAsCurrentSource": true,
+    "productionEquivalenceScope": "all tracked backend git entries excluding filenames ending _test.go; includes Go modules and non-test backend assets",
+    "productionScopeEntryCount": 742,
+    "productionScopeSHA256": "3188279948c41024c8c8b36befff01dc9cb2486fc2a62bc7095b72d23e880b0a",
+    "productionScopeByteEquivalentAcrossHeads": true,
+    "comparedHeads": [
+      "1bf0bf8ff6d4bf85bb998d8d6c47c0c7cc5860d8",
+      "4d0ecbd317175015d6e24b44b603c09d14c167cb",
+      "5fe11cbb978a0506f4761b4f5ad127b750339e94"
+    ],
+    "wholeBackendTreeEqual": false,
+    "limitation": "Only production backend git blobs are equivalent. Whole backend trees differ due to atomic test-only fixture changes. Neither the old local full run nor prior CI is claimed to execute this new HEAD."
+  },
+  "historicalFinancialUncertainty": {
+    "budgetCNY": null,
+    "spentCNY": null,
+    "pendingCNY": null,
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.21",
+    "evidence": [
+      "docs/release-evidence/v1.7.21.json",
+      "docs/release-evidence/v1.7.20.json"
+    ]
+  },
+  "observedAPIEnvironment": {
+    "deployedCommit": "acb9737f3218e1f5ab7cf1c98c71760eda3103f4",
+    "sameTaskGETOnly": true,
+    "noVideoPOST": true,
+    "nextAPICandidateNotClaimedDeployedOrVerifiedByTheseGETs": true,
+    "note": "真实下载与最终只读账务环境均为已部署 acb；未把后续 API 合并或 CI 进行中当作部署。",
+    "ownedGETMayEnsureExistingArchive": true
+  },
+  "formalPackageGates": {
+    "status": "pending_release_workflow",
+    "releasePublished": false,
+    "releaseComplete": false,
+    "platforms": [
+      "darwin-arm64",
+      "darwin-amd64",
+      "windows-amd64",
+      "linux-amd64"
+    ],
+    "workflow": ".github/workflows/release-desktop.yml",
+    "remaining": "正式四平台包、Windows 旧包升级/失败回滚、Linux 原生窗口、归档 smoke、签名与公开资产读回仍必须通过；本机源码与原任务验收不代替它们。"
+  },
+  "sourceEvidenceSHA256": {
+    "source-equivalence.json": "17199cd5ef01567d7aa456224def36cf24fa063e4e2aabff1f8e818990a21560",
+    "same-task-primary-download.json": "8c69f0d6107450020531ff7bbade8f33dd9de5284de9bd26adc36012c727280b",
+    "same-task-backup-renewal.json": "0db15195fc6bcc2c984c9c0aeacbdb40b946ff244ab5493432d87212351f560e",
+    "current-full-decode.json": "649852dd7dec5033791356060ea935a81957f8fb561c6531e38cc19a12af8dba",
+    "native-current-build.json": "9be8b9eb8e1acd6370137703c251bf6727ce2b06d1a174404483e0242aba27e4",
+    "desktop-current-local-gate.json": "77770517cc35a8d292671ae2f51cd8c6e2911929df7fde48d74404df23a4ea23",
+    "native-current-ui-witness.json": "38442d67c5248eb9880eb91ea8cd1e13e50245982083bcd6e87891426c7b90bb",
+    "native-current-original-linkage-after.json": "a8ee6a0a255496300b40e1588bb5539cccec1d3fd7dbb119146d50d765707e77",
+    "original-mini-billing-after.json": "29403d386f8ca4312dc26889865926582148c7325df2afc15dde055d2e499da9",
+    "original-mini-billing-after-verified.json": "93d9bf723953fa542a4aa984a4db020a420bbcfef1d3e83f05282ff132a437c5",
+    "source-review-safe.json": "94972d932d072fb5f93bd412946f9ea4a1cc0afdbc2eef842db374a709581706",
+    "current-source-ci-readback.json": "a8289342d1aed594db24a16fe2ca3006087372e103928f3e3b926bfbaf967b35",
+    "live-api-readback.json": "37108ae12131717888c83265213447989e0ae5f8c2696d35cb38a2a0222e4ad8"
+  },
+  "unchangedPriorExecutionEvidenceSHA256": {
+    "prior5fePublicReceipt": "8c01a47965089d28ab083ece242cacc5c6a22194cf6dec3d5439c4d4f9c22949",
+    "prior5fePublicProof": "728beb95eaae860d5e38383dac09a4ef9799553d0410b04352562af7b3c63367",
+    "prior5feRace": "6b98591c954f9e5c551e0774fda09131d7519fc3b0fcbf78b55fb1da9b78ab15",
+    "prior5fePhysicalIdle": "dc6b87f86920befd606903c6d7b24b29cd5e0f1d490ee0661e86076a76ca0e08"
+  },
+  "redaction": {
+    "credentials": false,
+    "signedMaterialURLs": false,
+    "privateUserId": false,
+    "accountBalance": false,
+    "privatePrompt": false,
+    "absoluteLocalPaths": false,
+    "upstreamAccountRequestIds": false
+  }
+}

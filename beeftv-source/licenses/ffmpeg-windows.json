@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "version": "8.1.3",
+  "runtimeVersion": "n8.1.3-18-g46d899d7a0-20261019",
+  "archiveURL": "https://github.com/glanderness/BeefTV/releases/download/media-ffmpeg-windows-n8.1.3-20261019/ffmpeg-n8.1.3-18-g46d899d7a0-win64-gpl-8.1.zip",
+  "upstreamArchiveURL": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-10-19-13-06/ffmpeg-n8.1.3-18-g46d899d7a0-win64-gpl-8.1.zip",
+  "archiveSHA256": "5dc774c80fca5b63803ce052cbb1c7fc82aaccf3908b32e34f8842b367573c37",
+  "archiveRoot": "ffmpeg-n8.1.3-18-g46d899d7a0-win64-gpl-8.1",
+  "binarySHA256": "45c6203b4db1e6f4666582b5ca0ecc6d969d57ead7284a1b9c36c6785352ad96",
+  "probeSHA256": "f454758a2db1d6d37a7637babff346196b2389531f1ee4fec74ca93ee88b9cb4",
+  "license": "GPL-3.0-or-later",
+  "licenseSHA256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+  "source": "https://github.com/FFmpeg/FFmpeg/tree/46d899d7a02bc63237472cc4897258d5ddf274ac",
+  "buildRecipe": "https://github.com/BtbN/FFmpeg-Builds/tree/63ac3265b0789ea16c7b1f8351cd2ad195a28722",
+  "buildRun": "https://github.com/BtbN/FFmpeg-Builds/actions/runs/39250769506",
+  "dependencyImage": "ghcr.io/btbn/ffmpeg-builds/win64-gpl-8.1@sha256:e18d0c0f89ca9cac1b297c98079a92661cbb9ce2ab0e285c01f794ca04618b82",
+  "sourceRelease": "https://github.com/glanderness/BeefTV/releases/tag/media-ffmpeg-windows-n8.1.3-20261019",
+  "sourceArtifacts": [
+    {
+      "name": "btbn-download-cache.tar.gz.part-001",
+      "url": "https://github.com/glanderness/BeefTV/releases/download/media-ffmpeg-windows-n8.1.3-20261019/btbn-download-cache.tar.gz.part-001",
+      "size": 1073741824,
+      "sha256": "b84ddbcbb880efe07dbb1ebbaaf96540a1684fb2a4dc3742b0f31281613266d0"
+    },
+    {
+      "name": "btbn-download-cache.tar.gz.part-002",
+      "url": "https://github.com/glanderness/BeefTV/releases/download/media-ffmpeg-windows-n8.1.3-20261019/btbn-download-cache.tar.gz.part-002",
+      "size": 1073741824,
+      "sha256": "c9ab627fd912880c936e71582702d7c47f15f69d686ac71180863a365be28068"
+    },
+    {
+      "name": "btbn-download-cache.tar.gz.part-003",
+      "url": "https://github.com/glanderness/BeefTV/releases/download/media-ffmpeg-windows-n8.1.3-20261019/btbn-download-cache.tar.gz.part-003",
+      "size": 62219321,
+      "sha256": "6d6970be78b6635df10e63dd99d6e718075fecdef84546746c03b72bbbd9489b"
+    },
+    {
+      "name": "btbn-win64-gpl-8.1-supplemental-sources.tar.gz",
+      "url": "https://github.com/glanderness/BeefTV/releases/download/media-ffmpeg-windows-n8.1.3-20261019/btbn-win64-gpl-8.1-supplemental-sources.tar.gz",
+      "size": 63911766,
+      "sha256": "ad22753bdd89f6d1a5c6288d12e93afa3b043d69ffc64b0cca652861a4ca2582"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "beeftv",
+  "interface": { "displayName": "BeefTV" },
+  "plugins": [
+    {
+      "name": "beeftv-skills",
+      "source": { "source": "local", "path": "./plugins/beeftv-skills" },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Productivity"
+    }
+  ]
+}

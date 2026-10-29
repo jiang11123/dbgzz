@@ -1,0 +1,175 @@
+{
+  "version": "v1.7.25",
+  "sourceDigest": "e3c0f4c86b937dc9b24d5bf5ce6d20fcb2ef928af4a0c9841b999c769c3a52bb",
+  "ownerException": {
+    "scope": "team-targeted-defer-skills-20261017",
+    "approvedBy": "Ender",
+    "instruction": "本版豁免重跑付费矩阵，专项验收后发布（推荐）",
+    "sourceDigest": "e3c0f4c86b937dc9b24d5bf5ce6d20fcb2ef928af4a0c9841b999c769c3a52bb",
+    "evidence": [
+      "docs/release-evidence/v1.7.25-review.md#授权及范围"
+    ]
+  },
+  "releaseAuthorization": {
+    "additionalHumanReplyRequired": false,
+    "scope": "v1.7.25 only",
+    "sourceDigest": "e3c0f4c86b937dc9b24d5bf5ce6d20fcb2ef928af4a0c9841b999c769c3a52bb",
+    "evidence": [
+      "docs/release-evidence/v1.7.25-review.md#授权及范围"
+    ]
+  },
+  "baseRelease": "v1.7.24",
+  "baseCommit": "2fe2311198f82ad8904a5d4c5dcbed7fbd7c8dd2",
+  "includedPullRequests": [
+    160,
+    161,
+    162,
+    163,
+    167,
+    168,
+    169,
+    171,
+    172,
+    174,
+    175,
+    177,
+    178,
+    179
+  ],
+  "deferredPullRequests": [
+    176
+  ],
+  "revertedCommit": "e2e278a7e71f9f4d25ae02b5b51b6ea2e6f6cf57",
+  "paidSubmissionPathChanged": true,
+  "paidSubmissionLimit": 0,
+  "newBudgetCNY": 0,
+  "newSpentCNY": 0,
+  "newPendingCNY": 0,
+  "cases": [],
+  "billingAttempts": [],
+  "budgetCNY": null,
+  "spentCNY": null,
+  "pendingCNY": null,
+  "liveMatrixStatus": "not_run_owner_waived",
+  "agentAcceptanceStatus": "not_run_owner_waived",
+  "acceptanceComplete": false,
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.24",
+    "pendingCNY": null,
+    "evidence": [
+      "docs/release-evidence/v1.7.24.json",
+      "docs/release-evidence/v1.7.25-review.md#付费验收"
+    ]
+  },
+  "review": {
+    "result": "approved",
+    "independent": true,
+    "reviewer": "Grok 20261017-131144-review-fa203e5d at 71132499; exact product/build source equivalence verified at 9ece3210; test-only followup passed full CI",
+    "reviewedHead": "71132499da5deff19d34e4176229c23197c05bcd",
+    "productAndBuildSourceUnchanged": true,
+    "subsequentTestOnlyChanges": [
+      "web/test/reference-preview-lifecycle.browser.test.ts"
+    ],
+    "supplementalDiagnosis": {
+      "jobId": "20261017-133303-continue-0ddc462d",
+      "status": "running",
+      "scope": "read-only diagnosis of the prior CI test timeout; not an additional approval receipt"
+    },
+    "sourceDigest": "e3c0f4c86b937dc9b24d5bf5ce6d20fcb2ef928af4a0c9841b999c769c3a52bb",
+    "evidence": [
+      "docs/release-evidence/v1.7.25-review.md#独立复核"
+    ]
+  },
+  "upgrade": {
+    "preservedData": true,
+    "sourceDigest": "e3c0f4c86b937dc9b24d5bf5ce6d20fcb2ef928af4a0c9841b999c769c3a52bb",
+    "evidence": [
+      "docs/release-evidence/v1.7.25-review.md#数据保留"
+    ]
+  },
+  "verification": {
+    "generationAndRecovery": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "e3c0f4c86b937dc9b24d5bf5ce6d20fcb2ef928af4a0c9841b999c769c3a52bb",
+      "evidence": [
+        "docs/release-evidence/v1.7.25-review.md#当前源码检查"
+      ]
+    },
+    "canvasAndDiagnostics": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "e3c0f4c86b937dc9b24d5bf5ce6d20fcb2ef928af4a0c9841b999c769c3a52bb",
+      "evidence": [
+        "docs/release-evidence/v1.7.25-review.md#浏览器测试修正"
+      ]
+    },
+    "assistantAndSkillDeferral": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "e3c0f4c86b937dc9b24d5bf5ce6d20fcb2ef928af4a0c9841b999c769c3a52bb",
+      "evidence": [
+        "docs/release-evidence/v1.7.25-review.md#当前源码检查"
+      ]
+    },
+    "installers": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "e3c0f4c86b937dc9b24d5bf5ce6d20fcb2ef928af4a0c9841b999c769c3a52bb",
+      "evidence": [
+        "docs/release-evidence/v1.7.25-review.md#当前源码检查"
+      ]
+    },
+    "noNewPaidGeneration": {
+      "status": "passed",
+      "method": "source-diff",
+      "sourceDigest": "e3c0f4c86b937dc9b24d5bf5ce6d20fcb2ef928af4a0c9841b999c769c3a52bb",
+      "evidence": [
+        "docs/release-evidence/v1.7.25-review.md#付费验收"
+      ]
+    },
+    "localReleaseGate": {
+      "status": "pending_release_workflow",
+      "method": "local-script",
+      "beforeDraft": true,
+      "sourceDigest": "e3c0f4c86b937dc9b24d5bf5ce6d20fcb2ef928af4a0c9841b999c769c3a52bb",
+      "evidence": [
+        ".github/workflows/release-desktop.yml",
+        "docs/release-evidence/v1.7.25-review.md#当前源码检查"
+      ]
+    },
+    "ci": {
+      "status": "passed",
+      "method": "github-actions",
+      "sourceDigest": "e3c0f4c86b937dc9b24d5bf5ce6d20fcb2ef928af4a0c9841b999c769c3a52bb",
+      "evidence": [
+        "https://github.com/glanderness/BeefTV/actions/runs/39007055805",
+        "https://github.com/glanderness/BeefTV/actions/runs/39007055762",
+        "https://github.com/glanderness/BeefTV/actions/runs/39007055766",
+        "docs/release-evidence/v1.7.25-review.md#CI 与最终安装包"
+      ]
+    }
+  },
+  "packages": {
+    "platforms": [
+      "darwin-arm64",
+      "darwin-amd64",
+      "windows-amd64",
+      "linux-amd64"
+    ],
+    "status": "pending_release_workflow",
+    "archives": null,
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "linuxNativeWindowBeforeUpload": true,
+    "signedManifestBeforePublish": true,
+    "publicReadbackAfterPublish": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml",
+      "docs/release-evidence/v1.7.25-review.md#CI 与最终安装包"
+    ]
+  },
+  "releasePublished": false,
+  "releaseComplete": false
+}

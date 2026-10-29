@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "runtime": {
+    "urls": ["https://github.com/glanderness/BeefTV/releases/download/v1.5.5/beeftv-depth-runtime-v1-darwin-arm64.zip"],
+    "size": 294629974,
+    "sha256": "f606dee084ec9d38d76a80e409e4cb9a80ad7db51c18778285a63e8f24376682",
+    "files": 23481,
+    "expandedSize": 955790953
+  },
+  "model": {
+    "urls": [
+      "https://github.com/glanderness/BeefTV/releases/download/v1.5.5/video_depth_anything_vits.pth",
+      "https://huggingface.co/depth-anything/Video-Depth-Anything-Small/resolve/main/video_depth_anything_vits.pth"
+    ],
+    "size": 116440756,
+    "sha256": "13379300b739e659f076a59d52e9801bd8d38c541a7e71f73bbca4dcfb013609"
+  }
+}

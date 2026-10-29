@@ -132,3 +132,31 @@ export interface GatewayTurnResult {
   thread: GatewayThread;
   message: GatewayMessage;
 }
+
+// ---------------------------------------------------------------------------
+// 豆包 3.0 网关视频规范与 BeefTV 对接契约
+// ---------------------------------------------------------------------------
+
+export type GatewayVideoTaskStatus =
+  | 'queued'
+  | 'processing'
+  | 'awaiting_confirmation'
+  | 'completed'
+  | 'needs_attention'
+  | 'failed'
+  | 'cancelled';
+
+export interface GatewayVideoTaskResponse {
+  task_id: string;
+  status: GatewayVideoTaskStatus;
+  progress?: number;
+  video_url?: string | null;
+  local_path?: string | null;
+  last_frame_path?: string | null;
+  status_text?: string;
+  /** 豆包最新回复原文；awaiting_confirmation 时是待用户确认的问题内容。 */
+  latest_reply?: string | null;
+  error?: string | null;
+  created_at?: number;
+  updated_at?: number;
+}

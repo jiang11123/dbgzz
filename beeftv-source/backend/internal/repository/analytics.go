@@ -1,0 +1,253 @@
+package repository
+
+import (
+	"errors"
+	"strings"
+	"time"
+
+	"infinite-canvas/backend/internal/model"
+
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+)
+
+type AnalyticsFilter struct {
+	From       time.Time
+	To         time.Time
+	UserID     string
+	Model      string
+	ChannelID  string
+	Capability string
+}
+
+type APICallLogFilter struct {
+	AnalyticsFilter
+	RecordType string
+	Keyword    string
+	Status     string
+	IDs        []string
+	Page       int
+	Limit      int
+}
+
+func (r *Repository) RecordUserActivity(userID string, event string, count int, now time.Time) error {
+	if userID == "" {
+		return nil
+	}
+	if count <= 0 {
+		count = 1
+	}
+	day := time.Date(now.UTC().Year(), now.UTC().Month(), now.UTC().Day(), 0, 0, 0, 0, time.UTC)
+	activity := model.UserDailyActivity{ID: userID + ":" + day.Format("2006-01-02"), Day: day, UserID: userID, CreatedAt: now, UpdatedAt: now}
+	updates := map[string]any{"updated_at": now}
+	switch event {
+	case "task":
+		activity.TaskCount = count
+		updates["task_count"] = gorm.Expr("user_daily_activities.task_count + ?", count)
+	case "agent_message":
+		activity.AgentMessageCount = count
+		updates["agent_message_count"] = gorm.Expr("user_daily_activities.agent_message_count + ?", count)
+	case "canvas":
+		activity.CanvasActive = true
+		updates["canvas_active"] = true
+	case "asset":
+		activity.AssetCount = count
+		updates["asset_count"] = gorm.Expr("user_daily_activities.asset_count + ?", count)
+	case "resource":
+		activity.ResourceCount = count
+		updates["resource_count"] = gorm.Expr("user_daily_activities.resource_count + ?", count)
+	default:
+		return nil
+	}
+	activity.FirstActiveAt = &now
+	activity.LastActiveAt = &now
+	updates["first_active_at"] = gorm.Expr("COALESCE(user_daily_activities.first_active_at, ?)", now)
+	updates["last_active_at"] = now
+	return r.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "day"}, {Name: "user_id"}},
+		DoUpdates: clause.Assignments(updates),
+	}).Create(&activity).Error
+}
+
+func (r *Repository) AnalyticsTasks(filter AnalyticsFilter) ([]model.Task, error) {
+	var tasks []model.Task
+	query := r.db.Select("id", "user_id", "type", "status", "operation", "provider", "model", "started_at", "completed_at", "created_at").Where("created_at >= ? AND created_at < ?", filter.From, filter.To)
+	if filter.UserID != "" {
+		query = query.Where("user_id = ?", filter.UserID)
+	}
+	if filter.Model != "" {
+		query = query.Where("model = ?", filter.Model)
+	}
+	if filter.Capability != "" {
+		if filter.Capability == "text" {
+			query = query.Where("type LIKE ? OR type LIKE ? OR type LIKE ?", "%text%", "%storyboard%", "%agent%")
+		} else {
+			query = query.Where("type LIKE ?", "%"+filter.Capability+"%")
+		}
+	}
+	return tasks, query.Find(&tasks).Error
+}
+
+func (r *Repository) AnalyticsAPICallLogs(filter AnalyticsFilter) ([]model.ApiCallLog, error) {
+	var logs []model.ApiCallLog
+	query := r.apiCallLogQuery(filter)
+	return logs, query.Omit("RequestBody", "ResponseBody").Find(&logs).Error
+}
+
+func (r *Repository) AnalyticsActivities(filter AnalyticsFilter) ([]model.UserDailyActivity, error) {
+	var activities []model.UserDailyActivity
+	query := r.db.Where("day >= ? AND day < ?", filter.From, filter.To)
+	if filter.UserID != "" {
+		query = query.Where("user_id = ?", filter.UserID)
+	}
+	return activities, query.Find(&activities).Error
+}
+
+func (r *Repository) QueryAPICallLogs(filter APICallLogFilter) ([]model.ApiCallLog, int64, error) {
+	if filter.Page <= 0 {
+		filter.Page = 1
+	}
+	if filter.Limit <= 0 || filter.Limit > 200 {
+		filter.Limit = 50
+	}
+	var total int64
+	// GORM 会把 Distinct 状态保留在同一查询链；计数和分页必须分别构造，避免 PostgreSQL 的 DISTINCT + ORDER BY 冲突。
+	if err := r.filteredAPICallLogQuery(filter).Model(&model.ApiCallLog{}).Distinct("api_call_logs.id").Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+	var logs []model.ApiCallLog
+	err := r.filteredAPICallLogQuery(filter).Omit("RequestBody", "ResponseBody").Order("api_call_logs.created_at desc").Offset((filter.Page - 1) * filter.Limit).Limit(filter.Limit).Find(&logs).Error
+	return logs, total, err
+}
+
+func (r *Repository) ExportAPICallLogs(filter APICallLogFilter, limit int) ([]model.ApiCallLog, error) {
+	if limit <= 0 || limit > 10_000 {
+		limit = 10_000
+	}
+	query := r.filteredAPICallLogQuery(filter)
+	if len(filter.IDs) > 0 {
+		query = query.Where("api_call_logs.id IN ?", filter.IDs)
+	}
+	var logs []model.ApiCallLog
+	err := query.Omit("RequestBody", "ResponseBody").Order("api_call_logs.created_at desc").Limit(limit).Find(&logs).Error
+	return logs, err
+}
+
+func (r *Repository) filteredAPICallLogQuery(filter APICallLogFilter) *gorm.DB {
+	query := r.apiCallLogQuery(filter.AnalyticsFilter)
+	switch filter.RecordType {
+	case "download":
+		query = query.Where("api_call_logs.request_kind = ?", "download")
+	case "all":
+	default:
+		query = visibleAPICallLogQuery(query).Where("COALESCE(api_call_logs.request_kind, '') <> ?", "download")
+	}
+	if value := strings.TrimSpace(filter.Keyword); value != "" {
+		pattern := "%" + strings.ToLower(value) + "%"
+		query = query.
+			Joins("LEFT JOIN model_channels ON model_channels.id = api_call_logs.channel_id").
+			Where(
+				"lower(api_call_logs.user_id) LIKE ? OR lower(api_call_logs.channel_id) LIKE ? OR lower(model_channels.name) LIKE ? OR lower(api_call_logs.model) LIKE ? OR lower(api_call_logs.path) LIKE ? OR lower(api_call_logs.provider_request_id) LIKE ? OR lower(api_call_logs.error_code) LIKE ? OR lower(api_call_logs.error) LIKE ?",
+				pattern, pattern, pattern, pattern, pattern, pattern, pattern, pattern,
+			)
+	}
+	if filter.Status != "" {
+		query = query.Where("api_call_logs.status = ?", filter.Status)
+	}
+	return query
+}
+
+func (r *Repository) APICallLogTasks(ids []string) ([]model.Task, error) {
+	if len(ids) == 0 {
+		return []model.Task{}, nil
+	}
+	var tasks []model.Task
+	err := r.db.Select("id", "user_id", "type", "status", "result_json").Where("id IN ?", ids).Find(&tasks).Error
+	return tasks, err
+}
+
+func (r *Repository) LatestProviderRequestIDForTask(taskID string) (string, error) {
+	var log model.ApiCallLog
+	err := r.db.Select("provider_request_id").
+		Where("task_id = ? AND provider_request_id <> ''", taskID).
+		Order("created_at desc").
+		First(&log).Error
+	return strings.TrimSpace(log.ProviderRequestID), err
+}
+
+func (r *Repository) HasAPICallLogForTask(taskID string) (bool, error) {
+	if strings.TrimSpace(taskID) == "" {
+		return false, nil
+	}
+	var count int64
+	err := r.db.Model(&model.ApiCallLog{}).Where("task_id = ?", taskID).Count(&count).Error
+	return count > 0, err
+}
+
+// Recovery requires one unambiguous create receipt. A later failed/unknown
+// create must never be hidden by selecting an earlier successful response.
+func (r *Repository) ImageCreateReceipt(userID, taskID string) (*model.ApiCallLog, error) {
+	query := r.db.Model(&model.ApiCallLog{}).Where("user_id = ? AND task_id = ? AND capability = ? AND request_kind = ? AND method = ?", userID, taskID, "image", "create", "POST")
+	var count int64
+	if err := query.Count(&count).Error; err != nil {
+		return nil, err
+	}
+	if count > 1 {
+		var uncertain int64
+		if err := query.Where("status_code IS NULL OR status_code = 0 OR (status_code >= 200 AND status_code < 300)").Count(&uncertain).Error; err != nil {
+			return nil, err
+		}
+		if uncertain > 0 {
+			return nil, errors.New("图片包含多条已接受或结果未知的创建回执，不能重新生成")
+		}
+		return nil, nil
+	}
+	var rows []model.ApiCallLog
+	err := r.db.Where("user_id = ? AND task_id = ? AND capability = ? AND request_kind = ? AND method = ?", userID, taskID, "image", "create", "POST").Order("created_at desc").Limit(2).Find(&rows).Error
+	if err != nil || len(rows) != 1 {
+		return nil, err
+	}
+	return &rows[0], nil
+}
+
+func visibleAPICallLogQuery(query *gorm.DB) *gorm.DB {
+	// 轮询属于一次生成调用的内部状态查询，管理端不单独展示。
+	return query.Where("api_call_logs.request_kind <> ?", "poll")
+}
+
+func (r *Repository) VideoAPICallRoot(log model.ApiCallLog) (*model.ApiCallLog, error) {
+	var root model.ApiCallLog
+	query := r.db.Where("capability = ? AND request_kind = ?", "video", "create")
+	if log.TaskID != "" {
+		query = query.Where("task_id = ?", log.TaskID)
+	} else {
+		query = query.Where("user_id = ? AND channel_id = ? AND provider_request_id = ?", log.UserID, log.ChannelID, log.ProviderRequestID)
+	}
+	if err := query.Order("created_at desc").First(&root).Error; err != nil {
+		return nil, err
+	}
+	return &root, nil
+}
+
+func (r *Repository) apiCallLogQuery(filter AnalyticsFilter) *gorm.DB {
+	query := r.db.Where("api_call_logs.created_at >= ? AND api_call_logs.created_at < ?", filter.From, filter.To)
+	if filter.UserID != "" {
+		query = query.Where("api_call_logs.user_id = ?", filter.UserID)
+	}
+	if filter.Model != "" {
+		query = query.Where("api_call_logs.model = ?", filter.Model)
+	}
+	if filter.ChannelID != "" {
+		query = query.Where("api_call_logs.channel_id = ?", filter.ChannelID)
+	}
+	if filter.Capability != "" {
+		query = query.Where("api_call_logs.capability = ?", filter.Capability)
+	}
+	return query
+}
+
+func (r *Repository) CurrentQueuedTaskCount() (int64, error) {
+	var count int64
+	err := r.db.Model(&model.Task{}).Where("status IN ?", []model.TaskStatus{model.TaskStatusQueued, model.TaskStatusRunning}).Count(&count).Error
+	return count, err
+}

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { messagesToPrompt, classify, MODEL_ALIASES, DEFAULT_MODEL } from './gateway';
+import { messagesToPrompt, normalizeChatMessages, chatContentToText, classify, MODEL_ALIASES, DEFAULT_MODEL, extractTargetAccountId, extractVideoModelVariant, resolveImagePageModel } from './gateway';
 import { IMAGE_MODELS, IMAGE_RATIOS, DEFAULT_IMAGE_MODEL } from './doubao-image';
 import type { ChatMessage } from './gateway';
 
@@ -66,4 +66,76 @@ test('gateway failover classifies transient vs logged_out errors correctly', () 
   assert.equal(classify('用户登录状态已失效'), 'logged_out');
   assert.equal(classify('触发 710022004 人机验证'), 'captcha');
   assert.equal(classify('今日额度已达上限'), 'quota');
+});
+
+test('parseVideoReferencePaths extracts reference images from image_urls and data urls', async () => {
+  const { parseVideoReferencePaths } = await import('./gateway');
+  const sampleDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+  const paths = await parseVideoReferencePaths({
+    image_urls: [sampleDataUrl],
+  });
+  assert.equal(paths.length, 1);
+  assert.ok(paths[0].includes('ref-'));
+  const fs = await import('node:fs');
+  assert.ok(fs.existsSync(paths[0]));
+});
+
+test('array content parts are flattened to text instead of becoming [object Object]', () => {
+  const messages = normalizeChatMessages([
+    { role: 'system', content: [{ type: 'text', text: '系统提示' }] },
+    { role: 'user', content: [{ type: 'text', text: '[当前画布 c1]' }, { type: 'image_url', image_url: { url: 'data:image/png;base64,AAA' } }, { type: 'text', text: '1+1等于几？' }] },
+  ]);
+  const prompt = messagesToPrompt(messages);
+  assert.ok(!prompt.includes('[object Object]'), prompt);
+  assert.match(prompt, /系统提示/);
+  assert.ok(prompt.trimEnd().endsWith('1+1等于几？'), prompt);
+  assert.ok(!prompt.includes('base64'), 'image parts are not pasted into the web chat');
+});
+
+test('developer messages act as system and tool results are skipped', () => {
+  const messages = normalizeChatMessages([
+    { role: 'developer', content: '规则' },
+    { role: 'user', content: '问' },
+    { role: 'tool', content: '工具结果' },
+    null,
+    'noise',
+  ]);
+  assert.deepEqual(messages, [{ role: 'system', content: '规则' }, { role: 'user', content: '问' }]);
+});
+
+test('chatContentToText handles strings, text objects and unknown shapes', () => {
+  assert.equal(chatContentToText('直接文本'), '直接文本');
+  assert.equal(chatContentToText({ text: '对象文本' }), '对象文本');
+  assert.equal(chatContentToText(['甲', { text: '乙' }, { type: 'image_url' }]), '甲\n乙');
+  assert.equal(chatContentToText(undefined), '');
+  assert.equal(chatContentToText(42), '');
+});
+
+test('video model id carries both the Doubao account and the page video model', () => {
+  for (const [id, account, variant] of [
+    ['doubao-video-account-2--seedance-2-0-mini', 2, 'Seedance 2.0 Mini'],
+    ['doubao-video-account-1--seedance-2-5', 1, 'Seedance 2.5'],
+    ['doubao-video-account-3--seedance-2-0-fast', 3, 'Seedance 2.0 Fast'],
+    ['doubao-video-account-12--seedance-2-0', 12, 'Seedance 2.0'],
+  ] as const) {
+    assert.equal(extractTargetAccountId(id), account, id);
+    assert.equal(extractVideoModelVariant(id), variant, id);
+  }
+});
+
+test('model ids without a known video model suffix leave the page default untouched', () => {
+  assert.equal(extractVideoModelVariant('doubao-video-account-2'), undefined);
+  assert.equal(extractVideoModelVariant('doubao-video-account-2--unknown-model'), undefined);
+  assert.equal(extractVideoModelVariant(undefined), undefined);
+  assert.equal(extractTargetAccountId('doubao-video'), null);
+});
+
+test('image requests resolve the Doubao page image model from image_model, the model name, or the default', () => {
+  assert.equal(resolveImagePageModel('doubao-image-account-2', 'Seedream 4.0'), 'Seedream 4.0');
+  assert.equal(resolveImagePageModel('Seedream 3.0'), 'Seedream 3.0');
+  // 账号模型 id 不是页面模型，不能原样发给豆包
+  assert.equal(resolveImagePageModel('doubao-image-account-1'), 'Seedream 4.5');
+  assert.equal(resolveImagePageModel('doubao-image-account-1', 'unknown-model'), 'Seedream 4.5');
+  assert.equal(resolveImagePageModel(undefined, undefined), 'Seedream 4.5');
+  assert.equal(extractTargetAccountId('doubao-image-account-3'), 3);
 });

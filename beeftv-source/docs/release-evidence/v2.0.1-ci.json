@@ -1,0 +1,74 @@
+{
+  "version": "v2.0.1",
+  "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+  "head": "8c2b15af482ac71e577aec117d2185bf2737949f",
+  "provider": "GitHub Actions",
+  "status": "passed",
+  "checks": [
+    {
+      "name": "Published Windows upgrade and rollback",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/glanderness/BeefTV/actions/runs/39610605752/job/119258429168",
+      "startedAt": "2026-10-21T13:44:51Z",
+      "completedAt": "2026-10-21T13:44:51Z"
+    },
+    {
+      "name": "SQLite and runtime (${{ matrix.os }})",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/glanderness/BeefTV/actions/runs/39610605752/job/119258429087",
+      "startedAt": "2026-10-21T13:44:51Z",
+      "completedAt": "2026-10-21T13:44:51Z"
+    },
+    {
+      "name": "Backend checks",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/glanderness/BeefTV/actions/runs/39610605752/job/119258427884",
+      "startedAt": "2026-10-21T13:44:54Z",
+      "completedAt": "2026-10-21T13:48:52Z"
+    },
+    {
+      "name": "Release publisher checks",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/glanderness/BeefTV/actions/runs/39610605752/job/119258427861",
+      "startedAt": "2026-10-21T13:44:54Z",
+      "completedAt": "2026-10-21T13:45:16Z"
+    },
+    {
+      "name": "Web checks",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/glanderness/BeefTV/actions/runs/39610605752/job/119258427466",
+      "startedAt": "2026-10-21T13:44:54Z",
+      "completedAt": "2026-10-21T13:56:14Z"
+    },
+    {
+      "name": "Windows storage migration",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/glanderness/BeefTV/actions/runs/39610605752/job/119258427296",
+      "startedAt": "2026-10-21T13:44:54Z",
+      "completedAt": "2026-10-21T13:47:35Z"
+    },
+    {
+      "name": "Director P0 Chrome E2E",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/glanderness/BeefTV/actions/runs/39610606525/job/119258155844",
+      "startedAt": "2026-10-21T13:44:21Z",
+      "completedAt": "2026-10-21T13:46:57Z"
+    },
+    {
+      "name": "linux",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/glanderness/BeefTV/actions/runs/39610605666/job/119258151175",
+      "startedAt": "2026-10-21T13:44:20Z",
+      "completedAt": "2026-10-21T13:46:35Z"
+    }
+  ],
+  "note": "Six required checks passed; the two conditional skips are not passes. Final installer/upgrade tests run in Release desktop after preflight."
+}

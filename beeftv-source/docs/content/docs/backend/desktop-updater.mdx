@@ -1,0 +1,145 @@
+---
+title: 桌面自动更新发布
+description: 签名清单、打包布局、密钥、发布工作流、回滚和用户数据保留
+---
+
+# 桌面自动更新发布
+
+桌面自动更新只替换应用本身。项目、素材、设置、BeefAPI 登录和自定义插件留在用户数据目录。新版本从广州 COS 读取签名清单和更新包，GitHub Release 保留同一份清单。已安装旧版仍可使用原更新地址，不经过业务云接口。
+
+`v1.5.2` 及以前的安装包没有更新器。给仓库补上清单，不会让已经装好的程序自己升级。用户需要先手动安装第一个带更新器的版本。
+
+## 用户侧行为
+
+带更新器的应用会显示当前版本，并在启动时检查一次更新。用户点击“下载并安装更新”后，应用会下载更新包、保存当前工作、准备安装，再退出并启动新版本。保存失败或超过 60 秒未完成时会留在当前应用中，允许稍后重试；迟到的保存结果不会自动触发安装。上次保存尚未结束时，重试会提示等待，不会重复保存；结束后再次重试会重新保存当前工作。
+
+侧栏直接显示校验、保存、解压、准备安装和重启阶段，解压时显示已完成文件数。准备耗时超过 30 秒时显示等待提示。下载后仅保留已按签名清单核验大小和 SHA-256 的压缩包，不再预先解压一份；安装前再次核验压缩包，只在程序所在磁盘解压一次，逐文件完成写入，并检查全部目录结构。坏包、危险路径、错误布局或准备失败都会在应用退出前拒绝，保留旧程序。安装准备设 10 分钟期限，在文件读取和文件间检查取消；操作系统阻塞的磁盘调用返回后才能响应期限。准备失败的临时目录会清理，下载包保留供重试。阶段切换和准备总耗时记录在 `update.log`。
+
+浏览器构建不会请求更新源。
+
+新安装可使用 Windows Setup、macOS DMG 或 Ubuntu 24.04 DEB，旧版本仍保留 ZIP 下载。详见仓库的 `docs/desktop-install.md`。Windows 安装器按当前用户安装，macOS 将应用拖到 Applications；两者沿用现有 ZIP 更新器。Linux DEB 通过安装新版 DEB 升级，应用内更新入口会提示使用安装包，避免替换包管理器维护的系统文件。
+
+下载时，侧栏显示目标版本、百分比、速度和预计剩余时间。下载不设总时长上限：60 秒内一个字节都没收到才算一次中断。中断后会按 1、2、4、8 秒退避自动重连，并用 HTTP Range 从已下载的位置继续；连续 5 次尝试都没有新进度时停止，侧栏显示「继续下载」。已下载的部分按包的 SHA-256 保存在缓存目录的 `BeefTV/updates/downloads/` 下，再次点击或重启应用后仍从断点继续；新版本发布后，旧版本的残留文件会被清掉。续传不降低校验强度：完整文件仍按签名清单核对大小和 SHA-256，续传的文件校验失败时，会自动从头重下一次。
+
+失败提示会区分代理连不上、网络不通、安全连接失败、服务器暂时不可用和网络不稳定。原始网络错误、每次重试，以及请求是直连还是经过哪个代理地址，都写入数据目录下的 `update.log`（超过 256 KB 时轮转为 `update.log.1`），不记录代理账号密码。
+
+更新失败后可点击侧栏的“更新失败排查”，或进入设置中的“问题诊断”。桌面版提供“打开日志文件夹”；日志位于“存储设置”显示的当前数据目录，迁移过存储位置时不应再按默认 AppData 路径查找。
+
+本地工作区导出的诊断包会读取 `update.log` 和 `update.log.1` 各自末尾至多 256 KB，筛选所选时间内的更新记录，写入 `desktop/update.log`。只保留已知阶段、耗时、文件数、下载量、是否使用代理及错误类别，不导出本机路径、代理地址或原始错误全文。`desktop/update-log.json` 标明读取状态、记录数和是否截断；日志缺失或无法读取不影响其他诊断信息导出。准备超时提示区分校验、解压和准备安装，失败时保留最后阶段及文件进度供排查。
+
+从 `v1.5.5` 起，侧栏提供“检查更新”，检查失败会显示重试入口。更新器优先使用显式配置的 `HTTP_PROXY` / `HTTPS_PROXY` 和 `NO_PROXY`；没有显式代理变量时，读取当前用户的 macOS 或 Windows 静态 HTTP/HTTPS 系统代理及排除规则。重试会重新读取系统设置，不修改系统代理。此路径不执行 PAC 脚本或 WPAD 自动发现。
+
+已安装的 `v1.5.3` / `v1.5.4` 不读取系统代理。如果这些旧版无法连接 GitHub，需先手动安装新版，或在可直连的网络、已有 TUN 网络模式或显式环境代理下重启旧版，再进行应用内更新。发布新包本身不能修复旧版访问不到更新源的问题。
+
+## 数据保留
+
+| 系统 | 更新包内容 | 数据目录（不会进包、不会被替换） |
+| --- | --- | --- |
+| macOS | `BeefTV.app` | `~/Library/Application Support/BeefTV` |
+| Windows | `BeefTV.exe`、官方插件、Agent 和 CLI | `%AppData%\BeefTV` |
+| Linux | `BeefTV-linux` 整个程序目录 | `~/.config/BeefTV`（遵循 `XDG_CONFIG_HOME`） |
+
+应用包身份和可执行文件名称保持稳定。Windows WebView2 默认缓存仍在 `%AppData%\BeefTV.exe`，不会因从解压目录移到安装目录而更名。安装、覆盖安装和卸载不会删除用户数据目录；自定义数据目录需要继续使用原配置。官方插件随应用包更新；装在数据目录里的自定义插件会留下来。ZIP 打包时遇到 `.env`、数据库或用户数据目录会失败。
+
+## 两种签名
+
+更新签名和 Apple 签名是分开的。
+
+更新清单用 Go 标准库 Ed25519。信封是：
+
+```json
+{
+  "payload": "BASE64_EXACT_JSON_BYTES",
+  "signature": "BASE64_ED25519_SIGNATURE_OF_PAYLOAD_BYTES"
+}
+```
+
+签名对象是 payload 的原始 JSON 字节，不是 Base64 文本。验签后再读：
+
+```json
+{
+  "schema": 1,
+  "version": "vX.Y.Z",
+  "commit": "完整 Git SHA",
+  "notes": "发行说明",
+  "platforms": {
+    "darwin-arm64": {
+      "url": "https://github.com/glanderness/BeefTV/releases/download/vX.Y.Z/BeefTV-vX.Y.Z-darwin-arm64.zip",
+      "sha256": "hex",
+      "size": 123
+    }
+  }
+}
+```
+
+平台键为 `darwin-arm64`、`darwin-amd64`、`windows-amd64`。版本只接受稳定的 `vMAJOR.MINOR.PATCH`。应用会拒绝相同或更低的版本。
+
+现有 macOS 发布脚本使用 ad hoc 签名，没有 Developer ID 身份或 Apple 公证。更新器可以独立验签，但这不保证首次下载的应用能通过 Gatekeeper。要让用户无需手动放行，需要 Developer ID Application 签名及 Apple 公证；此前用户可按 [Apple 的说明](https://support.apple.com/zh-cn/102445)，在确认应用来源后于「隐私与安全性」中选择「仍要打开」。不要关闭整个系统的安全检查。
+
+安装包哈希和 `codesign --verify --deep --strict` 只能验证完整性。发布验收还应记录 `spctl --assess --type execute --verbose=4`，并在没有历史放行记录的 Mac 上验证浏览器下载后的首次启动。更换下载托管服务不能代替 Apple 公证。
+
+Windows 构建需要支持 DWARF 5 的 UCRT64 GCC（binutils 2.37 或更新），见 `scripts/assert-windows-dwarf5-cgo.ps1`。
+
+## 密钥
+
+在本机生成到明确文件，权限 `0600`，不要把私钥打到终端或提交进仓库：
+
+```bash
+cd backend
+go run ./cmd/update-release gen-key \
+  --private-key /path/to/beeftv-updater.private \
+  --public-key /path/to/beeftv-updater.public
+```
+
+| GitHub 位置 | 名称 | 内容 |
+| --- | --- | --- |
+| Actions secret | `BEEFTV_UPDATER_PRIVATE_KEY` | 64 字节私钥的标准 Base64 |
+| Actions variable | `BEEFTV_UPDATER_PUBLIC_KEY` | 32 字节公钥的标准 Base64 |
+
+发布前会核对私钥推导出的公钥与变量一致。缺密钥或对不上都会失败，不会发布未签名更新源。
+
+私钥丢失后，已发出的包仍只认旧公钥。换密钥必须再发一个需要手动安装的引导包。私钥泄露时停止用旧密钥签名，换新密钥并请用户手动安装新包。
+
+生产密钥由仓库负责人保管。本仓库的工具不会生成生产密钥，也不会改 `VERSION`。
+
+## 发布流水线
+
+在 `glanderness/BeefTV` 的 `main` 上手动运行 `Release desktop`。`confirm_version` 必须等于 `VERSION`。`CHANGELOG.md` 里对应的 `## vX.Y.Z` 会同时成为 GitHub Release 说明和清单 `notes`。
+
+工作流默认只读；仅创建草稿和最终发布的任务申请 `contents: write`。构建任务不持有发布写权限或签名私钥。步骤：
+
+1. 校验稳定版本、唯一 tag、密钥和 changelog。
+2. 创建 **draft** Release。
+3. 用现有脚本构建 macOS arm64、macOS amd64、Windows amd64，并注入 FeedURL 与公钥。
+4. 按固定文件名打包 zip 并保存为 Actions 构建产物。
+5. 三个包都齐了之后才签名 `desktop-update.json`。
+6. 把所有包和清单上传到 draft 后，发布并明确标记为 latest。此时更新源才指向这个完整版本。
+
+固定文件名：
+
+```text
+BeefTV-vX.Y.Z-darwin-arm64.zip
+BeefTV-vX.Y.Z-darwin-amd64.zip
+BeefTV-vX.Y.Z-windows-amd64.zip
+desktop-update.json
+```
+
+同一版本的资源不可改写。已存在的 tag 或 Release（包括 draft）会让工作流失败。失败且从未公开的 draft，确认无人可下载后才能删除 draft 和 tag，再对同一版本重试。
+
+本地脚本、数据目录和打包命令写在仓库 `docs/desktop-release.md`。
+
+```bash
+cd backend
+go test ./cmd/update-release
+go run ./cmd/update-release package --platform windows-amd64 --input cmd/desktop/build/bin --output /tmp/BeefTV-vX.Y.Z-windows-amd64.zip
+```
+
+## 回滚
+
+不要覆盖或删除已经发布的 zip 和清单。要收回有问题的版本，发布一个更高的稳定号。已经更新成功的用户，不会因为删除 GitHub Release 而回到旧包。
+
+流水线显式标记 latest，且拒绝非递增稳定版本。不要手动把旧版本标记为 latest。
+
+客户端在退出前重新验包，并在程序所在磁盘准备安装文件。数据目录和程序目录重叠时会拒绝安装，避免覆盖自定义插件。替换只使用同磁盘重命名，安装锁防止多个实例同时替换。安装或进程启动失败时尝试恢复旧程序；若应用未退出、安装程序已经停止，界面会恢复可重试状态。成功启动后仍保留程序旁 `.beeftv-update-*` 目录中的备份和恢复记录；确认新版本正常后可清理该次目录。
+
+启动了进程不等于 SQLite 迁移或界面正常，因此不会在新进程启动后自动降级。恢复旧程序前需确认数据库兼容，必要时使用匹配的数据备份。此更新器不会复制或还原全部用户素材。

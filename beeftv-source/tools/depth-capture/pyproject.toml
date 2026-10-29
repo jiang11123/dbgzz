@@ -1,0 +1,20 @@
+[project]
+name = "beeftv-depth-capture"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+  "easydict>=1.13",
+  "einops>=0.8",
+  "imageio>=2.37",
+  "matplotlib>=3.10",
+  "numpy>=1.26",
+  "opencv-python>=4.10",
+  "pillow>=11",
+  "torch>=2.5",
+  "torchvision>=0.20",
+  "tqdm>=4.67",
+]
+
+[tool.uv]
+package = false
+

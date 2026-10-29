@@ -1,0 +1,12 @@
+[
+  {"message":"reference audio 2 is 0.900 seconds; use audio between 2 and 15 seconds","display":"第 2 段参考音频时长为 0.900 秒。需要 2–15 秒；请裁剪或更换这段素材后再提交"},
+  {"message":"reference audio 1 is 31.250 seconds; use audio between 2 and 30 seconds","display":"第 1 段参考音频时长为 31.250 秒。需要 2–30 秒；请裁剪或更换这段素材后再提交"},
+  {"message":"reference audio is 35.500 seconds in total; this model accepts at most 30 seconds of reference audio","display":"参考音频总时长为 35.500 秒。该模型最多支持 30 秒参考音频；请裁剪或减少参考音频后再提交"},
+  {"message":"reference audio 3: could not download reference audio within the allowed time and URL policy","display":"第 3 段参考音频无法下载。请重新上传音频，确认素材链接可公开访问后再提交"},
+  {"message":"reference audio 2: reference audio duration could not be measured: invalid WAV audio","display":"第 2 段参考音频的格式或时长无法读取。请将音频重新导出为 MP3、WAV 或 M4A，确认文件完整且含有音轨后再上传"},
+  {"message":"reference audio 1 exceeds the model's 15728640 byte limit","display":"第 1 段参考音频文件过大。请压缩或更换音频，确保文件不超过模型的大小限制后再提交"},
+  {"message":"reference audio 2: reference audio could not be downloaded completely within the allowed time","display":"第 2 段参考音频无法下载。请重新上传音频，确认素材链接可公开访问后再提交"},
+  {"message":"reference audio 2: reference audio must be at most 15 MiB","display":"第 2 段参考音频文件过大。请压缩或更换音频，确保文件不超过模型的大小限制后再提交"},
+  {"message":"reference audio 2: reference audio URL is not allowed","display":"第 2 段参考音频无法下载。请重新上传音频，确认素材链接可公开访问后再提交"},
+  {"message":"unexpected private detail https://private.invalid/?token=abc prompt=private","display":"参考音频不符合模型要求。请检查参考音频的时长、格式和大小，调整后再提交"}
+]

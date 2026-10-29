@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="175" height="28" viewBox="0 0 175 28" role="img" aria-labelledby="title desc">
+  <title id="title">Download BeefTV</title>
+  <desc id="desc">Download the latest BeefTV desktop release</desc>
+  <rect width="175" height="28" fill="#52657F"/>
+  <path transform="translate(2 1) scale(.64)" d="M21 11h6v13h5l-8 8-8-8h5V11zm-7 23h20v3H14z" fill="#FFFFFF"/>
+  <text x="32" y="18" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="10.5" font-weight="800" letter-spacing="1.2">DOWNLOAD BEEFTV</text>
+</svg>

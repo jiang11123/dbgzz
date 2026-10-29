@@ -1,0 +1,87 @@
+{
+  "version": "v1.7.12",
+  "sourceDigest": "e6c96bb27b6ec2af3a5f5bc13ba92a533329ca16a81202d9ff13beb182652b98",
+  "budgetCNY": null,
+  "spentCNY": null,
+  "pendingCNY": null,
+  "newSpentCNY": 0,
+  "newPendingCNY": 0,
+  "cases": [],
+  "liveMatrixStatus": "not_run_owner_waived",
+  "releaseComplete": false,
+  "liveTestWaiver": {
+    "approvedBy": "Ender",
+    "instruction": "上线吧 豁免了 飞书文档你再看看还要不要更新",
+    "scope": "seedance-unified-display",
+    "evidence": [
+      "docs/release-evidence/v1.7.12-targeted.md"
+    ]
+  },
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.11",
+    "pendingCNY": null,
+    "evidence": [
+      "docs/release-evidence/v1.7.11.json"
+    ]
+  },
+  "review": {
+    "result": "approved",
+    "independent": true,
+    "reviewer": "Codex /root/naming_review",
+    "sourceDigest": "e6c96bb27b6ec2af3a5f5bc13ba92a533329ca16a81202d9ff13beb182652b98",
+    "evidence": [
+      "docs/release-evidence/v1.7.12-targeted.md"
+    ]
+  },
+  "upgrade": {
+    "preservedData": true,
+    "sourceDigest": "e6c96bb27b6ec2af3a5f5bc13ba92a533329ca16a81202d9ff13beb182652b98",
+    "evidence": [
+      "docs/release-evidence/v1.7.12-targeted.md"
+    ]
+  },
+  "verification": {
+    "displayNames": {
+      "status": "passed",
+      "sourceDigest": "e6c96bb27b6ec2af3a5f5bc13ba92a533329ca16a81202d9ff13beb182652b98",
+      "method": "test",
+      "evidence": [
+        "docs/release-evidence/v1.7.12-targeted.md"
+      ]
+    },
+    "nativeNames": {
+      "status": "passed",
+      "sourceDigest": "e6c96bb27b6ec2af3a5f5bc13ba92a533329ca16a81202d9ff13beb182652b98",
+      "method": "native",
+      "evidence": [
+        "docs/release-evidence/v1.7.12-targeted.md"
+      ]
+    },
+    "localReleaseGate": {
+      "status": "passed",
+      "sourceDigest": "e6c96bb27b6ec2af3a5f5bc13ba92a533329ca16a81202d9ff13beb182652b98",
+      "method": "test",
+      "evidence": [
+        "docs/release-evidence/v1.7.12-targeted.md"
+      ]
+    },
+    "ci": {
+      "status": "passed",
+      "sourceDigest": "e6c96bb27b6ec2af3a5f5bc13ba92a533329ca16a81202d9ff13beb182652b98",
+      "method": "test",
+      "evidence": [
+        "https://github.com/glanderness/BeefTV/actions/runs/37644741344",
+        "https://github.com/glanderness/BeefTV/actions/runs/37644741231"
+      ]
+    }
+  },
+  "packages": {
+    "status": "pending_release_workflow",
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml"
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { createDurableTurnBudget } from './durable-turn-budget.mjs';
+import { spendModelRequest, spendToolStep } from './request-budget.mjs';
+test('turn request and tool budgets survive reopen and cannot reset by switching identity', (t) => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-turn-budget-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const entry = { sessionId: 'durable:test', turn: { turnId: 'turn' }, generation: {}, budgetDirectory: directory };
+  let budget = createDurableTurnBudget(entry, { maxRequests: 1, maxToolSteps: 1 });
+  assert(spendModelRequest(budget).allowed); assert(spendToolStep(budget).allowed);
+  budget = createDurableTurnBudget(entry, { maxRequests: 1, maxToolSteps: 1 });
+  assert.equal(spendModelRequest(budget).allowed, false); assert.equal(spendToolStep(budget).allowed, false);
+  budget.failure = { reason: 'turn_request_budget_exhausted', message: 'limit' };
+  assert.equal(createDurableTurnBudget(entry).failure.reason, 'turn_request_budget_exhausted');
+  assert.throws(() => createDurableTurnBudget({ ...entry, sessionId: 'foreign' }), /durable_budget_corrupt/);
+  fs.writeFileSync(path.join(directory, fs.readdirSync(directory)[0]), '{broken');
+  assert.throws(() => createDurableTurnBudget(entry), /durable_budget_corrupt/);
+});

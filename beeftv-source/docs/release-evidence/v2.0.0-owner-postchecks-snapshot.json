@@ -1,0 +1,1370 @@
+{
+  "schema": "beeftv-v200-owner-postchecks-snapshot-v1",
+  "version": "v2.0.0",
+  "ownerAuthorization": {
+    "instruction": "直接发布吧 剩下的发布完在验证吧 应该是可以用的 就是细节还需要调整",
+    "authorizationSHA256": "c75a63246f6618df4731361e806cae9081921a26d80aac373e8cbb14e9d71925",
+    "previousAuthorizationSHA256": "eab11b7c3df4187d46a6aaaaa1c11759cd6bcdbee5d304f476fef06eab546758"
+  },
+  "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+  "executedCommit": "6670123c8a2611c635d3c027d0bceb59b8c776ae",
+  "unchangedProductSourceDigest": "7806e2e76ccaa78cd8e52c1fd04e91a8755125e2beb5d4830297cc66f39aac50",
+  "acceptanceScriptPaths": [
+    "scripts/real-generation-release-contract.mjs",
+    "scripts/verify-real-generation-release.mjs",
+    "scripts/verify-real-generation-release.test.mjs"
+  ],
+  "checklistSHA256": "c1b61f0328d0ef3f72444b324f948a6a5cf90b70ceafa32b32cc3eba02f06de5",
+  "agentChecks": {
+    "canvas_read": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "native-current-followup-preparation/current667-canvas-final-independent-review.json",
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-readonly-final.json",
+        "native-current-followup-preparation/current667-readonly-skill-independent-review.json",
+        "native-current-followup-preparation/current667-binding-pre-title-independent-review.json",
+        "native-current-followup-preparation/current667-title-partial-independent-review.json",
+        "native-current-followup-preparation/current667-final-three-check-conditions.json",
+        "native-current-followup-preparation/current667-context-completed.json",
+        "native-current-followup-preparation/current667-fullaccess-completed.json",
+        "native-agent-supplement-review/current667-after-title-partial.json",
+        "native-agent-supplement-review/current667-fullaccess-completed.json",
+        "native-agent-supplement-review/current667-final-fields-reopened.json",
+        "current667-context-completed.png",
+        "current667-fullaccess-completed.png",
+        "current667-f39-history-reopened.png",
+        "native-current-followup-preparation/README.md"
+      ],
+      "limitations": "A 真节点/连线/未保存模型设置及四原始媒体版本已读；B 在完全访问权限下 seq26/78 实际读取。B 是用户自然语言点名并明确授权的同 owner 画布，不宣称存在未实现的 UI 跨画布引用入口。当前画布模式 scope_denied 原失败保留。",
+      "originalChecklistRecordSHA256": "37143d5d8f3a3b51ce70468ec37cc12a0816b7c739ea4f661b868e0bbfda5a79",
+      "evidenceSHA256": {
+        "native-current-followup-preparation/current667-canvas-final-independent-review.json": "71f7bdf00d45bef37e7dc250e3f7b847f4c1d1c6bc171d96cf8e8fc45d255b5d",
+        "wand-audio-candidate-install-receipt.json": "f311add90ded59855cc807b4b4bb013b327d48a4c59b8b25d62737ecb8a657ee",
+        "native-current-followup-preparation/current667-readonly-final.json": "91072a33a5ab62658e74e65371e9f33da157f54dbe5c21d1f6a1340465e17896",
+        "native-current-followup-preparation/current667-readonly-skill-independent-review.json": "8d774d19b4a38defa09f5294f76f2c0f423f80cfd3daca4abab76047e2bc3279",
+        "native-current-followup-preparation/current667-binding-pre-title-independent-review.json": "b4512461cd2bbf9eb46e0984a98c576ea1ceb513e062571482fdee31e0305019",
+        "native-current-followup-preparation/current667-title-partial-independent-review.json": "1088dca8f40a348bd84975600cc1b690803d9704fac0012dcc4ffc6d1e014ad2",
+        "native-current-followup-preparation/current667-final-three-check-conditions.json": "0947dd9f40f1e0af993da418b2e3a2629d1428cc527befa200f0286102c81c16",
+        "native-current-followup-preparation/current667-context-completed.json": "13fdb66c889bf5684f721d2e7b504bac6358bfd01572cd39341dac11a477a277",
+        "native-current-followup-preparation/current667-fullaccess-completed.json": "6188f1bc35f1146b2159e4cfc22eff5f59159a6399032d4e93c62742ea230632",
+        "native-agent-supplement-review/current667-after-title-partial.json": "6c078e2c292c348a429b9a1d6f58065b896e1954d0bac7e989e856e325823754",
+        "native-agent-supplement-review/current667-fullaccess-completed.json": "b921fb6441eece4ba51090e8edd31e6bd1dc5c3648742a907c950cf63e3a929f",
+        "native-agent-supplement-review/current667-final-fields-reopened.json": "eff0ea0acd20e4254e77afe6d8ae688d2b5922eed83d8c8bb94f9ceff8af70fa",
+        "current667-context-completed.png": "40efa47c4bfa97b6c2a2341597824c063c6f54345ac1e0eb772f38578b737cf4",
+        "current667-fullaccess-completed.png": "bba00a29df6342baff4a6c52a9202f2b37c016739c6a1dc787dc4ead8f631b1e",
+        "current667-f39-history-reopened.png": "1336632b4035182a0f16ddedcc439a1f7816fb13c38273520bf2ac2578cca900",
+        "native-current-followup-preparation/README.md": "41ff0756bd75b0812568a713f75bb78631a31c76fcf347647f9d951bc919c5ca"
+      }
+    },
+    "asset_reference": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "native-current-followup-preparation/native-media-independent-review-current667.json",
+        "native-current-followup-preparation/native-media-final-current667.json",
+        "wand-audio-candidate-install-receipt.json",
+        "wand-native-media-final-ui.json",
+        "wand-native-video-before-send.png",
+        "wand-native-audio-supplement-before-send.png",
+        "wand-native-audio-supplement-sent.png",
+        "wand-native-media-final.png"
+      ],
+      "limitations": "两 PNG 与 MP4 先选入，WAV 在同一运行轮补充；四份资源/版本和实际读取已核对。首次 node-only 与 resourceId schema 失败、自愈过程及 GUI 残留红字保留；视频内容质量仍未通过。",
+      "originalChecklistRecordSHA256": "d1c47016e562d2630078208a4b30fffb7e993290a4cbffe4f0b60ec67d86f283",
+      "evidenceSHA256": {
+        "native-current-followup-preparation/native-media-independent-review-current667.json": "e0f5b9e3d1e9985c517cd8626dc47f46fdc4257f2864d64be307fb2e7a4263cf",
+        "native-current-followup-preparation/native-media-final-current667.json": "72fa0ceb811ea5551f499cc8caa658b5e73763d4df140e0684b62d09e31bb4ea",
+        "wand-audio-candidate-install-receipt.json": "f311add90ded59855cc807b4b4bb013b327d48a4c59b8b25d62737ecb8a657ee",
+        "wand-native-media-final-ui.json": "19ed9ebff044540a28ec7ceecef76c25a74e439004a6b725d74bde21e5798914",
+        "wand-native-video-before-send.png": "413d12949a30662a36e343d1317bdac12a71b96b5dd7f473109f4629cbc998d4",
+        "wand-native-audio-supplement-before-send.png": "b31bc0e4a3bb2840a51530eda4337ecd5ee5d42ac35d289b9332c93ca8f42078",
+        "wand-native-audio-supplement-sent.png": "2db0c23b25cd862d276733587311f509480b1c6e37c082b9c4a1b6c696f0c258",
+        "wand-native-media-final.png": "fe83b83931b76c93aed6fca9dbe64d7083a35247eda7dba065ad66f7d17f8403"
+      }
+    },
+    "canvas_mutation": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "native-current-followup-preparation/current667-canvas-final-independent-review.json",
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-readonly-final.json",
+        "native-current-followup-preparation/current667-readonly-skill-independent-review.json",
+        "native-current-followup-preparation/current667-binding-pre-title-independent-review.json",
+        "native-current-followup-preparation/current667-title-partial-independent-review.json",
+        "native-current-followup-preparation/current667-final-three-check-conditions.json",
+        "native-current-followup-preparation/current667-context-completed.json",
+        "native-current-followup-preparation/current667-fullaccess-completed.json",
+        "native-agent-supplement-review/current667-after-title-partial.json",
+        "native-agent-supplement-review/current667-fullaccess-completed.json",
+        "native-agent-supplement-review/current667-final-fields-reopened.json",
+        "current667-context-completed.png",
+        "current667-fullaccess-completed.png",
+        "current667-f39-history-reopened.png",
+        "native-current-followup-preparation/README.md"
+      ],
+      "limitations": "依明确批准的当前复用路线完成原有两空节点的绑定、连线、坐标排布、medium 参数与标题修改，重开保留；旧节点 create 来源不改签为当前 667。布局由 node.move 实现，不声称点击 UI 自动整理。",
+      "originalChecklistRecordSHA256": "07b20f0ff5d38d58a41d432768722110f67b089020880e9e45e017975170ae67",
+      "evidenceSHA256": {
+        "native-current-followup-preparation/current667-canvas-final-independent-review.json": "71f7bdf00d45bef37e7dc250e3f7b847f4c1d1c6bc171d96cf8e8fc45d255b5d",
+        "wand-audio-candidate-install-receipt.json": "f311add90ded59855cc807b4b4bb013b327d48a4c59b8b25d62737ecb8a657ee",
+        "native-current-followup-preparation/current667-readonly-final.json": "91072a33a5ab62658e74e65371e9f33da157f54dbe5c21d1f6a1340465e17896",
+        "native-current-followup-preparation/current667-readonly-skill-independent-review.json": "8d774d19b4a38defa09f5294f76f2c0f423f80cfd3daca4abab76047e2bc3279",
+        "native-current-followup-preparation/current667-binding-pre-title-independent-review.json": "b4512461cd2bbf9eb46e0984a98c576ea1ceb513e062571482fdee31e0305019",
+        "native-current-followup-preparation/current667-title-partial-independent-review.json": "1088dca8f40a348bd84975600cc1b690803d9704fac0012dcc4ffc6d1e014ad2",
+        "native-current-followup-preparation/current667-final-three-check-conditions.json": "0947dd9f40f1e0af993da418b2e3a2629d1428cc527befa200f0286102c81c16",
+        "native-current-followup-preparation/current667-context-completed.json": "13fdb66c889bf5684f721d2e7b504bac6358bfd01572cd39341dac11a477a277",
+        "native-current-followup-preparation/current667-fullaccess-completed.json": "6188f1bc35f1146b2159e4cfc22eff5f59159a6399032d4e93c62742ea230632",
+        "native-agent-supplement-review/current667-after-title-partial.json": "6c078e2c292c348a429b9a1d6f58065b896e1954d0bac7e989e856e325823754",
+        "native-agent-supplement-review/current667-fullaccess-completed.json": "b921fb6441eece4ba51090e8edd31e6bd1dc5c3648742a907c950cf63e3a929f",
+        "native-agent-supplement-review/current667-final-fields-reopened.json": "eff0ea0acd20e4254e77afe6d8ae688d2b5922eed83d8c8bb94f9ceff8af70fa",
+        "current667-context-completed.png": "40efa47c4bfa97b6c2a2341597824c063c6f54345ac1e0eb772f38578b737cf4",
+        "current667-fullaccess-completed.png": "bba00a29df6342baff4a6c52a9202f2b37c016739c6a1dc787dc4ead8f631b1e",
+        "current667-f39-history-reopened.png": "1336632b4035182a0f16ddedcc439a1f7816fb13c38273520bf2ac2578cca900",
+        "native-current-followup-preparation/README.md": "41ff0756bd75b0812568a713f75bb78631a31c76fcf347647f9d951bc919c5ca"
+      }
+    },
+    "multi_turn": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "native-current-followup-preparation/current667-canvas-final-independent-review.json",
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-readonly-final.json",
+        "native-current-followup-preparation/current667-readonly-skill-independent-review.json",
+        "native-current-followup-preparation/current667-binding-pre-title-independent-review.json",
+        "native-current-followup-preparation/current667-title-partial-independent-review.json",
+        "native-current-followup-preparation/current667-final-three-check-conditions.json",
+        "native-current-followup-preparation/current667-context-completed.json",
+        "native-current-followup-preparation/current667-fullaccess-completed.json",
+        "native-agent-supplement-review/current667-after-title-partial.json",
+        "native-agent-supplement-review/current667-fullaccess-completed.json",
+        "native-agent-supplement-review/current667-final-fields-reopened.json",
+        "current667-context-completed.png",
+        "current667-fullaccess-completed.png",
+        "current667-f39-history-reopened.png",
+        "native-current-followup-preparation/README.md"
+      ],
+      "limitations": "同 f39 连续人工轮次真实仅改近景标题，再由新 followup 无工具正确回忆前轮资产与版本；标题 turn 原 scope_denied/续答未完成保留，后续没有重做已成功修改。重开 A 文档及操作均保持。",
+      "originalChecklistRecordSHA256": "07929793b81606dd30fc9861fd4887894e379b89d8b0edc1764f84b9db4e29fd",
+      "evidenceSHA256": {
+        "native-current-followup-preparation/current667-canvas-final-independent-review.json": "71f7bdf00d45bef37e7dc250e3f7b847f4c1d1c6bc171d96cf8e8fc45d255b5d",
+        "wand-audio-candidate-install-receipt.json": "f311add90ded59855cc807b4b4bb013b327d48a4c59b8b25d62737ecb8a657ee",
+        "native-current-followup-preparation/current667-readonly-final.json": "91072a33a5ab62658e74e65371e9f33da157f54dbe5c21d1f6a1340465e17896",
+        "native-current-followup-preparation/current667-readonly-skill-independent-review.json": "8d774d19b4a38defa09f5294f76f2c0f423f80cfd3daca4abab76047e2bc3279",
+        "native-current-followup-preparation/current667-binding-pre-title-independent-review.json": "b4512461cd2bbf9eb46e0984a98c576ea1ceb513e062571482fdee31e0305019",
+        "native-current-followup-preparation/current667-title-partial-independent-review.json": "1088dca8f40a348bd84975600cc1b690803d9704fac0012dcc4ffc6d1e014ad2",
+        "native-current-followup-preparation/current667-final-three-check-conditions.json": "0947dd9f40f1e0af993da418b2e3a2629d1428cc527befa200f0286102c81c16",
+        "native-current-followup-preparation/current667-context-completed.json": "13fdb66c889bf5684f721d2e7b504bac6358bfd01572cd39341dac11a477a277",
+        "native-current-followup-preparation/current667-fullaccess-completed.json": "6188f1bc35f1146b2159e4cfc22eff5f59159a6399032d4e93c62742ea230632",
+        "native-agent-supplement-review/current667-after-title-partial.json": "6c078e2c292c348a429b9a1d6f58065b896e1954d0bac7e989e856e325823754",
+        "native-agent-supplement-review/current667-fullaccess-completed.json": "b921fb6441eece4ba51090e8edd31e6bd1dc5c3648742a907c950cf63e3a929f",
+        "native-agent-supplement-review/current667-final-fields-reopened.json": "eff0ea0acd20e4254e77afe6d8ae688d2b5922eed83d8c8bb94f9ceff8af70fa",
+        "current667-context-completed.png": "40efa47c4bfa97b6c2a2341597824c063c6f54345ac1e0eb772f38578b737cf4",
+        "current667-fullaccess-completed.png": "bba00a29df6342baff4a6c52a9202f2b37c016739c6a1dc787dc4ead8f631b1e",
+        "current667-f39-history-reopened.png": "1336632b4035182a0f16ddedcc439a1f7816fb13c38273520bf2ac2578cca900",
+        "native-current-followup-preparation/README.md": "41ff0756bd75b0812568a713f75bb78631a31c76fcf347647f9d951bc919c5ca"
+      }
+    },
+    "proposal_decline": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "5eed2376d3565325feca3e9221cd261d84e598f00da1513ff9282d20487edbb6",
+      "evidence": [
+        "native-proposal3d-independent-review.json",
+        "native-proposal3d-declined.json",
+        "native-proposal3d-declined.png"
+      ],
+      "evidenceSHA256": {
+        "native-proposal3d-independent-review.json": "946ed1dc180ccfaf997129386a2be7fcf0f205ae4dc5df377408027a4dc500e4",
+        "native-proposal3d-declined.json": "84f16465f58704e0ea9b743702196e0b5b6d63e8224ed102b823b9e78b553772",
+        "native-proposal3d-declined.png": "1956175b912d08d2836ea03ab24b087d12f8f19f7405876ab48fb55e8fbb47d4"
+      }
+    },
+    "proposal_stale": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "5eed2376d3565325feca3e9221cd261d84e598f00da1513ff9282d20487edbb6",
+      "evidence": [
+        "native-proposal3d-stale-independent-review.json",
+        "native-proposal3d-stale-ready.json",
+        "native-proposal3d-stale-mutated.json",
+        "native-proposal3d-stale-rejected.json",
+        "native-proposal3d-stale-confirm.png"
+      ],
+      "evidenceSHA256": {
+        "native-proposal3d-stale-independent-review.json": "d12754ac66305f21344f5986a22c9aeb3acc6d4e2ae4c7b6100a6eaee1ebed52",
+        "native-proposal3d-stale-ready.json": "069991291b4e5b8e73de13567a1b4d77f344a3c9f1c5a337863cff19e4c776ae",
+        "native-proposal3d-stale-mutated.json": "31132d9716656d2f126925090d2a4267fdc2975ad07ecaa2ad6cf8e3217a9d00",
+        "native-proposal3d-stale-rejected.json": "19a1ee7ae270bb600f83a9668b714f0d83cbd71b20f65ea90aa9bc664585ef1a",
+        "native-proposal3d-stale-confirm.png": "4a4372c707c50e3fc0fa2669ebb7372236846d5d999016ce460cb1bc8f6e7394"
+      }
+    },
+    "proposal_idempotency": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "5eed2376d3565325feca3e9221cd261d84e598f00da1513ff9282d20487edbb6",
+      "evidence": [
+        "native-round1-t2i-independent-review.json",
+        "native-round1-t2i-confirm.png",
+        "native-round1-t2i-submitted.json",
+        "task-evidence/round1-t2i-completed.json"
+      ],
+      "evidenceSHA256": {
+        "native-round1-t2i-independent-review.json": "c693eed09d5a81511e5e20da5e326a8bafb6a49a799592ff0dae732fbc6c0992",
+        "native-round1-t2i-confirm.png": "87c45628c60acf2eb3cd67ee18ec1d9d8b2bb493f43766c7fbfaaf0c6f23624c",
+        "native-round1-t2i-submitted.json": "f4c6d18306e6860d5a87adb1e086a08191e5240f7ff390a01e09f2a320dbb938",
+        "task-evidence/round1-t2i-completed.json": "df487c1f192733190114c78315c24ebce1da1a390b752ce45486326724353971"
+      }
+    },
+    "session_history": {
+      "status": "pending",
+      "method": null,
+      "sourceDigest": null,
+      "evidence": [],
+      "limitations": "完整验收尚未执行完成。",
+      "originalChecklistRecordSHA256": "16ac9fde97d831f9ab828f2da24fbd9ce4fcc5757708b671ee72ffbf6244d8c1",
+      "evidenceSHA256": {}
+    },
+    "session_restart": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "5eed2376d3565325feca3e9221cd261d84e598f00da1513ff9282d20487edbb6",
+      "evidence": [
+        "native-round1-restart-independent-review.json",
+        "native-round1-restart-original-gui-receipts-v2.json",
+        "native-round1-before-final-restart.json",
+        "native-round1-after-final-restart.json",
+        "native-round1-restart-restored-canvas.png"
+      ],
+      "evidenceSHA256": {
+        "native-round1-restart-independent-review.json": "05a7fc3fa88d09053b88c1e99744935d5c0490caa3c5f276e1feec82bd385d88",
+        "native-round1-restart-original-gui-receipts-v2.json": "6ea120c075825fcc42c031b657fbc05cd799da56ff7192e1ea5de4a1bc4528a9",
+        "native-round1-before-final-restart.json": "0e08003bcf11035843b94c5e01123870fb36081f2e00119c044ff97de23c71b5",
+        "native-round1-after-final-restart.json": "d95edf08d5d4116ed82414635fde46066cbfe31e55f297fbed91792dd52bf9d4",
+        "native-round1-restart-restored-canvas.png": "022269721b46a42349b19f8c9bdeb3e9d8c83bd58eb69eb0cd11bd6fda8d44d1"
+      }
+    },
+    "cancel": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "5eed2376d3565325feca3e9221cd261d84e598f00da1513ff9282d20487edbb6",
+      "evidence": [
+        "native-audio374-cancel-final-independent-review.json",
+        "native-audio374-stop-original-gui-receipt.json",
+        "native-audio374-independent-review.json",
+        "native-audio374-stopped.json"
+      ],
+      "evidenceSHA256": {
+        "native-audio374-cancel-final-independent-review.json": "396ab05337b88fc2eebb34cdbe4db16be23c7d692c7853b8042374b3095ee07d",
+        "native-audio374-stop-original-gui-receipt.json": "6b286de50b8ec92e404feb00a1c617e3d6cd63f3acd8666df55db28e1a8f6e61",
+        "native-audio374-independent-review.json": "802ab901ee32d752d59ab1f837fc281a14444c63c04c7c84e89a95138539645a",
+        "native-audio374-stopped.json": "3866ebd6660327f3002f534211cae0413a2ac3a935fec7b66b669e989e68679e"
+      }
+    },
+    "conflict_undo": {
+      "status": "passed",
+      "method": "deterministic",
+      "sourceDigest": "5eed2376d3565325feca3e9221cd261d84e598f00da1513ff9282d20487edbb6",
+      "evidence": [
+        "deterministic-agent-checks-audio-fix/REPORT.md",
+        "deterministic-agent-checks-audio-fix/evidence.json"
+      ],
+      "evidenceSHA256": {
+        "deterministic-agent-checks-audio-fix/REPORT.md": "e2ea4329b3f777dbf3dfff9da91a9912d9f7486b0db265353a8721897bc653a9",
+        "deterministic-agent-checks-audio-fix/evidence.json": "b4f685debc432cd2f54d7c741b2c78b87033af1e236c41ad2e74193aa92f564c"
+      }
+    },
+    "host_recovery": {
+      "status": "passed",
+      "method": "deterministic",
+      "sourceDigest": "5eed2376d3565325feca3e9221cd261d84e598f00da1513ff9282d20487edbb6",
+      "evidence": [
+        "deterministic-agent-checks-audio-fix/REPORT.md",
+        "deterministic-agent-checks-audio-fix/evidence.json"
+      ],
+      "evidenceSHA256": {
+        "deterministic-agent-checks-audio-fix/REPORT.md": "e2ea4329b3f777dbf3dfff9da91a9912d9f7486b0db265353a8721897bc653a9",
+        "deterministic-agent-checks-audio-fix/evidence.json": "b4f685debc432cd2f54d7c741b2c78b87033af1e236c41ad2e74193aa92f564c"
+      }
+    },
+    "scope_isolation": {
+      "status": "passed",
+      "method": "deterministic",
+      "sourceDigest": "5eed2376d3565325feca3e9221cd261d84e598f00da1513ff9282d20487edbb6",
+      "evidence": [
+        "deterministic-agent-checks-audio-fix/REPORT.md",
+        "deterministic-agent-checks-audio-fix/evidence.json"
+      ],
+      "evidenceSHA256": {
+        "deterministic-agent-checks-audio-fix/REPORT.md": "e2ea4329b3f777dbf3dfff9da91a9912d9f7486b0db265353a8721897bc653a9",
+        "deterministic-agent-checks-audio-fix/evidence.json": "b4f685debc432cd2f54d7c741b2c78b87033af1e236c41ad2e74193aa92f564c"
+      }
+    },
+    "budget": {
+      "status": "passed",
+      "method": "deterministic",
+      "sourceDigest": "5eed2376d3565325feca3e9221cd261d84e598f00da1513ff9282d20487edbb6",
+      "evidence": [
+        "deterministic-agent-checks-audio-fix/REPORT.md",
+        "deterministic-agent-checks-audio-fix/evidence.json"
+      ],
+      "evidenceSHA256": {
+        "deterministic-agent-checks-audio-fix/REPORT.md": "e2ea4329b3f777dbf3dfff9da91a9912d9f7486b0db265353a8721897bc653a9",
+        "deterministic-agent-checks-audio-fix/evidence.json": "b4f685debc432cd2f54d7c741b2c78b87033af1e236c41ad2e74193aa92f564c"
+      }
+    },
+    "cli_mcp": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "5eed2376d3565325feca3e9221cd261d84e598f00da1513ff9282d20487edbb6",
+      "evidence": [
+        "cli-native-3d080c9a/receipt.json",
+        "cli-native-3d080c9a/state.json",
+        "cli-native-3d080c9a/native-revoked.png",
+        "cli-native-3d080c9a/cleanup-receipt.json"
+      ],
+      "evidenceSHA256": {
+        "cli-native-3d080c9a/receipt.json": "b6228b0e136cea030cccbd9cde98f7cf72fc328cb2711a57bb8a97ab744d43da",
+        "cli-native-3d080c9a/state.json": "cb4c1cd1d0ac395e78f3322af7b20088fff37dc9a1e08d8351fe0055c3d576e7",
+        "cli-native-3d080c9a/native-revoked.png": "174294aff0610a34e9b738236fdd39f3a0ba3caf9a91d49cb85b9b199be3f1fd",
+        "cli-native-3d080c9a/cleanup-receipt.json": "f6d779be63716fe38806127249a334ff6dd72247b63f120a4ac33a969a963317"
+      }
+    },
+    "durable_resume": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "5eed2376d3565325feca3e9221cd261d84e598f00da1513ff9282d20487edbb6",
+      "evidence": [
+        "durable-resume-current3d-review/independent-review-final.json",
+        "native-round1-restart-original-gui-receipts-v2.json",
+        "native-round1-before-final-restart.json",
+        "native-round1-after-final-restart.json",
+        "deterministic-agent-checks-audio-fix/REPORT.md"
+      ],
+      "evidenceSHA256": {
+        "durable-resume-current3d-review/independent-review-final.json": "7951dd8e64b8b45c3b30e63f6830948f3efb859c733610f2d0af6e26c244eb9f",
+        "native-round1-restart-original-gui-receipts-v2.json": "6ea120c075825fcc42c031b657fbc05cd799da56ff7192e1ea5de4a1bc4528a9",
+        "native-round1-before-final-restart.json": "0e08003bcf11035843b94c5e01123870fb36081f2e00119c044ff97de23c71b5",
+        "native-round1-after-final-restart.json": "d95edf08d5d4116ed82414635fde46066cbfe31e55f297fbed91792dd52bf9d4",
+        "deterministic-agent-checks-audio-fix/REPORT.md": "e2ea4329b3f777dbf3dfff9da91a9912d9f7486b0db265353a8721897bc653a9"
+      }
+    },
+    "native_video": {
+      "status": "failed",
+      "method": "native",
+      "sourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "native-current-followup-preparation/native-media-independent-review-current667.json",
+        "native-current-followup-preparation/native-video-normalization-diagnosis-current667.json"
+      ],
+      "limitations": "实际连续视频观察漏报1.5秒硬切和叶片移动；同一实际提交视频SHA证明72帧和动作保留，不归因客户端丢帧。按Owner最新授权发布后继续验证，未标通过。",
+      "originalChecklistRecordSHA256": "5c96af60d0e3838b7475b5a5ac6e742d1402d6d5f247e7d024789bc9f9118325",
+      "evidenceSHA256": {
+        "native-current-followup-preparation/native-media-independent-review-current667.json": "e0f5b9e3d1e9985c517cd8626dc47f46fdc4257f2864d64be307fb2e7a4263cf",
+        "native-current-followup-preparation/native-video-normalization-diagnosis-current667.json": "7d5145384c10ca6b6d40b2f08babc1a488d0fb831c8c943572177078a1fd9244"
+      }
+    },
+    "native_audio": {
+      "status": "failed",
+      "method": "native",
+      "sourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "native-current-followup-preparation/current667-audio-film-regression-independent-review.json",
+        "native-current-followup-preparation/current667-film-initial-completed.json",
+        "native-current-followup-preparation/current667-film-initial-fee-readback.json",
+        "native-current-followup-preparation/native-media-independent-review-current667.json",
+        "native-current-followup-preparation/native-media-final-current667.json",
+        "wand-audio-candidate-install-receipt.json",
+        "wand-native-media-final-ui.json",
+        "wand-native-video-before-send.png",
+        "wand-native-audio-supplement-before-send.png",
+        "wand-native-audio-supplement-sent.png",
+        "wand-native-media-final.png"
+      ],
+      "limitations": "此前同源原生正确样本保留于earlierPass。本轮同一音频字节在生产场景被转写为同音异义“金液”并直接烧入，语义转写/上下文应用未稳定通过；不归因为音频协议或声学辨字失败。实际音轨与提示音识别事实仍成立，费用pending不释放。",
+      "originalChecklistRecordSHA256": "90fc897c1f51128d272c59ee05a0179bb0f43e3bf9b8fa25e76401f78d0bb2fd",
+      "evidenceSHA256": {
+        "native-current-followup-preparation/current667-audio-film-regression-independent-review.json": "34d7c624b7b4e2e7953b00312dd55209fe363177c80a4f3f8edcb2ebc5b3f5e2",
+        "native-current-followup-preparation/current667-film-initial-completed.json": "ca18d7bae168d6ee0946ebcb940a2df9311d6ba6b648d8492484889762d81ace",
+        "native-current-followup-preparation/current667-film-initial-fee-readback.json": "6a00678aefb5c16d4f07d9e5c98a9613a6e0debf4613e2c382188a939f3f72c5",
+        "native-current-followup-preparation/native-media-independent-review-current667.json": "e0f5b9e3d1e9985c517cd8626dc47f46fdc4257f2864d64be307fb2e7a4263cf",
+        "native-current-followup-preparation/native-media-final-current667.json": "72fa0ceb811ea5551f499cc8caa658b5e73763d4df140e0684b62d09e31bb4ea",
+        "wand-audio-candidate-install-receipt.json": "f311add90ded59855cc807b4b4bb013b327d48a4c59b8b25d62737ecb8a657ee",
+        "wand-native-media-final-ui.json": "19ed9ebff044540a28ec7ceecef76c25a74e439004a6b725d74bde21e5798914",
+        "wand-native-video-before-send.png": "413d12949a30662a36e343d1317bdac12a71b96b5dd7f473109f4629cbc998d4",
+        "wand-native-audio-supplement-before-send.png": "b31bc0e4a3bb2840a51530eda4337ecd5ee5d42ac35d289b9332c93ca8f42078",
+        "wand-native-audio-supplement-sent.png": "2db0c23b25cd862d276733587311f509480b1c6e37c082b9c4a1b6c696f0c258",
+        "wand-native-media-final.png": "fe83b83931b76c93aed6fca9dbe64d7083a35247eda7dba065ad66f7d17f8403"
+      },
+      "earlierPass": {
+        "status": "passed",
+        "method": "native",
+        "sourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+        "evidence": [
+          "native-current-followup-preparation/native-media-independent-review-current667.json",
+          "native-current-followup-preparation/native-media-final-current667.json",
+          "wand-audio-candidate-install-receipt.json",
+          "wand-native-media-final-ui.json",
+          "wand-native-video-before-send.png",
+          "wand-native-audio-supplement-before-send.png",
+          "wand-native-audio-supplement-sent.png",
+          "wand-native-media-final.png"
+        ],
+        "limitations": "原生 WAND audio 0–5832ms 原答正确复述两句中文与前置提示音；中性问题未给真相。WAND 时间标注粗，最终静音区间是客观测量、语句分配明确为推断，不宣称词级对齐或主 Opus 亲自听音。WAND 现金尚未结算，预留未释放。",
+        "originalChecklistRecordSHA256": "daa2812b02a36061c9f5cb0fe4a71e2e133a0c3b4e9770203fef1884ca7afb33",
+        "evidenceSHA256": {
+          "native-current-followup-preparation/native-media-independent-review-current667.json": "e0f5b9e3d1e9985c517cd8626dc47f46fdc4257f2864d64be307fb2e7a4263cf",
+          "native-current-followup-preparation/native-media-final-current667.json": "72fa0ceb811ea5551f499cc8caa658b5e73763d4df140e0684b62d09e31bb4ea",
+          "wand-audio-candidate-install-receipt.json": "f311add90ded59855cc807b4b4bb013b327d48a4c59b8b25d62737ecb8a657ee",
+          "wand-native-media-final-ui.json": "19ed9ebff044540a28ec7ceecef76c25a74e439004a6b725d74bde21e5798914",
+          "wand-native-video-before-send.png": "413d12949a30662a36e343d1317bdac12a71b96b5dd7f473109f4629cbc998d4",
+          "wand-native-audio-supplement-before-send.png": "b31bc0e4a3bb2840a51530eda4337ecd5ee5d42ac35d289b9332c93ca8f42078",
+          "wand-native-audio-supplement-sent.png": "2db0c23b25cd862d276733587311f509480b1c6e37c082b9c4a1b6c696f0c258",
+          "wand-native-media-final.png": "fe83b83931b76c93aed6fca9dbe64d7083a35247eda7dba065ad66f7d17f8403"
+        }
+      }
+    },
+    "skill_version": {
+      "status": "pending",
+      "method": null,
+      "sourceDigest": null,
+      "evidence": [],
+      "limitations": "完整验收尚未执行完成。",
+      "originalChecklistRecordSHA256": "e25fbafb7de1a3775a514cc9c088f3f49524e79e580f11258e8bc563c07629be",
+      "evidenceSHA256": {}
+    },
+    "skill_files": {
+      "status": "pending",
+      "method": null,
+      "sourceDigest": null,
+      "evidence": [],
+      "limitations": "完整验收尚未执行完成。",
+      "originalChecklistRecordSHA256": "b4e3e4bc0d8a9b0c25f8971924319bd9c4f73d9cc66e71f2a4143c00cbecebde",
+      "evidenceSHA256": {}
+    },
+    "permission_modes": {
+      "status": "pending",
+      "method": null,
+      "sourceDigest": null,
+      "evidence": [],
+      "limitations": "完整验收尚未执行完成。",
+      "originalChecklistRecordSHA256": "d52a33893d5edd716d1c666863cb3c7d90e03de99ebf5fa5d4fe4a311c9539d8",
+      "evidenceSHA256": {}
+    },
+    "external_business": {
+      "status": "passed",
+      "method": "native",
+      "sourceDigest": "5eed2376d3565325feca3e9221cd261d84e598f00da1513ff9282d20487edbb6",
+      "evidence": [
+        "cli-native-3d080c9a/receipt.json",
+        "cli-native-3d080c9a/state.json",
+        "cli-native-3d080c9a/native-revoked.png",
+        "cli-native-3d080c9a/cleanup-receipt.json"
+      ],
+      "evidenceSHA256": {
+        "cli-native-3d080c9a/receipt.json": "b6228b0e136cea030cccbd9cde98f7cf72fc328cb2711a57bb8a97ab744d43da",
+        "cli-native-3d080c9a/state.json": "cb4c1cd1d0ac395e78f3322af7b20088fff37dc9a1e08d8351fe0055c3d576e7",
+        "cli-native-3d080c9a/native-revoked.png": "174294aff0610a34e9b738236fdd39f3a0ba3caf9a91d49cb85b9b199be3f1fd",
+        "cli-native-3d080c9a/cleanup-receipt.json": "f6d779be63716fe38806127249a334ff6dd72247b63f120a4ac33a969a963317"
+      }
+    },
+    "media_film_review": {
+      "status": "failed",
+      "method": "native",
+      "sourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "native-current-followup-preparation/current667-audio-film-regression-independent-review.json",
+        "native-current-followup-preparation/current667-film-initial-completed.json",
+        "native-current-followup-preparation/current667-film-initial-fee-readback.json",
+        "wand-audio-candidate-install-receipt.json"
+      ],
+      "limitations": "真实初版已渲染并保存，但字幕使用金液，角标被作居中字幕，成片字幕/语音精确对齐及修正版未完成；最终无费用表述错误，chat已结算而WAND现金仍pending。",
+      "originalChecklistRecordSHA256": "afde10002e65a91c9826d4c6136c68ddbff4152b9c917313998b138c4475dc1d",
+      "evidenceSHA256": {
+        "native-current-followup-preparation/current667-audio-film-regression-independent-review.json": "34d7c624b7b4e2e7953b00312dd55209fe363177c80a4f3f8edcb2ebc5b3f5e2",
+        "native-current-followup-preparation/current667-film-initial-completed.json": "ca18d7bae168d6ee0946ebcb940a2df9311d6ba6b648d8492484889762d81ace",
+        "native-current-followup-preparation/current667-film-initial-fee-readback.json": "6a00678aefb5c16d4f07d9e5c98a9613a6e0debf4613e2c382188a939f3f72c5",
+        "wand-audio-candidate-install-receipt.json": "f311add90ded59855cc807b4b4bb013b327d48a4c59b8b25d62737ecb8a657ee"
+      }
+    }
+  },
+  "postReleaseChecks": [
+    {
+      "id": "session_history",
+      "status": "pending",
+      "evidence": [
+        "fixtures/agent-checklist.json"
+      ],
+      "reason": "完整验收尚未执行完成。",
+      "nextAction": "新建第二会话后切换回首会话，检查本轮工具与附件历史。 验收要求：会话历史、素材身份、初版/修正版可以辨认，不串会话。",
+      "owner": "Ender"
+    },
+    {
+      "id": "native_video",
+      "status": "failed",
+      "evidence": [
+        "native-current-followup-preparation/native-media-independent-review-current667.json",
+        "native-current-followup-preparation/native-video-normalization-diagnosis-current667.json"
+      ],
+      "reason": "实际连续视频观察漏报1.5秒硬切和叶片移动；同一实际提交视频SHA证明72帧和动作保留，不归因客户端丢帧。按Owner最新授权发布后继续验证，未标通过。",
+      "nextAction": "通过自然语言请求理解reference-motion.mp4全段，实际video模式连续读取0–3秒。 验收要求：独立识别宽→近唯一硬切及动作/景别；与ground-truth比对。抽帧或精确工具指令接线不能替代自然语言选择。",
+      "owner": "Ender"
+    },
+    {
+      "id": "native_audio",
+      "status": "failed",
+      "evidence": [
+        "native-current-followup-preparation/current667-audio-film-regression-independent-review.json",
+        "native-current-followup-preparation/current667-film-initial-completed.json",
+        "native-current-followup-preparation/current667-film-initial-fee-readback.json",
+        "native-current-followup-preparation/native-media-independent-review-current667.json",
+        "native-current-followup-preparation/native-media-final-current667.json",
+        "wand-audio-candidate-install-receipt.json",
+        "wand-native-media-final-ui.json",
+        "wand-native-video-before-send.png",
+        "wand-native-audio-supplement-before-send.png",
+        "wand-native-audio-supplement-sent.png",
+        "wand-native-media-final.png"
+      ],
+      "reason": "此前同源原生正确样本保留于earlierPass。本轮同一音频字节在生产场景被转写为同音异义“金液”并直接烧入，语义转写/上下文应用未稳定通过；不归因为音频协议或声学辨字失败。实际音轨与提示音识别事实仍成立，费用pending不释放。",
+      "nextAction": "通过真实选择或粘贴WAV，并在运行中补充一次附件；自然语言请求听音转写和声音顺序。 验收要求：实际audio模式读取指定区间，独立辨认两句中文与提示音顺序；不向模型提供ground-truth答案。",
+      "owner": "Ender"
+    },
+    {
+      "id": "skill_version",
+      "status": "pending",
+      "evidence": [
+        "fixtures/agent-checklist.json"
+      ],
+      "reason": "完整验收尚未执行完成。",
+      "nextAction": "真实选择固定Skill版本并重启，另验证改版、卸载或错误hash后的拒绝。 验收要求：pin不漂移，不静默加载最新版。",
+      "owner": "Ender"
+    },
+    {
+      "id": "skill_files",
+      "status": "pending",
+      "evidence": [
+        "fixtures/agent-checklist.json"
+      ],
+      "reason": "完整验收尚未执行完成。",
+      "nextAction": "实际使用选中Skill内辅助文本完成本场景；测试未选Skill、越界路径和缺少脚本能力。 验收要求：只读取允许的包内文件，不授予任意磁盘或脚本权限。",
+      "owner": "Ender"
+    },
+    {
+      "id": "permission_modes",
+      "status": "pending",
+      "evidence": [
+        "fixtures/agent-checklist.json"
+      ],
+      "reason": "完整验收尚未执行完成。",
+      "nextAction": "正式UI分别切只读、当前画布、完整业务访问，实际试读写及重启恢复。 验收要求：只读不写、当前画布不跨写、完整模式可写同owner其它画布，foreign owner与CAS冲突仍拒绝。",
+      "owner": "Ender"
+    },
+    {
+      "id": "media_film_review",
+      "status": "failed",
+      "evidence": [
+        "native-current-followup-preparation/current667-audio-film-regression-independent-review.json",
+        "native-current-followup-preparation/current667-film-initial-completed.json",
+        "native-current-followup-preparation/current667-film-initial-fee-readback.json",
+        "wand-audio-candidate-install-receipt.json"
+      ],
+      "reason": "真实初版已渲染并保存，但字幕使用金液，角标被作居中字幕，成片字幕/语音精确对齐及修正版未完成；最终无费用表述错误，chat已结算而WAND现金仍pending。",
+      "nextAction": "按prompts.json完成6秒双镜头初版，再只改片尾小字生成修正版；实际读取成片video/audio区间并人工观看听音。 验收要求：宽→近/3秒剪点/完整音频/字幕一致；初版和修正版均可播放下载且重开可分辨。只改时间线或任务排队不能算交付。",
+      "owner": "Ender"
+    }
+  ],
+  "throughLedger": {
+    "prefixBytes": 187912,
+    "prefixSHA256": "1b71457fa4219857b93bdf87d562c94f72cdd46f62a55f642726f024808cb564",
+    "throughSequenceInclusive": 602,
+    "throughEventAt": "2026-10-21T03:49:46.232Z"
+  },
+  "billingAuditSHA256": "2c9292e86b5375d41684f186806bb009bd1bb272b4bed39d7a3e27a46974955a",
+  "additionalBillingAttempts": [
+    {
+      "id": "b42744a3-db8d-409d-b5bd-d8b9b776aa20",
+      "kind": "chat",
+      "model": "wand-vega-vl-1.0-flash",
+      "holdAt": "2026-10-21T02:30:10.696Z",
+      "heldCNY": 0.24586,
+      "requestId": "01a15c4b-727e-7e47-a076-89b38544f32f",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "pending",
+      "costCNY": null,
+      "settlementEvidenceSHA256": null,
+      "acceptanceCredit": false,
+      "executionSourceStatus": "not_app_execution",
+      "executedSourceDigest": null,
+      "executorSHA256": "11bf0d4633f7195ffb7b44ce26757a4a09045a001bb6b0b07fc9eb374b6f963c",
+      "evidence": [
+        "wand-audio-direct-20261021/result.json",
+        "wand-audio-direct-20261021/state.json",
+        "wand-audio-direct-20261021/protocol.mjs",
+        "billing-completeness-audit-20261021/direct-executor-offline-wire-readback.json"
+      ],
+      "originalCostRecordSHA256": "2778775c02fe9071dc73a044a98cfb7b7b64c13f02bd16a8e74db9d170161120"
+    },
+    {
+      "id": "d4f3756e-d06c-42dc-ba01-7951e2707f55",
+      "kind": "chat",
+      "model": "wand-vega-vl-1.0-flash",
+      "holdAt": "2026-10-21T02:35:12.719Z",
+      "heldCNY": 0.24586,
+      "requestId": "01a15c50-0e72-73de-b1c1-a916645e9d61",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "pending",
+      "costCNY": null,
+      "settlementEvidenceSHA256": null,
+      "acceptanceCredit": false,
+      "executionSourceStatus": "not_app_execution",
+      "executedSourceDigest": null,
+      "executorSHA256": "fa4b90d351ca2188003ad6e38f70b6b6800dbb08ef06fc71491fca4d288e1989",
+      "evidence": [
+        "wand-audio-segment-20261021/result.json",
+        "wand-audio-segment-20261021/state.json",
+        "wand-audio-segment-20261021/protocol.mjs",
+        "billing-completeness-audit-20261021/direct-executor-offline-wire-readback.json"
+      ],
+      "originalCostRecordSHA256": "8e398f8e90e6806e642fa1a5b9563f3f7c24aae68b9dfe723475195c2a6050cf"
+    },
+    {
+      "id": "ba53c64e-545c-406e-a411-97b5c8c3497a",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T02:58:05.706Z",
+      "heldCNY": 2.869308,
+      "requestId": "202610210258069222225628268d9d6GXfn2JSu",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.211548,
+      "settlementEvidenceSHA256": "d493334355085c3a5ad5cd347b41f11f82f177987fe5269ab77e64cfabc7c6cf",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/native-media-final-current667.json",
+        "billing-completeness-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210258069222225628268d9d6GXfn2JSu.json"
+      ],
+      "originalCostRecordSHA256": "01edb9aa4e940787ee19581c305fd18bf432fefacbe29ef3c7072362f8f7baf3"
+    },
+    {
+      "id": "40eafc1a-9fdd-4b08-820d-775c15741b3a",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T02:58:35.355Z",
+      "heldCNY": 2.920651,
+      "requestId": "202610210258356789155798268d9d688XvKKQD",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.213396,
+      "settlementEvidenceSHA256": "d89928fde7560a39121dfa2d8371f508996ca03fc6dbe77954d4fabf1df60ea8",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/native-media-final-current667.json",
+        "billing-completeness-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210258356789155798268d9d688XvKKQD.json"
+      ],
+      "originalCostRecordSHA256": "722c8c7cdc5d4ffca0321256f59e60e75a16d5b5e38e51c86c6ad3b4b3ee1ed4"
+    },
+    {
+      "id": "63871b0f-e013-4654-bef5-10c2b027f254",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T02:59:02.690Z",
+      "heldCNY": 3.222036,
+      "requestId": "20261021025903259883348268d9d6sWtMLOzB",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.230528,
+      "settlementEvidenceSHA256": "7a37cbe30d367d36acc9992933899306b77c4cab69f623b23db6280b16fa39ad",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/native-media-final-current667.json",
+        "billing-completeness-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-20261021025903259883348268d9d6sWtMLOzB.json"
+      ],
+      "originalCostRecordSHA256": "4cbe12494d48eb6960b6461dc41d052cde4b72092b494ceca673fd2628c31027"
+    },
+    {
+      "id": "92dd3492-b7ae-454c-abb2-9fb316908001",
+      "kind": "chat",
+      "model": "wand-vega-vl-1.0-flash",
+      "holdAt": "2026-10-21T02:59:21.009Z",
+      "heldCNY": 0.686482,
+      "requestId": "01a15c66-27b7-728b-b83c-91990af941bf",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "pending",
+      "costCNY": null,
+      "settlementEvidenceSHA256": null,
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/native-media-final-current667.json",
+        "native-current-followup-preparation/native-media-independent-review-current667.json"
+      ],
+      "originalCostRecordSHA256": "21cd44c590b4e6fcb5c41c53883b5945eb91724c3c3004c84c5fda42af257600"
+    },
+    {
+      "id": "0bf2e154-289f-47cb-8257-59e7170f8c0a",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T02:59:28.401Z",
+      "heldCNY": 3.433759,
+      "requestId": "202610210259297748405818268d9d62qzOgYFH",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.24666,
+      "settlementEvidenceSHA256": "d9270e3f8005151e8601965b9bd457899a389eadd0bc43b1a2a183c90d3d8c38",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/native-media-final-current667.json",
+        "billing-completeness-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210259297748405818268d9d62qzOgYFH.json"
+      ],
+      "originalCostRecordSHA256": "b06e9b0610a7a98134297646b85097ec9e49beaa0a77c051a5860772619452a4"
+    },
+    {
+      "id": "34ce3309-2ecc-4b5f-b5c7-766b3445ea12",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T02:59:57.099Z",
+      "heldCNY": 4.017153,
+      "requestId": "202610210259584669520768268d9d6AwyaOnbh",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.265756,
+      "settlementEvidenceSHA256": "08dd48b301b432b9ea78e28ca52546bf2aa9ee428fac206d0e280ab24d3e3ad9",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/native-media-final-current667.json",
+        "billing-completeness-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210259584669520768268d9d6AwyaOnbh.json"
+      ],
+      "originalCostRecordSHA256": "d77906a4c92b8a4a979ddfee4ac1dbcf91c621976230ec5fe548b1b1141cb02f"
+    },
+    {
+      "id": "915975de-2b9e-4f0d-8130-ad2004f82815",
+      "kind": "chat",
+      "model": "wand-vega-vl-1.0-flash",
+      "holdAt": "2026-10-21T03:00:42.880Z",
+      "heldCNY": 0.24586,
+      "requestId": "01a15c67-677a-7e8c-bb36-0630e26290bd",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "pending",
+      "costCNY": null,
+      "settlementEvidenceSHA256": null,
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/native-media-final-current667.json",
+        "native-current-followup-preparation/native-media-independent-review-current667.json"
+      ],
+      "originalCostRecordSHA256": "6f18df1574c34c741e1e5dd46ccbc2877dfa29974fd6fa22754d526b1af46072"
+    },
+    {
+      "id": "2ed2124a-bc62-42ba-8e2f-42c2e0a38292",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:00:55.861Z",
+      "heldCNY": 4.396676,
+      "requestId": "202610210300575502738558268d9d6ziCTohmA",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.32085,
+      "settlementEvidenceSHA256": "702f6bc1a634da0888abc3c81f229c6ce24cd1490539135d4be9311ff85014d4",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/native-media-final-current667.json",
+        "billing-completeness-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210300575502738558268d9d6ziCTohmA.json"
+      ],
+      "originalCostRecordSHA256": "8290d139c9a07f678618e77fd93adb88e538b6471aa5dad276f73af27df3d029"
+    },
+    {
+      "id": "10c78e63-7a85-448a-ba7d-cf25b6661eed",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:14:16.831Z",
+      "heldCNY": 1.347134,
+      "requestId": "202610210314177775212008268d9d6JazxhHof",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.094964,
+      "settlementEvidenceSHA256": "c4e8be427515f9c2040fafff754c732dafdc814a3696634487e31bace2766952",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-readonly-final.json",
+        "billing-completeness-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210314177775212008268d9d6JazxhHof.json"
+      ],
+      "originalCostRecordSHA256": "896c3e669dbcb2256f41b67ad37cd1356d7a3c7052424ea5bccdfafbec06c2d4"
+    },
+    {
+      "id": "c8beff97-ab5a-472f-91bd-0f3506da5a18",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:14:35.852Z",
+      "heldCNY": 1.446516,
+      "requestId": "202610210314361972898568268d9d66ewMG0Il",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.114588,
+      "settlementEvidenceSHA256": "626a5a7064795f598003a120448c9bab23102d9260eb7906768bf1734fda3eda",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-readonly-final.json",
+        "billing-completeness-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210314361972898568268d9d66ewMG0Il.json"
+      ],
+      "originalCostRecordSHA256": "2cd3105d96dc8d88aba24af75f812fc74642f6b83e832523eee0db8dfd25d6e5"
+    },
+    {
+      "id": "24ece4b6-ac83-4ace-b6a2-18d95da1dcd2",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:14:56.795Z",
+      "heldCNY": 1.639447,
+      "requestId": "202610210314571595781318268d9d68y5xv7Vt",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.118716,
+      "settlementEvidenceSHA256": "d35cc884811837dfea219357ad45b6a55d4b388b44f4599d349a9c89ad3417b1",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-readonly-final.json",
+        "billing-completeness-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210314571595781318268d9d68y5xv7Vt.json"
+      ],
+      "originalCostRecordSHA256": "e71f920ece4aea995b35eab84870e32b944f3a07c32ceb7bdbf0dfb04223df11"
+    },
+    {
+      "id": "9c137d9c-ae23-45fa-9c84-1af64f3258df",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:15:06.436Z",
+      "heldCNY": 1.85765,
+      "requestId": "202610210315067795304428268d9d6Bvgiobif",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.147614,
+      "settlementEvidenceSHA256": "acbdfe0322917fb460efe6783207d5f09094ff243aeecc04cb428641efa76d8c",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-readonly-final.json",
+        "billing-completeness-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210315067795304428268d9d6Bvgiobif.json"
+      ],
+      "originalCostRecordSHA256": "8f30116a646282c7d73289f44601dd657e34eab856d9759cbb824cfd961c0a66"
+    },
+    {
+      "id": "fac214d5-6946-4fc2-bf1c-b7e633f8ca83",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:17:17.939Z",
+      "heldCNY": 2.718356,
+      "requestId": "202610210317193241092278268d9d6x1DrF74b",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.189396,
+      "settlementEvidenceSHA256": "360f4112cff43c2391bc967c1b6cdae83325f30fe59af0a6836ffac640a57ef9",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-binding-active-1.json",
+        "billing-completeness-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210317193241092278268d9d6x1DrF74b.json"
+      ],
+      "originalCostRecordSHA256": "fe592f4a742f3f3856cab68e988495daf0ff4f896a72b101b33db4e645d98c47"
+    },
+    {
+      "id": "93787542-cb14-4d3c-8caf-390ba962a182",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:17:45.429Z",
+      "heldCNY": 2.762452,
+      "requestId": "202610210317459579375038268d9d6oIulu3bW",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.184406,
+      "settlementEvidenceSHA256": "ee6486ae08cc8c8524c25fcc19f7923a57890db74f9d184f4ec4f00a3e89e7b9",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-binding-active-1.json",
+        "billing-completeness-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210317459579375038268d9d6oIulu3bW.json"
+      ],
+      "originalCostRecordSHA256": "44df591a07031f626f5626c3d9e8e9b7be8b5741ceffac06d7208e7b9e642059"
+    },
+    {
+      "id": "f091b667-5f46-42c2-bc62-e1d000437fcb",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:18:07.908Z",
+      "heldCNY": 2.797704,
+      "requestId": "202610210318081069150218268d9d6QAUbUUiN",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.191852,
+      "settlementEvidenceSHA256": "aa92712eb75cc9c2064986e58acd655d63ae536cd6e6d7e66ac5e3d862d56262",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-binding-active-2.json",
+        "billing-completeness-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210318081069150218268d9d6QAUbUUiN.json"
+      ],
+      "originalCostRecordSHA256": "f74c97f63f8a385d0bc0cbbbd7f7dec861b16df8360937863f61a620446c9fde"
+    },
+    {
+      "id": "ad7e9f36-07e3-4b73-ab00-b56fba504d27",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:18:24.468Z",
+      "heldCNY": 2.848183,
+      "requestId": "202610210318256227990598268d9d6dWJqbZZN",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.194428,
+      "settlementEvidenceSHA256": "f0cf9513f136fa620326d550553c3fc5486e5e8206ab1245a2431447d4d8ad18",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-binding-active-2.json",
+        "billing-completeness-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210318256227990598268d9d6dWJqbZZN.json"
+      ],
+      "originalCostRecordSHA256": "4299e823a63df9bfe8a2f93860f9546a7a348f1aa7ab0479225f66adfb27b698"
+    },
+    {
+      "id": "6bce0ab8-4b0e-4ec1-a556-269548f2e6cd",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:18:41.108Z",
+      "heldCNY": 2.886145,
+      "requestId": "202610210318423140863968268d9d6m8eufRAt",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.195986,
+      "settlementEvidenceSHA256": "6a270a3b6f88179b3c921badd740be116bc3ed36d02472373c3e5f39d2b2a52d",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-binding-active-2.json",
+        "billing-completeness-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210318423140863968268d9d6m8eufRAt.json"
+      ],
+      "originalCostRecordSHA256": "6223dc543248ed4a20a67bc7ec6b47238d1f3dfaf20575cbb06ba98a3ad2a39f"
+    },
+    {
+      "id": "70c0d204-9e51-4d2a-8873-fcb8bddd9eee",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:18:58.627Z",
+      "heldCNY": 2.979349,
+      "requestId": "2026102103185932185968268d9d6QkWr9nOm",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.223648,
+      "settlementEvidenceSHA256": "92a486506e7e9e5e549dc28a6e61db38424f2768b236f67aabdd9e8b429e0f7d",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-binding-active-2.json",
+        "billing-completeness-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-2026102103185932185968268d9d6QkWr9nOm.json"
+      ],
+      "originalCostRecordSHA256": "cbc943a1b374f02195da98e32a9d094fa26a136eccac91e8962ac1162d479907"
+    },
+    {
+      "id": "9bc2e2c8-6541-467a-a3fe-7a6331f16ac4",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:25:32.433Z",
+      "heldCNY": 3.024093,
+      "requestId": "202610210325337322046528268d9d6yFG0SjkJ",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.210784,
+      "settlementEvidenceSHA256": "dd7311735b8104ed349fb4ed02cc21a00cf889ae5dc74624b5cb2e496e1f3e5d",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-title-active-1.json",
+        "billing-completeness-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210325337322046528268d9d6yFG0SjkJ.json"
+      ],
+      "originalCostRecordSHA256": "f18a2c19030390936d27b8c8a62d495f3ae776042e169599f7c9b125c4283ef8"
+    },
+    {
+      "id": "d2193d20-c909-49ff-82c4-365a56e0ba9f",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:41:33.800Z",
+      "heldCNY": 3.064464,
+      "requestId": "20261021034135705341888268d9d6sGR2OTgN",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.22943,
+      "settlementEvidenceSHA256": "01490a334894d53e5ebb9fbcfeff8d5dbf45cfd880549d26ee368b28d8891b74",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-context-completed.json",
+        "billing-completeness-tail-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-20261021034135705341888268d9d6sGR2OTgN.json"
+      ],
+      "originalCostRecordSHA256": "e8e1bf81a2e7793b7ba33073acb78cdc6f72b73cc7de65085408487ab5264c05"
+    },
+    {
+      "id": "2e7f3db5-b998-4b94-9a0a-2436efb4ef02",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:43:35.265Z",
+      "heldCNY": 2.258967,
+      "requestId": "202610210343363908067238268d9d6iROSDjkt",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.17006,
+      "settlementEvidenceSHA256": "b596a544473c78dbd635bcb25bd207a6d9d1ee6a6826507a0dd0f0f971057b20",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-fullaccess-completed.json",
+        "billing-completeness-tail-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210343363908067238268d9d6iROSDjkt.json"
+      ],
+      "originalCostRecordSHA256": "9010b76ee254757984e7417a80fd2e6a5b2fe73cee4f4a012a544e156cf3498d"
+    },
+    {
+      "id": "4d1ef6bf-27cc-498e-b87f-fcddbdcbf68c",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:44:01.176Z",
+      "heldCNY": 2.368965,
+      "requestId": "202610210344015245294588268d9d6qGHhtkFO",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.167768,
+      "settlementEvidenceSHA256": "e2aecfd7867e1f2e2c454d5f0ae4d717d417034815d8f3415d7c1a6823961a8b",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-fullaccess-completed.json",
+        "billing-completeness-tail-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210344015245294588268d9d6qGHhtkFO.json"
+      ],
+      "originalCostRecordSHA256": "916f8880d9cac9bffd44c291d36b259a14c8cb49347c41d0a1561628e5c8d4e9"
+    },
+    {
+      "id": "6aa888c7-17ac-417a-85e4-9c12f45e38cf",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:44:27.076Z",
+      "heldCNY": 2.404173,
+      "requestId": "202610210344281520080808268d9d64C1NpM87",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.168488,
+      "settlementEvidenceSHA256": "3b12008357057fc56c761fc1955611eb3b1bb9e5949f1e9626ac9dda1dd00976",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-fullaccess-completed.json",
+        "billing-completeness-tail-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210344281520080808268d9d64C1NpM87.json"
+      ],
+      "originalCostRecordSHA256": "b48be8f9e97b995bf23f7deac2bffe36c34e9b093957400a96b76b213a497fba"
+    },
+    {
+      "id": "33df77bd-095b-468f-a3b9-f22a1aa49e4e",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:44:43.306Z",
+      "heldCNY": 2.439813,
+      "requestId": "202610210344444168675398268d9d6KPsl5cph",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.193462,
+      "settlementEvidenceSHA256": "dc32d5a37f53689c0744c5da90d570c8b2624826dedc6beac59b6deebcfc5093",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-fullaccess-completed.json",
+        "billing-completeness-tail-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210344444168675398268d9d6KPsl5cph.json"
+      ],
+      "originalCostRecordSHA256": "01b9962affe20afada9ee4635c4d250e0d0e43f562574519d95776c382bb188d"
+    },
+    {
+      "id": "6dcd86fc-d19c-4abc-aa1a-8f55978d2b98",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:47:51.873Z",
+      "heldCNY": 2.125533,
+      "requestId": "202610210347529637704578268d9d6q8HIDGZ5",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.138722,
+      "settlementEvidenceSHA256": "5f5431399d1436fc453aab4416d60ee56968065b63ed0f6bcb2dc9d5fff64a37",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-film-initial-progress1.json",
+        "billing-completeness-tail-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210347529637704578268d9d6q8HIDGZ5.json"
+      ],
+      "originalCostRecordSHA256": "04ef7c99373ed65a653cdc1ee22b8eff3d4850ccb87caec1746d8a228ce8ff05"
+    },
+    {
+      "id": "82162fc6-f4c5-4efe-a192-dbf6ec0c5bec",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:48:15.488Z",
+      "heldCNY": 2.232334,
+      "requestId": "202610210348158381240688268d9d6nwanHZU4",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.16354,
+      "settlementEvidenceSHA256": "ecf7cd701f9776f06a0362dfd78f2f9fd228e924930552f62c3e6d9aca4136d5",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-film-initial-completed.json",
+        "billing-completeness-tail-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210348158381240688268d9d6nwanHZU4.json"
+      ],
+      "originalCostRecordSHA256": "b6c12240ba10149a6a041317192bf83ef4de72f088f7bff762f539c6240476e6"
+    },
+    {
+      "id": "333950f4-9cb4-4e45-b504-1254ba9392a0",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:48:36.964Z",
+      "heldCNY": 2.275815,
+      "requestId": "202610210348371286991018268d9d6bRyP9jGE",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.170686,
+      "settlementEvidenceSHA256": "ea0541ecd079c8cea1b4a0db7d16df0752f0d8cdca8785cb8c54e844b278f71b",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-film-initial-completed.json",
+        "billing-completeness-tail-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210348371286991018268d9d6bRyP9jGE.json"
+      ],
+      "originalCostRecordSHA256": "b3a93de4818f6798929acd12b1933f10566cc13cd5afd9e8e6d964bab5b09e54"
+    },
+    {
+      "id": "9e9209d3-6f9e-4de7-a713-897e902d5522",
+      "kind": "chat",
+      "model": "wand-vega-vl-1.0-flash",
+      "holdAt": "2026-10-21T03:48:46.413Z",
+      "heldCNY": 0.24586,
+      "requestId": "01a15c93-6739-7e2d-a434-73583f0e43c1",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "pending",
+      "costCNY": null,
+      "settlementEvidenceSHA256": null,
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-film-initial-completed.json"
+      ],
+      "originalCostRecordSHA256": "b88d4de86a84336f13e96d59c227e82b4e029ac480185ac6876c391f38b095d5"
+    },
+    {
+      "id": "4f1a3426-a502-47d3-ba4b-c33bc039584f",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:48:52.194Z",
+      "heldCNY": 2.338153,
+      "requestId": "202610210348532940538598268d9d6NcEMqqHb",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.204644,
+      "settlementEvidenceSHA256": "5fba0d38aee06299234da0f6d4bf02e69f8b2ad7ce2443c7ce8799e50dd6d4ba",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-film-initial-completed.json",
+        "billing-completeness-tail-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210348532940538598268d9d6NcEMqqHb.json"
+      ],
+      "originalCostRecordSHA256": "6c3ff65bf71ebe86671d4e0bf2e8fde82b6a3328a65347990e401bf9893bcc00"
+    },
+    {
+      "id": "1ae8bf4e-2951-4ec4-8705-b6df1e842c0c",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:49:11.260Z",
+      "heldCNY": 2.442114,
+      "requestId": "202610210349123955485868268d9d61rOVgS3Y",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.18554,
+      "settlementEvidenceSHA256": "63d16189f6f680c2710bf96b8e54c7cff37ae49349f59dd8b171e134ea9e3808",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-film-initial-completed.json",
+        "billing-completeness-tail-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210349123955485868268d9d61rOVgS3Y.json"
+      ],
+      "originalCostRecordSHA256": "7483ccc5c963ee44c4ab729ad2ea25a8d7b6341b08c993ea7c7e4455e0168195"
+    },
+    {
+      "id": "3e6865eb-a413-4604-8963-35102d6dfb6c",
+      "kind": "chat",
+      "model": "claude-opus-5-5",
+      "holdAt": "2026-10-21T03:49:22.011Z",
+      "heldCNY": 2.725981,
+      "requestId": "202610210349233121057638268d9d6jF0v2zEg",
+      "httpStatus": 200,
+      "resultComplete": true,
+      "billing": "settled",
+      "costCNY": 0.233682,
+      "settlementEvidenceSHA256": "5d466f30952c4636f124b21c9f5fbe588d6f8a9902ae6a041210b4d9029d664f",
+      "acceptanceCredit": false,
+      "executionSourceStatus": "current",
+      "executedSourceDigest": "1403d515498205c064a5002ec86c86fe867dbf03c4dc7cfa03b5309a1e07df3a",
+      "evidence": [
+        "wand-audio-candidate-install-receipt.json",
+        "native-current-followup-preparation/current667-film-initial-completed.json",
+        "billing-completeness-tail-audit-20261021/durable-transport-metadata.json",
+        "live-price-preflight/reconcile-202610210349233121057638268d9d6jF0v2zEg.json"
+      ],
+      "originalCostRecordSHA256": "7cd91e40a0786ab17914d2a5331581c396cb367c391b18ba02f4068a38f5e4f7"
+    }
+  ],
+  "externalCash": {
+    "id": "external-review-20261020-183633-review-3b841316",
+    "kind": "other",
+    "externalReviewJob": "20261020-183633-review-3b841316",
+    "executedSourceDigest": null,
+    "executionSourceStatus": "unknown_historical",
+    "acceptanceCredit": false,
+    "billing": "settled",
+    "costCNY": 0,
+    "settlementEvidenceSHA256": "f84a927b4087535100d3cc0d3b1ee67ac6db806957021c0d9f95cc68ef25a0f4",
+    "evidence": [
+      "grok-billing-recheck-20261021-1000/reconciliation.json"
+    ],
+    "serverReportedUsageCostUSD": "0.33098728",
+    "basis": "existing subscription allowance; incremental cash zero per saved reviewed account evidence, not an exchange conversion or per-request invoice",
+    "newProviderQuery": false
+  },
+  "spentCNY": 42.796765,
+  "pendingCNY": 3.506822,
+  "additionalPaidTestsStopped": true
+}

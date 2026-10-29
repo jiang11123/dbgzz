@@ -1,0 +1,157 @@
+name: Desktop installer checks
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/*installer*'
+      - 'scripts/smoke-webview-cache.mjs'
+      - 'scripts/webview-cache-probe_windows.go'
+      - 'scripts/installers/**'
+      - 'scripts/build-beeftv*'
+      - 'scripts/package-media-runtime-*'
+      - 'scripts/test-media-runtime-*'
+      - 'scripts/assert-media-runtime-*'
+      - 'licenses/ffmpeg-windows.json'
+      - 'licenses/ffmpeg-windows-README.txt'
+      - 'backend/internal/mediatools/**'
+      - 'backend/internal/asset/media_metadata*'
+      - 'backend/internal/desktopupdate/**'
+      - '.github/workflows/desktop-installers.yml'
+      - '.github/workflows/release-desktop.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+concurrency:
+  group: installers-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  native:
+    name: Installer (${{ matrix.platform }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            platform: darwin-arm64
+            target: darwin/arm64
+          - os: macos-15-intel
+            platform: darwin-amd64
+            target: darwin/amd64
+          - os: windows-2022
+            platform: windows-amd64
+            target: windows/amd64
+          - os: ubuntu-24.04
+            platform: linux-amd64
+            target: linux/amd64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Select bundled Node runtime
+        shell: bash
+        run: |
+          node -e 'const fs=require("fs"),p=require("path"); const bin=p.dirname(process.execPath); fs.appendFileSync(process.env.GITHUB_ENV, `BEEFTV_NODE_RUNTIME=${process.platform==="win32"?bin:p.dirname(bin)}\n`);'
+      - name: Verify bundled Agent runtime
+        shell: bash
+        run: bun test scripts/package-agent-host.test.mjs
+      - name: Linux desktop dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev ffmpeg fonts-noto-cjk xvfb xdotool dbus-x11
+      - name: Windows compiler
+        id: msys2
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: false
+          release: true
+          path-type: inherit
+          install: mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-binutils
+      - name: Select Windows compiler and NSIS
+        if: runner.os == 'Windows'
+        env:
+          MSYSTEM_PREFIX: ${{ steps.msys2.outputs.msys2-location }}\ucrt64
+        shell: pwsh
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\assert-windows-dwarf5-cgo.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (!(Test-Path 'C:\Program Files (x86)\NSIS\makensis.exe')) { choco install nsis --no-progress -y; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE } }
+      - name: Verify Windows cache probe before full desktop build
+        if: runner.os == 'Windows'
+        shell: bash
+        run: python scripts/smoke-desktop-installer.py --probe-only
+      - name: Build Unix desktop
+        if: runner.os != 'Windows'
+        env:
+          BEEFTV_SKIP_LOCAL_VERIFY: '1'
+          BEEFTV_WAILS_PLATFORM: ${{ matrix.target }}
+          BEEFTV_UPDATER_PUBLIC_KEY: ${{ vars.BEEFTV_UPDATER_PUBLIC_KEY }}
+        run: |
+          sh plugin-packages/build-packages.sh
+          ./scripts/build-beeftv-release.sh
+      - name: Build Windows desktop
+        if: runner.os == 'Windows'
+        env:
+          CGO_ENABLED: '1'
+          BEEFTV_UPDATER_PUBLIC_KEY: ${{ vars.BEEFTV_UPDATER_PUBLIC_KEY }}
+        shell: pwsh
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-beeftv-windows-release.ps1
+      - name: Package native installer
+        shell: bash
+        run: python scripts/package-desktop-installer.py --platform '${{ matrix.platform }}'
+      - name: Validate Windows updater archive
+        if: runner.os == 'Windows'
+        working-directory: backend
+        shell: pwsh
+        run: |
+          go run ./cmd/update-release package --platform windows-amd64 --input cmd/desktop/build/bin --output "$env:RUNNER_TEMP/BeefTV-windows-updater-check.zip"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test actual installation and preserved user data
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(tr -d '[:space:]' < VERSION)"
+          platform='${{ matrix.platform }}'
+          payload='backend/cmd/desktop/build/bin'
+          suffix='-setup.exe'
+          if [[ "$platform" == darwin-* ]]; then payload="$payload/BeefTV.app"; suffix='.dmg'; fi
+          if [[ "$platform" == linux-* ]]; then payload="$payload/BeefTV-linux"; suffix='.deb'; fi
+          command=(python scripts/smoke-desktop-installer.py --platform "$platform" --installer "dist/BeefTV-${version}-${platform}${suffix}" --payload "$payload")
+          if [[ "$platform" == linux-* ]]; then xvfb-run -a dbus-run-session -- "${command[@]}"; else "${command[@]}"; fi
+      - name: Verify DEB dependencies on clean Ubuntu
+        if: runner.os == 'Linux'
+        run: |
+          docker run --rm -v "${PWD}/dist:/packages:ro" ubuntu:24.04 sh -ec '
+            apt-get update
+            apt-get install -y /packages/BeefTV-*.deb
+            dpkg --audit
+            dpkg --verify beeftv
+            ldd /opt/beeftv/BeefTV-linux/BeefTV > /tmp/links
+            cat /tmp/links
+            ! grep -q "not found" /tmp/links
+          '
+      - name: Preserve installer artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: installer-check-${{ matrix.platform }}
+          path: dist/BeefTV-*
+          retention-days: 7
+          if-no-files-found: error

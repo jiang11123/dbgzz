@@ -1,0 +1,94 @@
+[
+  {
+    "model": "hy-image-v3",
+    "protocol": "openai-image",
+    "path": "/images/generations",
+    "promptMaxChars": 8192,
+    "maxImages": 3,
+    "maxImageBytes": 10485760,
+    "minSide": 512,
+    "maxSide": 2048,
+    "maxPixels": 1048576,
+    "sizes": {
+      "1:1": "1024x1024",
+      "3:2": "1152x768",
+      "2:3": "768x1152",
+      "4:3": "1024x768",
+      "3:4": "768x1024",
+      "16:9": "1280x720",
+      "9:16": "720x1280",
+      "21:9": "1344x576"
+    }
+  },
+  {
+    "model": "midjourney-v8.2",
+    "protocol": "openai-image",
+    "path": "/images/generations",
+    "fixedOutputs": 4,
+    "generationOutputs": [
+      4,
+      8,
+      12
+    ],
+    "promptMaxChars": 2000,
+    "maxImages": 1,
+    "maxImageBytes": 10485760,
+    "minSide": 1024,
+    "maxSide": 1024,
+    "maxPixels": 1048576,
+    "sizes": {
+      "1:1": "1024x1024"
+    },
+    "presets": [
+      {
+        "tier": "1k",
+        "ratio": "1:1",
+        "size": "1024x1024",
+        "width": 1024,
+        "height": 1024
+      },
+      {
+        "tier": "1k",
+        "ratio": "16:9",
+        "size": "1456x816",
+        "width": 1456,
+        "height": 816
+      },
+      {
+        "tier": "1k",
+        "ratio": "9:16",
+        "size": "816x1456",
+        "width": 816,
+        "height": 1456
+      },
+      {
+        "tier": "1k",
+        "ratio": "4:3",
+        "size": "1232x928",
+        "width": 1232,
+        "height": 928
+      },
+      {
+        "tier": "1k",
+        "ratio": "3:4",
+        "size": "928x1232",
+        "width": 928,
+        "height": 1232
+      },
+      {
+        "tier": "1k",
+        "ratio": "3:2",
+        "size": "1344x896",
+        "width": 1344,
+        "height": 896
+      },
+      {
+        "tier": "1k",
+        "ratio": "2:3",
+        "size": "896x1344",
+        "width": 896,
+        "height": 1344
+      }
+    ]
+  }
+]

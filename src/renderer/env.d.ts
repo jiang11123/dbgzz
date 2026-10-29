@@ -57,9 +57,11 @@ declare global {
     chatConfirm: (request: { threadId?: string; text?: string }) => Promise<boolean>;
     downloadMedia: (attachment: import('../shared/types').GatewayAttachment, context?: { accountId?: number | null; threadId?: string }) => Promise<{ path?: string; error?: string; alreadyInFolder?: boolean }>;
     saveLastFrame: (payload: { dataUrl: string; name?: string }) => Promise<{ path?: string; error?: string }>;
-  getAppMode: () => Promise<'gateway' | 'account'>;
+    getAppMode: () => Promise<'gateway' | 'account'>;
     setAppMode: (mode: 'gateway' | 'account') => Promise<'gateway' | 'account'>;
     onAppModeChanged: (listener: (mode: 'gateway' | 'account') => void) => () => void;
+    beeftvSync: () => Promise<{ ok: boolean; count: number; error?: string }>;
+    beeftvLaunch: () => Promise<boolean>;
   } }
 }
 export {};

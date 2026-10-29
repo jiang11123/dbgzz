@@ -1,0 +1,14 @@
+{
+  "source": "Native diagnostic export v3-assistant-interrupted; identifiers replaced, message text excluded",
+  "turns": [
+    {"id":"native-turn","sessionId":"durable:native-session","canvasId":"native-canvas","state":"settled","createdAt":"2026-10-21T09:06:29.894868Z","updatedAt":"2026-10-21T09:09:42.057932Z"}
+  ],
+  "records": [
+    {"id":"native:entry:22:0","sessionId":"durable:native-session","turnId":"","canvasId":"native-canvas","kind":"tool","name":"plan_update","status":"completed","reason":"turn_link_not_recorded","operationId":"native-plan-before","timestamp":"2026-10-21T09:07:19.031Z","durationMs":21},
+    {"id":"native:entry:24:0","sessionId":"durable:native-session","turnId":"","canvasId":"native-canvas","kind":"tool","name":"canvas_nodes_create","status":"completed","reason":"turn_link_not_recorded","operationId":"native-create-before","timestamp":"2026-10-21T09:07:19.091Z","durationMs":56},
+    {"id":"native:entry:35:0","sessionId":"durable:native-session","turnId":"","canvasId":"native-canvas","kind":"model_call","name":"model.response","status":"toolUse","reason":"turn_link_not_recorded","model":"test-model","timestamp":"2026-10-21T09:07:43.590Z","durationMs":11027},
+    {"id":"native:entry:37:0","sessionId":"durable:native-session","turnId":"","canvasId":"native-canvas","kind":"tool","name":"plan_update","status":"failed","reason":"turn_link_not_recorded","operationId":"native-plan-failed","timestamp":"2026-10-21T09:07:54.633Z","durationMs":11},
+    {"id":"native:entry:39:0","sessionId":"durable:native-session","turnId":"","canvasId":"native-canvas","kind":"tool","name":"canvas_nodes_create","status":"failed","reason":"turn_link_not_recorded","operationId":"native-create-failed","timestamp":"2026-10-21T09:07:54.639Z","durationMs":1},
+    {"id":"native:entry:41:0","sessionId":"durable:native-session","turnId":"","canvasId":"native-canvas","kind":"model_call","name":"model.response","status":"error","reason":"turn_link_not_recorded","model":"test-model","timestamp":"2026-10-21T09:07:54.655Z","durationMs":1}
+  ]
+}

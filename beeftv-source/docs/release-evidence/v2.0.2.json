@@ -1,0 +1,377 @@
+{
+  "version": "v2.0.2",
+  "contractVersion": 3,
+  "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+  "baseRelease": "v2.0.1",
+  "baseCommit": "5ae8e627508f0e77108c3f9b6526fcfa4faaf7a5",
+  "includedMain": "d33ff1b7553cb938dc9e8f777c04a7e396a45d11",
+  "includedPullRequests": [
+    221,
+    222,
+    223,
+    224,
+    225,
+    226,
+    227,
+    228,
+    230,
+    231,
+    233
+  ],
+  "releasePreparationPullRequest": 237,
+  "ownerException": {
+    "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+    "evidence": [
+      "docs/release-evidence/v2.0.2-owner-authorization.json"
+    ],
+    "scope": "v2.0.2-targeted-no-paid-20261022",
+    "approvedBy": "Ender",
+    "instruction": "本版豁免完整十二次生成和整套助手验收；不新增付费生成，源码 review、专项回归、四平台包、升级回滚及签名检查通过后发布",
+    "authorizationSHA256": "086acf1c17fa12d6f97293603388aead6f02e1f3d1c40e68ee403d330d758cf3"
+  },
+  "liveMatrixStatus": "not_run_owner_waived",
+  "agentAcceptanceStatus": "not_run_owner_waived",
+  "acceptanceComplete": false,
+  "releaseComplete": false,
+  "releasePublished": false,
+  "cases": [],
+  "deferredAcceptance": {
+    "status": "not_run_owner_waived",
+    "caseKeys": [
+      "1/text-image",
+      "1/image-image",
+      "1/image-video",
+      "1/text-video",
+      "1/video-video",
+      "1/multi-video",
+      "2/text-image",
+      "2/image-image",
+      "2/image-video",
+      "2/text-video",
+      "2/video-video",
+      "2/multi-video"
+    ],
+    "agentCheckIds": [
+      "canvas_read",
+      "asset_reference",
+      "canvas_mutation",
+      "multi_turn",
+      "proposal_decline",
+      "proposal_stale",
+      "proposal_idempotency",
+      "session_history",
+      "session_restart",
+      "cancel",
+      "conflict_undo",
+      "host_recovery",
+      "scope_isolation",
+      "budget",
+      "cli_mcp",
+      "durable_resume",
+      "native_video",
+      "native_audio",
+      "skill_version",
+      "skill_files",
+      "permission_modes",
+      "external_business",
+      "media_film_review"
+    ]
+  },
+  "agentChecks": {
+    "canvas_read": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "asset_reference": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "canvas_mutation": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "multi_turn": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "proposal_decline": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "proposal_stale": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "proposal_idempotency": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "session_history": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "session_restart": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "cancel": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "conflict_undo": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "host_recovery": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "scope_isolation": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "budget": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "cli_mcp": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "durable_resume": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "native_video": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "native_audio": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "skill_version": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "skill_files": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "permission_modes": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "external_business": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    },
+    "media_film_review": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-owner-authorization.json"
+      ],
+      "status": "not_run_owner_waived"
+    }
+  },
+  "billingScope": "New application media generation only. Independent external review is not application execution; its USD job costs are retained separately in the review artifacts.",
+  "budgetCNY": null,
+  "spentCNY": null,
+  "pendingCNY": null,
+  "newPaidBudgetCNY": 0,
+  "newPaidSubmissions": 0,
+  "newSpentCNY": 0,
+  "newPendingCNY": 0,
+  "billingAttempts": [],
+  "priorReceiptSHA256": "b084ecb21922cdf368abde033a95d295a5a9a6f4bb71dbc3d87bf1a93a79fc40",
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v2.0.1",
+    "pendingCNY": null,
+    "evidence": [
+      "docs/release-evidence/v2.0.1.json"
+    ]
+  },
+  "knownLimitations": {
+    "carriedFromVersion": "v2.0.1",
+    "inheritedFailedCheckIds": [
+      "native_video",
+      "native_audio",
+      "media_film_review"
+    ],
+    "evidence": [
+      "docs/release-evidence/v2.0.1.json",
+      "docs/release-evidence/v2.0.2-targeted.md"
+    ]
+  },
+  "review": {
+    "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+    "evidence": [
+      "docs/release-evidence/v2.0.2-targeted.md"
+    ],
+    "result": "approved",
+    "independent": true,
+    "reviewer": "Grok Companion / grok-4.7-build",
+    "reviewedHead": "94855e8cdc359ceda78fa2b8da4d105284d54b8a",
+    "initialJob": "20261022-205208-review-9d158e56",
+    "repairJob": "20261022-224309-continue-9056f3cb",
+    "finalJob": "20261022-225933-continue-b58b91b3",
+    "releaseNotesJob": "20261022-231050-continue-7903dcac"
+  },
+  "verification": {
+    "uploadAndDns": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-targeted.md"
+      ],
+      "status": "passed",
+      "method": "go-targeted"
+    },
+    "assistantRecovery": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-targeted.md"
+      ],
+      "status": "passed",
+      "method": "go-targeted-and-node-runtime"
+    },
+    "seedreamOutputs": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-targeted.md"
+      ],
+      "status": "passed",
+      "method": "go-and-bun-targeted"
+    },
+    "desktopLinksAndMarkdown": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-targeted.md"
+      ],
+      "status": "passed",
+      "method": "targeted-tests"
+    },
+    "publisher": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-targeted.md"
+      ],
+      "status": "passed",
+      "method": "python-unittest-and-node-contract"
+    },
+    "ci": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "https://github.com/glanderness/BeefTV/actions/runs/39802303617",
+        "https://github.com/glanderness/BeefTV/actions/runs/39802303558",
+        "https://github.com/glanderness/BeefTV/actions/runs/39802303554"
+      ],
+      "status": "passed",
+      "method": "github-actions",
+      "checkedHead": "94855e8cdc359ceda78fa2b8da4d105284d54b8a"
+    },
+    "localReleaseGate": {
+      "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+      "evidence": [
+        "docs/release-evidence/v2.0.2-targeted.md",
+        ".github/workflows/release-desktop.yml"
+      ],
+      "status": "passed",
+      "method": "local-script",
+      "beforeDraft": true
+    }
+  },
+  "upgrade": {
+    "sourceDigest": "65c41c7186103a1a4f3ba2b3c9d8eddc72e5656eeb2cc4c582127a927ef0476c",
+    "evidence": [
+      "docs/release-evidence/v2.0.2-targeted.md"
+    ],
+    "status": "pending_release_workflow",
+    "preservedData": null,
+    "requiredBeforePublish": true
+  },
+  "packages": {
+    "status": "pending_release_workflow",
+    "platforms": [
+      "darwin-arm64",
+      "darwin-amd64",
+      "windows-amd64",
+      "linux-amd64"
+    ],
+    "archives": null,
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "linuxNativeWindowBeforeUpload": true,
+    "signedManifestBeforePublish": true,
+    "publicReadbackAfterPublish": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml"
+    ]
+  }
+}

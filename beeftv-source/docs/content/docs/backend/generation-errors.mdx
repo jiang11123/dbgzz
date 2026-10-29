@@ -1,0 +1,98 @@
+---
+title: 生成失败归类
+description: 画布、任务中心和批量生成如何把上游失败变成可行动说明
+---
+
+# 生成失败归类
+
+生成失败要告诉使用者发生了什么、下一步做什么。不能把 HTTP 状态或原始 JSON 直接铺到画布上。
+
+错误处理参考 [OpenAI Python SDK](https://github.com/openai/openai-python/blob/main/src/openai/_exceptions.py) 对状态、错误码和请求编号的保留方式、[LiteLLM](https://docs.litellm.ai/docs/exception_mapping) 的供应商错误归类、[Vercel AI SDK](https://github.com/vercel/ai/blob/main/packages/provider/src/errors/api-call-error.ts) 对可重试性的独立表达，以及 Bufflow 对未确认提交和产物交付失败的区分。[TanStack Query](https://tanstack.com/query/latest/docs/framework/react/guides/mutations) 的查询与写入重试边界也适用：重新提交生成可能再次计费，不能照搬查询重试。
+
+## 责任边界
+
+| 位置 | 职责 |
+| --- | --- |
+| `backend/internal/generation` | 唯一后端归类器。`HTTPError.Error()` 和任务持久化走这里，正文先归类再变成用户文案。 |
+| `web/src/lib/generation-error.ts` | 前端唯一归类器。覆盖同步渠道错误、轮询、下载，以及已经落库的任务文案。 |
+| 画布 / 任务中心 / 批量生成 | 只展示归类后的原因、下一步，以及可复制的排查信息。 |
+
+两端类目表必须保持同名。`fixtures/generation-error-codes.json` 列出已覆盖的 BeefAPI 错误码及预期分类，Go 和前端测试共同验证。新增错误码应同步更新这个覆盖合同；无法确认原因的内部错误明确归入 `unknown`。
+
+审核错误对照 [Ark 官方错误码表](https://docs.volcengine.com/docs/ark/error-codes?lang=zh) 区分输入与输出、文字与图片/视频/音频。`SensitiveContentDetected` 本身不代表真人；该错误族的 `PolicyViolation` 表示版权限制，只有输入图片/视频的 `PrivacyInformation` 才提示真人形象，`DeepFake` 提示伪造内容审核。`fixtures/moderation-errors.json` 由前后端共享，并验证原始错误、通用包装码、纯消息和任务落库回读。文案指出上游审核结果，不把它当成已证实的侵权事实。
+
+明确的鉴权、权限等错误码仍优先于正文。`invalid_request_error`、`upstream_error` 等通用包装码允许由可信错误消息进一步识别审核、限流或素材问题；请求回显中的提示词不参与判断。纯消息没有足够信息时不猜具体媒体类型。历史任务若已把原始原因丢弃并保存成错误的泛化文案，新版本不能凭空恢复原始原因。
+
+参考素材在提交前按渠道能力配置校验数量、单文件大小、时长、宽高、宽高比和像素总量。链接地址的素材按单文件限制检查，不把文件体积加总成整次请求上限。能力配置来自企业目录或渠道保存值；已写明的 0、关闭项和生成模式列表保持原样，不会用官方缺省改写。本地图片缺少宽高时，会先读取文件头尺寸再校验。尺寸过小要调整尺寸或更换，不要裁切。错误说明指出素材序号和需要满足的范围。历史 OpenAI 配置和带供应商前缀的模型使用相同校验。已接单任务恢复时直接查询原任务，不再校验历史参考素材。
+
+上游返回的 `Duration must be between 1.8s and 30.2s` 属于参数错误，应提示调整参考素材，不能只显示“检查模型和参数”。`Height must be between 300px and 6000px`、宽高比、像素总量分别说明尺寸、宽高比和像素；整次请求过大与单个文件过大也要分开说。内置 BeefAPI Seedance 若参考素材未能上传，应提示暂时无法接收或重新提交。确认失败时，若已有可直接给使用者看的中文说明则保留该说明；无法判断的失败仍提示重新提交。不得自动再发一次生成请求。网关在 JSON 后附加的 `(request id: ...)` 不影响正文解析，请求编号单独保留供排查。任务卡片的标题和悬停说明只显示归类后的原因，不把原始 JSON 铺到主文案或 tooltip。
+
+`video_submission_unknown` 表示接单结果待核对。画布、批量作品操作条和错误详情都应引导查看原任务；接单未知、超时和未修改的无效参数不能直接显示“重新生成”。
+
+受管 BeefAPI 图片接口在模型创建前上传参考图失败时，会返回 HTTP 503、`error.code=image_reference_upload_failed` 和 `error.metadata.submission_state=not_submitted`。后端只在原始地址与最终响应地址均属于受管 BeefAPI、且操作是图片创建时接受该证明，将尝试记作 `rejected_no_job`，允许用户重试；本次失败不会自动再次提交。自定义地址、重定向到其他服务、普通 400/5xx 或缺少证明继续遵守原任务保护。网关若此前已经有结果未知的尝试，不会出具未提交证明。历史失败记录不凭新规则改写。
+
+自定义渠道在执行前将本地参考素材上传到用户对象存储，上传或公开读取失败时使用 `reference_media_upload_failed`。这是本地准备步骤的类型化失败，模型尚未被调用；存储的 401/403 不归为模型鉴权或权限问题，用户应检查对象存储配置和公开读取权限。此类失败禁止自动重发，修正配置后可主动重试。未知提交状态仍优先，第三方响应中的相同文案不能作为未提交证明。
+
+OpenAI 图片编辑的遮罩继续作为 multipart 文件字节传输，参考图片的对象存储或手动链接设置不作用到遮罩。其他协议原有的遮罩限制保持不变。
+
+## 类目矩阵
+
+结构化 `code` / `type` / `status` 优先于 HTTP 状态。正文里的数字或请求 ID 不会被当成 HTTP 状态。451 单独出现不代表安全审核。402 单独出现只表示计费或额度请求被拒绝，不表示本站用户余额，也不承诺退款。
+
+| 类目 | 典型信号 | 使用者下一步 | 自动重试 |
+| --- | --- | --- | --- |
+| `auth` | 401、invalid_api_key | 检查 API Key | 否 |
+| `permission` | 403、permission_denied | 检查渠道权限或换模型 | 否 |
+| `quota_user` | insufficient_user_quota | 检查账号余额或联系管理员调整额度 | 否 |
+| `quota_unknown` | 402、insufficient_quota、余额/额度措辞 | 到渠道或供应商核对账单与额度 | 否 |
+| `quota_upstream` | arrearage、billing_hard_limit | 到供应商核对 | 否 |
+| `quota_limit` | SetLimitExceeded | 检查并调整渠道用量或预算限制 | 否 |
+| `moderation_input` | content_policy、sensitive_words_detected、输入文本审核 | 调整提示词或参考素材 | 原任务否；改输入后可新建 |
+| `moderation_reference` | 输入图片、视频、音频审核 | 检查并更换对应参考素材 | 原任务否；改素材后可新建 |
+| `moderation_output` | 输出审核 | 调整输入后新建 | 原任务否 |
+| `invalid_params` | 400/422、invalid_request、尺寸/格式 | 检查模型与参数 | 否 |
+| `local_storage` | 500 + `reason=local_storage_failed`，本地入队前读写失败 | 尚未提交生成；重启应用，仍失败则更新并联系支持 | 否 |
+| `context_too_long` | context_length、长度超出 | 缩短输入 | 否 |
+| `input_inaccessible` | url error、素材无法读取 | 检查素材 | 否 |
+| `input_too_large` | 413、too large | 压缩或更换素材 | 否 |
+| `model_missing` | 404、model_not_found | 检查模型名和渠道 | 否 |
+| `throttled` | 429 且非额度码 | 稍后重试 | 可稍后 |
+| `concurrency` | 渠道并发槽位 | 等待已有任务 | 可稍后 |
+| `provider_unavailable` | 5xx、HTML 网关页 | 稍后重试 | 可稍后 |
+| `network` | 连接失败 | 检查网络并核对原任务 | 否 |
+| `request_not_sent` | 连接跟踪确认整次提交尚未取得 HTTP 连接 | 检查网络或代理后重试 | 可重试 |
+| `timeout` | 408/504/524 | 先查原任务 | 否 |
+| `submission_uncertain` | `submission_unknown` | 查询原任务，不要重交 | 否 |
+| `async_failed` | 上游任务失败 | 查看详情后决定 | 否 |
+| `cancelled` | 用户取消 | 可按原输入再提交 | 可由用户重试 |
+| `partial_success` | 部分成功 | 查看已有结果 | 否 |
+| `download_failed` | 结果下载失败 | 重新加载，不要立刻重交 | 否 |
+| `results_missing` | 没有可用结果 | 查看详情 | 否 |
+| `malformed_response` | 非 JSON、HTML | 查看详情、核对原任务 | 否 |
+| `unknown` | 无法归类 | 查看详情后再决定 | 否 |
+
+`AccountOverdueError`、`OperationDenied.ServiceOverdue` 属于供应商计费问题，不能用 HTTP 403 推断权限不足；`InflightBatchsizeExceeded` 属于并发限制，`SetLimitExceeded` 属于配置的用量上限，不统一提示“请求频繁，稍后再试”。`ContentSecurityDetectionError` 表示审核服务内部失败，不能声称用户内容违规。
+
+## VOD 图片任务
+
+VOD 错误按创建、查询和任务结果区分。同名 `FailedOperation` 在创建阶段只表示操作失败，不能确认是否已创建任务；在已结束任务里表示模型任务堆积。查询失败、重复任务、超时或已有部分输出时，保留原任务并引导查询或取回结果，不把重新生成作为恢复方式。
+
+网关返回的 `vod_image_*` 错误、历史 `VOD image task failed [错误码]: ...` 和已保存的中文说明均进入同一归类器。已公布的创建业务码、任务扩展码及公共码覆盖审核、授权、配置、素材缺失、参数/格式、请求过大、容量/频率、模型失败、取消与超时；未知创建码提示核对原任务，未知终态失败码提示联系支持排查。结构化鉴权等明确错误优先，JSON 中的提示词回显不参与归类。
+
+前后端用 `fixtures/vod-image-errors.json` 验证相同的原因、下一步、恢复后说明及原任务保护。只增加提示覆盖，不放宽网关的生成重试条件。
+
+仓库里已经出现过的码会映射到上表；未收录的码落到 `unknown`，不会把原文 JSON/HTML/密钥/签名 URL/提示词回显给使用者。
+
+## 排查信息
+
+`request_not_sent` 必须有实际连接跟踪证据；单凭旧日志中的 TLS 超时文本不能把 `submission_unknown` 改成可重试。连接曾经成功、但响应丢失或后续重定向失败时，仍保留原任务保护。
+
+复制排查信息只包含：原因、下一步、类目、经过脱敏的上游代码、任务 ID、请求 ID、模型、时间。这些字段必须真实存在，不能编造。复制边界再次检查上下文字段；剪贴板失败时显示“复制失败”。
+
+## 限制
+
+- 没有数据库新字段。类目在任务摘要的 `errorCode` 和用户文案里投影；旧任务只有泛化 HTTP 文案时，前端会按残留文本再归一次。
+- 自定义渠道若把 JSON 错误原样转给浏览器，由前端归类；非 JSON 由后端归类后再返回。
+- 响应拦截规则仍会改写最终用户文案。
+- 没有改路由、计费、调度重试间隔或表结构。
+- 无法从上游正文可靠区分“用户余额”和“供应商账单”时，一律使用 `quota_unknown`。

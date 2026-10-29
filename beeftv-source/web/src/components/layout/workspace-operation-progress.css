@@ -1,0 +1,35 @@
+.workspace-operation-tray {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: var(--z-dialog-popover);
+    width: min(352px, calc(100vw - 24px));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg, 12px);
+    background: var(--popover, var(--background));
+    color: var(--foreground);
+    box-shadow: var(--shadow-lg);
+    font-size: 12px;
+}
+.workspace-operation-heading { display: flex; width: 100%; align-items: center; justify-content: space-between; padding: 12px 14px; font-weight: 600; gap: 12px; }
+.workspace-operation-list { max-height: min(440px, 50dvh); overflow-y: auto; border-top: 1px solid var(--border); }
+.workspace-operation-item { padding: 14px; }
+.workspace-operation-item + .workspace-operation-item { border-top: 1px solid var(--border); }
+.workspace-operation-title { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+.workspace-operation-title strong { min-width: 0; flex: 1; overflow-wrap: anywhere; line-height: 1.5; }
+.workspace-operation-title button { flex-shrink: 0; padding: 3px; }
+.file-operation-stage { display: flex; justify-content: space-between; gap: 12px; line-height: 1.6; }
+.file-operation-stage span { min-width: 0; overflow-wrap: anywhere; }
+.file-operation-stage strong { flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.file-operation-bar { height: 4px; margin: 8px 0; overflow: hidden; border-radius: 4px; background: var(--muted); }
+.file-operation-bar i { display: block; height: 100%; background: var(--foreground); border-radius: inherit; transition: width 180ms linear; }
+.file-operation-bar[data-indeterminate] i { width: 30%; animation: file-operation-scan 1.6s ease-in-out infinite; }
+.file-operation-metrics { display: flex; flex-wrap: wrap; column-gap: 12px; row-gap: 4px; font-variant-numeric: tabular-nums; color: var(--muted-foreground); line-height: 1.6; }
+.file-operation-metrics span { white-space: nowrap; }
+.file-operation-time { color: var(--muted-foreground); line-height: 1.6; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.workspace-operation-item[data-phase="error"] { color: var(--destructive); }
+.file-operation-spin { animation: file-operation-spin 1.4s linear infinite; flex-shrink: 0; }
+@keyframes file-operation-spin { to { transform: rotate(360deg); } }
+@keyframes file-operation-scan { from { transform: translateX(-100%); } to { transform: translateX(430%); } }
+@media (max-width: 480px) { .workspace-operation-tray { right: 12px; bottom: 12px; } }
+@media (prefers-reduced-motion: reduce) { .file-operation-spin, .file-operation-bar[data-indeterminate] i { animation: none; } .file-operation-bar i { transition: none; } }

@@ -1,0 +1,351 @@
+{
+  "version": "v1.7.20",
+  "sourceDigest": "b66d45fb395177eaaa6e9b472ea9ec7637c9a368fb23cc9abccf41c79ab78472",
+  "ownerException": {
+    "scope": "fal-h3-family-20261013",
+    "approvedBy": "Ender",
+    "instruction": "直接上线吧",
+    "evidence": [
+      "docs/release-evidence/v1.7.20-targeted.md",
+      "docs/release-evidence/v1.7.20-review.md",
+      "https://github.com/glanderness/BeefTV/actions/runs/38424940024",
+      "https://github.com/glanderness/BeefTV/actions/runs/38424939952",
+      "https://github.com/glanderness/BeefTV/actions/runs/38424939977",
+      "Grok 20261013-234034-continue-fa9ce240",
+      "Grok 20261013-235302-continue-0ec878d9",
+      "Grok 20261014-000339-continue-f71bd614"
+    ]
+  },
+  "releaseAuthorization": {
+    "scope": "v1.7.20 only",
+    "additionalHumanReplyRequired": false
+  },
+  "paidSubmissionLimit": 8,
+  "cases": [],
+  "billingAttempts": [],
+  "budgetCNY": null,
+  "spentCNY": null,
+  "pendingCNY": null,
+  "newSpentCNY": null,
+  "newPendingCNY": null,
+  "liveMatrixStatus": "not_run_owner_waived",
+  "agentAcceptanceStatus": "not_run_owner_waived",
+  "acceptanceComplete": false,
+  "h3Funding": {
+    "budgetCNY": 20,
+    "reservedUpperCNY": 19.241966,
+    "supplierInvoiceConfirmed": false,
+    "supplierBillingReadHTTPStatus": 403,
+    "evidence": [
+      "docs/release-evidence/v1.7.20-targeted.md",
+      "docs/release-evidence/v1.7.20-review.md",
+      "https://github.com/glanderness/BeefTV/actions/runs/38424940024",
+      "https://github.com/glanderness/BeefTV/actions/runs/38424939952",
+      "https://github.com/glanderness/BeefTV/actions/runs/38424939977",
+      "Grok 20261013-234034-continue-fa9ce240",
+      "Grok 20261013-235302-continue-0ec878d9",
+      "Grok 20261014-000339-continue-f71bd614"
+    ],
+    "inferenceRequestIds": [
+      "01a1343d-8b34-7583-a06f-8bbec5ee2072",
+      "01a1343e-0c99-78e2-a261-92f142c460b3",
+      "01a1343e-8652-7c43-a06a-3e01c6c3c490",
+      "01a1343f-048b-7a70-8f9a-41de9ebd56c0",
+      "01a134e7-11e4-70c2-9633-066bc9bf0de2",
+      "01a135b9-4894-7a82-8548-3e998b19d9b9",
+      "01a135b9-fdcb-70a0-afb9-e9b45096a74c",
+      "01a135d3-e1b3-77f3-be6f-03abacf0942e"
+    ]
+  },
+  "priorH3Inference": {
+    "version": "v1.7.18",
+    "count": 5,
+    "reservedUpperCNY": 7.10326,
+    "providerRequestIds": [
+      "01a1343d-8b34-7583-a06f-8bbec5ee2072",
+      "01a1343e-0c99-78e2-a261-92f142c460b3",
+      "01a1343e-8652-7c43-a06a-3e01c6c3c490",
+      "01a1343f-048b-7a70-8f9a-41de9ebd56c0",
+      "01a134e7-11e4-70c2-9633-066bc9bf0de2"
+    ],
+    "evidence": [
+      "docs/release-evidence/v1.7.18.json"
+    ]
+  },
+  "familyCalls": [
+    {
+      "id": "max-text-768p",
+      "executedCommit": "2a9b19963bccb370a788014306fd417c6f31e4ed",
+      "executedSourceDigest": "b9894d787af35a5eb09aa46425a09f2e6451ff22d1a9b3fcf643d482c0261952",
+      "evidence": [
+        "docs/release-evidence/v1.7.20-targeted.md",
+        "docs/release-evidence/v1.7.20-review.md",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424940024",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939952",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939977",
+        "Grok 20261013-234034-continue-fa9ce240",
+        "Grok 20261013-235302-continue-0ec878d9",
+        "Grok 20261014-000339-continue-f71bd614"
+      ],
+      "model": "minimax-h3-max",
+      "seconds": 3,
+      "resolution": "768p",
+      "status": "succeeded",
+      "billing": "settled",
+      "billingMarket": "enterprise",
+      "costCNY": 1.464782,
+      "artifactSHA256": "83068c79217e85a115a3fc265297dea739fd359da6e7d7b1868db3e411a44457",
+      "gatewayTaskId": "task_9d4Jsil0SErKPogcpIcbTbXhsKCD2YyV",
+      "providerRequestId": "01a135b9-4894-7a82-8548-3e998b19d9b9",
+      "saved": true,
+      "mediaDecoded": true,
+      "noDuplicateSubmission": true,
+      "method": "production-go-test"
+    },
+    {
+      "id": "base-reference-480p",
+      "executedCommit": "2a9b19963bccb370a788014306fd417c6f31e4ed",
+      "executedSourceDigest": "b9894d787af35a5eb09aa46425a09f2e6451ff22d1a9b3fcf643d482c0261952",
+      "evidence": [
+        "docs/release-evidence/v1.7.20-targeted.md",
+        "docs/release-evidence/v1.7.20-review.md",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424940024",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939952",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939977",
+        "Grok 20261013-234034-continue-fa9ce240",
+        "Grok 20261013-235302-continue-0ec878d9",
+        "Grok 20261014-000339-continue-f71bd614"
+      ],
+      "model": "minimax-h3",
+      "seconds": 5,
+      "resolution": "480p",
+      "status": "succeeded",
+      "billing": "settled",
+      "billingMarket": "enterprise",
+      "costCNY": 3.356792,
+      "artifactSHA256": "ef19556c171d600233193f939ec244650c415d50fe122bf87d2faeb3f7999dce",
+      "gatewayTaskId": "task_yzU6L2rrYsmOa7dqroEEwDKlTbryOOoT",
+      "providerRequestId": "01a135b9-fdcb-70a0-afb9-e9b45096a74c",
+      "saved": true,
+      "mediaDecoded": true,
+      "noDuplicateSubmission": true,
+      "method": "production-go-test",
+      "referenceImages": 6,
+      "referenceVideos": 1,
+      "referenceAudios": 1,
+      "freeReferenceImages": 5
+    },
+    {
+      "id": "base-native-2k-keyframes",
+      "executedCommit": "2a9b19963bccb370a788014306fd417c6f31e4ed",
+      "executedSourceDigest": "b9894d787af35a5eb09aa46425a09f2e6451ff22d1a9b3fcf643d482c0261952",
+      "evidence": [
+        "docs/release-evidence/v1.7.20-targeted.md",
+        "docs/release-evidence/v1.7.20-review.md",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424940024",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939952",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939977",
+        "Grok 20261013-234034-continue-fa9ce240",
+        "Grok 20261013-235302-continue-0ec878d9",
+        "Grok 20261014-000339-continue-f71bd614"
+      ],
+      "model": "minimax-h3",
+      "seconds": 5,
+      "resolution": "2k",
+      "status": "succeeded",
+      "billing": "settled",
+      "billingMarket": "enterprise",
+      "costCNY": 6.611864,
+      "artifactSHA256": "8a9beb4446d9238e098f2775be23a78fa6838a59d0ec379a9c837e550cdd3745",
+      "gatewayTaskId": "task_XiNIQpbLsgA4F8rKpiGdLhv826g6LHyd",
+      "providerRequestId": "01a135d3-e1b3-77f3-be6f-03abacf0942e",
+      "saved": true,
+      "mediaDecoded": true,
+      "noDuplicateSubmission": true,
+      "method": "native-cli",
+      "clientVersion": "v1.7.19",
+      "taskId": "397f28617003bf47909d1508e2cb38e2",
+      "canvasVerified": true,
+      "reopened": true
+    }
+  ],
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.19",
+    "pendingCNY": null,
+    "evidence": [
+      "docs/release-evidence/v1.7.19.json"
+    ]
+  },
+  "review": {
+    "result": "approved",
+    "independent": true,
+    "reviewer": "Grok Companion",
+    "sourceDigest": "b66d45fb395177eaaa6e9b472ea9ec7637c9a368fb23cc9abccf41c79ab78472",
+    "evidence": [
+      "docs/release-evidence/v1.7.20-targeted.md",
+      "docs/release-evidence/v1.7.20-review.md",
+      "https://github.com/glanderness/BeefTV/actions/runs/38424940024",
+      "https://github.com/glanderness/BeefTV/actions/runs/38424939952",
+      "https://github.com/glanderness/BeefTV/actions/runs/38424939977",
+      "Grok 20261013-234034-continue-fa9ce240",
+      "Grok 20261013-235302-continue-0ec878d9",
+      "Grok 20261014-000339-continue-f71bd614"
+    ]
+  },
+  "upgrade": {
+    "preservedData": true,
+    "sourceDigest": "b66d45fb395177eaaa6e9b472ea9ec7637c9a368fb23cc9abccf41c79ab78472",
+    "evidence": [
+      "docs/release-evidence/v1.7.20-targeted.md",
+      "docs/release-evidence/v1.7.20-review.md",
+      "https://github.com/glanderness/BeefTV/actions/runs/38424940024",
+      "https://github.com/glanderness/BeefTV/actions/runs/38424939952",
+      "https://github.com/glanderness/BeefTV/actions/runs/38424939977",
+      "Grok 20261013-234034-continue-fa9ce240",
+      "Grok 20261013-235302-continue-0ec878d9",
+      "Grok 20261014-000339-continue-f71bd614"
+    ]
+  },
+  "verification": {
+    "h3FamilyCatalog": {
+      "status": "passed",
+      "sourceDigest": "b66d45fb395177eaaa6e9b472ea9ec7637c9a368fb23cc9abccf41c79ab78472",
+      "evidence": [
+        "docs/release-evidence/v1.7.20-targeted.md",
+        "docs/release-evidence/v1.7.20-review.md",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424940024",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939952",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939977",
+        "Grok 20261013-234034-continue-fa9ce240",
+        "Grok 20261013-235302-continue-0ec878d9",
+        "Grok 20261014-000339-continue-f71bd614"
+      ]
+    },
+    "keyframesAndReferences": {
+      "status": "passed",
+      "sourceDigest": "b66d45fb395177eaaa6e9b472ea9ec7637c9a368fb23cc9abccf41c79ab78472",
+      "evidence": [
+        "docs/release-evidence/v1.7.20-targeted.md",
+        "docs/release-evidence/v1.7.20-review.md",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424940024",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939952",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939977",
+        "Grok 20261013-234034-continue-fa9ce240",
+        "Grok 20261013-235302-continue-0ec878d9",
+        "Grok 20261014-000339-continue-f71bd614"
+      ]
+    },
+    "actualCNYSettlement": {
+      "status": "passed",
+      "sourceDigest": "b66d45fb395177eaaa6e9b472ea9ec7637c9a368fb23cc9abccf41c79ab78472",
+      "evidence": [
+        "docs/release-evidence/v1.7.20-targeted.md",
+        "docs/release-evidence/v1.7.20-review.md",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424940024",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939952",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939977",
+        "Grok 20261013-234034-continue-fa9ce240",
+        "Grok 20261013-235302-continue-0ec878d9",
+        "Grok 20261014-000339-continue-f71bd614"
+      ]
+    },
+    "candidateReopenPlayback": {
+      "status": "passed",
+      "sourceDigest": "b66d45fb395177eaaa6e9b472ea9ec7637c9a368fb23cc9abccf41c79ab78472",
+      "evidence": [
+        "docs/release-evidence/v1.7.20-targeted.md",
+        "docs/release-evidence/v1.7.20-review.md",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424940024",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939952",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939977",
+        "Grok 20261013-234034-continue-fa9ce240",
+        "Grok 20261013-235302-continue-0ec878d9",
+        "Grok 20261014-000339-continue-f71bd614"
+      ]
+    },
+    "noDuplicateSubmission": {
+      "status": "passed",
+      "sourceDigest": "b66d45fb395177eaaa6e9b472ea9ec7637c9a368fb23cc9abccf41c79ab78472",
+      "evidence": [
+        "docs/release-evidence/v1.7.20-targeted.md",
+        "docs/release-evidence/v1.7.20-review.md",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424940024",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939952",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939977",
+        "Grok 20261013-234034-continue-fa9ce240",
+        "Grok 20261013-235302-continue-0ec878d9",
+        "Grok 20261014-000339-continue-f71bd614"
+      ]
+    },
+    "localReleaseGate": {
+      "status": "passed",
+      "sourceDigest": "b66d45fb395177eaaa6e9b472ea9ec7637c9a368fb23cc9abccf41c79ab78472",
+      "evidence": [
+        "docs/release-evidence/v1.7.20-targeted.md",
+        "docs/release-evidence/v1.7.20-review.md",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424940024",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939952",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939977",
+        "Grok 20261013-234034-continue-fa9ce240",
+        "Grok 20261013-235302-continue-0ec878d9",
+        "Grok 20261014-000339-continue-f71bd614"
+      ]
+    },
+    "ci": {
+      "status": "passed",
+      "sourceDigest": "b66d45fb395177eaaa6e9b472ea9ec7637c9a368fb23cc9abccf41c79ab78472",
+      "evidence": [
+        "docs/release-evidence/v1.7.20-targeted.md",
+        "docs/release-evidence/v1.7.20-review.md",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424940024",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939952",
+        "https://github.com/glanderness/BeefTV/actions/runs/38424939977",
+        "Grok 20261013-234034-continue-fa9ce240",
+        "Grok 20261013-235302-continue-0ec878d9",
+        "Grok 20261014-000339-continue-f71bd614"
+      ]
+    }
+  },
+  "candidateReopen": {
+    "clientVersion": "v1.7.20",
+    "originalTaskId": "397f28617003bf47909d1508e2cb38e2",
+    "byteExact": true,
+    "nativePlayback": true,
+    "newPaidSubmissions": 0,
+    "h3ExecutionUnchanged": true,
+    "sourceDigest": "b66d45fb395177eaaa6e9b472ea9ec7637c9a368fb23cc9abccf41c79ab78472",
+    "evidence": [
+      "docs/release-evidence/v1.7.20-targeted.md",
+      "docs/release-evidence/v1.7.20-review.md",
+      "https://github.com/glanderness/BeefTV/actions/runs/38424940024",
+      "https://github.com/glanderness/BeefTV/actions/runs/38424939952",
+      "https://github.com/glanderness/BeefTV/actions/runs/38424939977",
+      "Grok 20261013-234034-continue-fa9ce240",
+      "Grok 20261013-235302-continue-0ec878d9",
+      "Grok 20261014-000339-continue-f71bd614"
+    ],
+    "executedCommit": "cd95e069fbc3f056f9cb861b0965d81871d3da2b",
+    "executedRuntimeSourceDigest": "f06c7941ba8001bfa49ae8fb7d3a4c8f42236040255216dce265153b53681f44"
+  },
+  "packages": {
+    "platforms": [
+      "darwin-arm64",
+      "darwin-amd64",
+      "windows-amd64",
+      "linux-amd64"
+    ],
+    "status": "pending_release_workflow",
+    "archives": null,
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "linuxNativeWindowBeforeUpload": true,
+    "signedManifestBeforePublish": true,
+    "publicReadbackAfterPublish": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml"
+    ]
+  },
+  "releasePublished": false,
+  "releaseComplete": false
+}

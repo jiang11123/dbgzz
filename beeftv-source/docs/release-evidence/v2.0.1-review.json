@@ -1,0 +1,21 @@
+{
+  "version": "v2.0.1",
+  "reviewedHead": "8c2b15af482ac71e577aec117d2185bf2737949f",
+  "sourceDigest": "93c4237223a1e35874845bcaff03ed868abaf206c2aa07dba577bfab3c097a81",
+  "reviewer": "Grok Companion",
+  "independent": true,
+  "jobId": "20261021-214419-continue-8abb3e9e",
+  "result": "approve",
+  "summary": "HEAD 8c2b15af only changes the v2.0.1 upgrade receipt. scripts/v201-release-contract.mjs:46-47 now requires upgrade.status=pending_release_workflow, preservedData=null, and requiredBeforePublish=true, so a preflight receipt cannot record a preservation pass. The two new tests reject preservedData=true and requiredBeforePublish=false. node --test scripts/v201-release-contract.test.mjs passed 22/22. release-desktop.yml is unchanged: build still needs preflight and runs the native installer lifecycle for darwin-arm64, darwin-amd64, windows-amd64, and linux-amd64 before publish, which still needs both jobs. smoke-desktop-installer.py:373 still refuses to run unless GITHUB_ACTIONS=true. Owner deferral, source-digest review binding, the 12/23 pending acceptance, zero new budget, inherited failures, and verification.ci.status=passed are unchanged. This approves the source at 8c2b15af. GitHub CI for this commit was not observed and still has to pass before merge; the four-platform installer lifecycle has not run.",
+  "findings": [],
+  "priorFindings": {
+    "jobId": "20261021-213315-review-c3397e8b",
+    "count": 2,
+    "disposition": "withdrawn by the same independent reviewer after checking actual Actions job dependencies; no final findings"
+  },
+  "limits": [
+    "Source review is not CI success or native installer execution.",
+    "12 media cases and 23 assistant checks remain pending after release.",
+    "Native data preservation remains pending until the four-platform release workflow executes."
+  ]
+}

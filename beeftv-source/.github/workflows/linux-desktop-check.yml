@@ -1,0 +1,71 @@
+name: Linux desktop package checks
+
+on:
+  pull_request:
+    paths:
+      - 'backend/**'
+      - 'agent-host/**'
+      - 'web/**'
+      - 'plugin-packages/**'
+      - 'scripts/*linux*'
+      - 'scripts/*agent-host*'
+      - 'scripts/build-beeftv-release.sh'
+      - 'scripts/smoke-packaged-cli*'
+      - 'docs/linux-install.md'
+      - '.github/workflows/linux-desktop-check.yml'
+      - '.github/workflows/release-desktop.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: linux-desktop-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - name: Install native desktop and media dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev ffmpeg fonts-noto-cjk xvfb xdotool dbus-x11
+          node -e 'const fs=require("fs"),p=require("path"); fs.appendFileSync(process.env.GITHUB_ENV, `BEEFTV_NODE_RUNTIME=${p.dirname(p.dirname(process.execPath))}\n`);'
+      - name: Verify updater and bundled agent on Linux
+        run: |
+          cd backend
+          go test ./cmd/update-release ./internal/desktopupdate ./internal/assistantruntime
+          cd ..
+          bun test scripts/package-agent-host.test.mjs
+      - name: Build native Linux package without publishing
+        env:
+          BEEFTV_SKIP_LOCAL_VERIFY: '1'
+          BEEFTV_WAILS_PLATFORM: linux/amd64
+        run: |
+          sh plugin-packages/build-packages.sh
+          ./scripts/build-beeftv-release.sh
+          cd backend
+          go run ./cmd/update-release package --platform linux-amd64 --input cmd/desktop/build/bin/BeefTV-linux --output ../dist/BeefTV-linux-check.zip
+      - name: Verify shipped CLI and native desktop window
+        run: |
+          python3 scripts/smoke-packaged-cli.py --platform linux-amd64 --archive dist/BeefTV-linux-check.zip
+          xvfb-run -a dbus-run-session -- python3 scripts/smoke-linux-desktop.py --archive dist/BeefTV-linux-check.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-desktop-check
+          path: dist/BeefTV-linux-check.zip
+          retention-days: 7
+          if-no-files-found: error

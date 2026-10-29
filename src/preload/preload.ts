@@ -1,5 +1,12 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
+contextBridge.exposeInMainWorld('doubaoUpdater', {
+  UpdateStatus: () => ipcRenderer.invoke('app-update:status'),
+  CheckForUpdate: () => ipcRenderer.invoke('app-update:check'),
+  DownloadUpdate: () => ipcRenderer.invoke('app-update:download'),
+  InstallUpdate: () => ipcRenderer.invoke('app-update:install'),
+});
+
 const api = {
   messageSyncState: () => ipcRenderer.invoke('message-sync:state'),
   readMessageImages: (kind: string) => ipcRenderer.invoke('message-sync:read',kind),
@@ -78,6 +85,8 @@ const api = {
   getAppMode: () => ipcRenderer.invoke('app:mode'),
   setAppMode: (mode: 'gateway' | 'account') => ipcRenderer.invoke('app:set-mode', mode),
   onAppModeChanged: (listener: (mode: 'gateway' | 'account') => void) => { const handler = (_e: Electron.IpcRendererEvent, mode: 'gateway' | 'account') => listener(mode); ipcRenderer.on('app:mode-changed', handler); return () => ipcRenderer.removeListener('app:mode-changed', handler); },
-  onGatewayLog: (listener: (message: string) => void) => { const handler = (_event: Electron.IpcRendererEvent, message: string) => listener(message); ipcRenderer.on('gateway:log', handler); return () => ipcRenderer.removeListener('gateway:log', handler); }
+  onGatewayLog: (listener: (message: string) => void) => { const handler = (_event: Electron.IpcRendererEvent, message: string) => listener(message); ipcRenderer.on('gateway:log', handler); return () => ipcRenderer.removeListener('gateway:log', handler); },
+  beeftvSync: () => ipcRenderer.invoke('beeftv:sync'),
+  beeftvLaunch: () => ipcRenderer.invoke('beeftv:launch'),
 };
 contextBridge.exposeInMainWorld('workspace', api);

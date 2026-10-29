@@ -1,0 +1,9 @@
+{
+  "id": "beefapi",
+  "displayName": "BeefTV",
+  "baseUrl": "https://beeftv.app",
+  "catalogProtocol": "openai",
+  "presetVersion": 1,
+  "pinned": true,
+  "models": []
+}

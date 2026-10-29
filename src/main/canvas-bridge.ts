@@ -1,10 +1,10 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import { createReadStream, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { createReadStream, existsSync, mkdirSync, promises as fsp, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import type { BrowserView } from 'electron';
 import type { Account } from '../shared/types';
-import { ensureComposerMode, readComposerSettings, selectPageSetting, selectVideoDuration, selectDoubaoVideoSettings, prepareText, clickComposerSend, waitForComposer, assertEmptyDraft } from './page-composer';
+import { ensureComposerMode, readComposerSettings, selectPageSetting, selectVideoDuration, selectDoubaoVideoSettings, prepareText, clickComposerSend, waitForComposer, assertEmptyDraft, assertVideoDuration } from './page-composer';
 import { reimportOrderedImages } from './chat-images';
 import { pageReplySnapshotScript, createPageReplyBaseline, collectPageReplies, normalizePageReplyText, type PageReplyBaseline, type PageReplySnapshot } from './page-replies';
 import { uploadVideoReferences } from './video-reference';
@@ -43,6 +43,7 @@ export type CanvasBridgeTask = {
   conversationId?: string;
   gatewayReplyMessageId?: number;
   videoPath: string | null;
+  lastFramePath?: string | null;
   error: string | null;
   createdAt: string;
   updatedAt: string;
@@ -56,6 +57,8 @@ type Runtime = {
   isViewAttached?: (view: BrowserView) => boolean;
   onTaskChanged: (task?: CanvasBridgeTask) => void;
   downloadHDVideo?: (view: BrowserView, task: CanvasBridgeTask) => Promise<string | null>;
+  extractLastFrame?: (videoPath: string) => Promise<string | null>;
+  popupAccountForCaptcha?: (accountId: number, reason?: string) => void;
 };
 
 export function videoConversationForAccount(thread: { accountId: number | null; doubaoConversationId: string } | null, accountId?: number | null): string | undefined {
@@ -71,6 +74,21 @@ export function videoReplyState(text: string): Pick<CanvasBridgeTask, 'status' |
 }
 
 const terminal = new Set<CanvasBridgeStatus>(['completed', 'needs_attention', 'failed', 'cancelled']);
+
+/**
+ * loadURL 在网络挂起（代理失效、DNS 卡住）时可能 pending 数分钟到永久，
+ * 会把整条任务执行链冻住、账号锁假释放。超时后 stop() 加载并抛错。
+ */
+async function loadURLWithTimeout(view: BrowserView, url: string, timeoutMs = 30_000) {
+  const contents = view.webContents;
+  await new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      try { if (!contents.isDestroyed() && contents.isLoading()) contents.stop(); } catch { /* ignore */ }
+      reject(new Error(`页面加载超时（${Math.round(timeoutMs / 1000)}s）`));
+    }, timeoutMs);
+    contents.loadURL(url).then(() => { clearTimeout(timer); resolve(); }, (error) => { clearTimeout(timer); reject(error instanceof Error ? error : new Error(String(error))); });
+  });
+}
 const contentType = (filePath: string) => /\.webm$/i.test(filePath) ? 'video/webm' : /\.mov$/i.test(filePath) ? 'video/quicktime' : 'video/mp4';
 
 const QUOTA_PATTERN = /免费次数用完|额度不足|创作额度.*不足|暂时无法使用|额度已用尽|今日.*上限/;
@@ -91,12 +109,36 @@ export function normalizeTaskUrl(url: string | null | undefined): string {
   return String(url ?? '').trim().replace(/#.*$/, '').replace(/\/+$/, '');
 }
 
+export function isRootDoubaoChatUrl(url: string | null | undefined): boolean {
+  if (!url) return false;
+  const normalized = normalizeTaskUrl(url);
+  return /^https?:\/\/(?:www\.)?doubao\.com(?:\/chat)?$/i.test(normalized);
+}
+
+export function isSpecificDoubaoChatUrl(url: string | null | undefined): boolean {
+  if (!url) return false;
+  const normalized = normalizeTaskUrl(url);
+  return /^https?:\/\/(?:www\.)?doubao\.com\/chat\/[a-zA-Z0-9_-]+$/i.test(normalized);
+}
+
+export function isPendingDoubaoChatUrl(url: string | null | undefined): boolean {
+  return isRootDoubaoChatUrl(url) || /^https?:\/\/(?:www\.)?doubao\.com\/chat\/local_[a-zA-Z0-9_-]+$/i.test(normalizeTaskUrl(url));
+}
+
 export function shouldRecoverTaskPage(currentUrl: string, taskUrl: string | null, attempts: number) {
   // A doubao video render takes minutes and the page drifts off its task URL while it
   // works (progress views, hash changes, a redirect home). Recover generously, but keep a
   // cap so a genuinely lost page still surfaces to the user instead of looping forever.
-  if (!taskUrl) return false;
-  return normalizeTaskUrl(currentUrl) !== normalizeTaskUrl(taskUrl) && attempts < 8;
+  if (!taskUrl || isPendingDoubaoChatUrl(taskUrl)) return false;
+  const normCurrent = normalizeTaskUrl(currentUrl);
+  const normTask = normalizeTaskUrl(taskUrl);
+  if (normCurrent === normTask) return false;
+  // If the task was submitted on root /chat and natural SPA navigation progressed it
+  // to a specific /chat/<id>, this is normal conversation creation, not page loss.
+  if (isRootDoubaoChatUrl(normTask) && isSpecificDoubaoChatUrl(normCurrent)) {
+    return false;
+  }
+  return isRootDoubaoChatUrl(normCurrent) && attempts < 8;
 }
 
 function json(response: ServerResponse, code: number, value: unknown) {
@@ -106,8 +148,14 @@ function json(response: ServerResponse, code: number, value: unknown) {
 
 async function requestBody(request: IncomingMessage) {
   const chunks: Buffer[] = [];
-  for await (const chunk of request) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-  if (Buffer.concat(chunks).length > 12 * 1024 * 1024) throw new Error('请求过大');
+  let total = 0;
+  for await (const chunk of request) {
+    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    total += buffer.length;
+    // 边读边限：读完全部再检查对超大 body 毫无防护。
+    if (total > 12 * 1024 * 1024) throw new Error('请求过大');
+    chunks.push(buffer);
+  }
   return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}') as CanvasTaskRequest;
 }
 
@@ -119,19 +167,30 @@ function imageExtension(dataUrl: string) {
   return 'png';
 }
 
-function writeReferences(root: string, taskId: string, references: CanvasReference[]) {
+async function writeReferences(root: string, taskId: string, references: CanvasReference[]) {
   const directory = path.join(root, taskId);
   mkdirSync(directory, { recursive: true });
-  return references
+  const targets = references
     .filter((reference) => reference.mediaType !== 'video' && /^data:image\/[a-z0-9.+-]+;base64,/i.test(reference.src))
     .slice(0, 12)
     .map((reference, index) => {
       const encoded = reference.src.slice(reference.src.indexOf(',') + 1);
-      const destination = path.join(directory, `reference-${index + 1}.${imageExtension(reference.src)}`);
-      writeFileSync(destination, Buffer.from(encoded, 'base64'));
-      return destination;
+      return { destination: path.join(directory, `reference-${index + 1}.${imageExtension(reference.src)}`), encoded };
     });
+  // 每张参考图可达数 MB，异步写避免阻塞主进程事件循环。
+  await Promise.all(targets.map(({ destination, encoded }) => fsp.writeFile(destination, Buffer.from(encoded, 'base64'))));
+  return targets.map(({ destination }) => destination);
 }
+
+const CAPTCHA_VISIBLE_SCRIPT = `(() => {
+  const el = document.getElementById('captcha_container')
+    || document.querySelector('.captcha_verify_container')
+    || document.querySelector('[id*="captcha_"]')
+    || document.querySelector('iframe[src*="captcha"]');
+  if (!el) return false;
+  const style = window.getComputedStyle(el);
+  return style.display !== 'none' && style.visibility !== 'hidden' && el.offsetHeight > 0;
+})()`;
 
 async function runInPage(view: BrowserView, script: string) {
   if (!view.webContents || view.webContents.isDestroyed()) throw new Error('豆包网页已关闭');
@@ -238,7 +297,16 @@ async function selectDoubaoVideoAspectRatio(view: BrowserView, ratio: string) {
 
 
 export class CanvasBridge {
-  private server = createServer((request, response) => void this.handle(request, response));
+  private server = createServer((request, response) => {
+    // handle() 内任何路由抛错都不允许变成 unhandledRejection 打崩主进程。
+    void this.handle(request, response).catch((error) => {
+      console.error('[canvas-bridge] 请求处理失败：', error);
+      try {
+        if (!response.headersSent) response.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+        response.end(JSON.stringify({ error: error instanceof Error ? error.message : String(error) }));
+      } catch { /* 连接已断开 */ }
+    });
+  });
   private tasks = new Map<string, CanvasBridgeTask>();
   private busyAccountIds = new Set<number>();
   /** Tasks currently inside dispatch(); keeps concurrent triggers from double-dispatching. */
@@ -255,6 +323,10 @@ export class CanvasBridge {
   /** Last time the poller actually looked at each task, to spot ghost tasks holding an account. */
   private lastPolledAt = new Map<string, number>();
   private lastPollError: string | null = null;
+  /** 终态任务的按任务 Map 条目延迟清理定时器：慢性内存泄漏的回收点。 */
+  private taskCleanupTimers = new Map<string, NodeJS.Timeout>();
+  /** persistTasks 防抖定时器。 */
+  private persistTimer: NodeJS.Timeout | null = null;
   private readonly uploadRoot: string;
   private readonly taskStorePath: string;
   private readonly pool: AccountPool;
@@ -283,12 +355,15 @@ export class CanvasBridge {
     const view = this.runtime.viewForAccount(accountId) ?? this.runtime.openAccount(accountId);
     if (!view?.webContents || view.webContents.isDestroyed()) return { ok: false, reason: '账号页面不可用' };
     try {
-      await view.webContents.loadURL('https://www.doubao.com/chat/');
+      await loadURLWithTimeout(view, 'https://www.doubao.com/chat/');
       await new Promise(resolve => setTimeout(resolve, 2500));
       const state = await runInPage(view, `(() => ({ url: location.pathname, text: (document.body?.innerText || '').replace(/\\s+/g, ' ').slice(0, 400) }))()`) as { url: string; text: string };
       const blocked = /人机验证|安全验证|滑块|verify|captcha/i.test(state.url + ' ' + state.text);
       if (blocked) return { ok: false, reason: '账号仍需人机验证' };
       this.pool.markOk(accountId);
+      // 冷却恢复后主动补位派发：否则队列里只剩 queued 任务时没有任何事件
+      // 会触发 drain，任务会饿到某个无关操作才被派发。
+      this.dispatchNextQueuedTask();
       return { ok: true };
     } catch (error) {
       return { ok: false, reason: error instanceof Error ? error.message : String(error) };
@@ -313,7 +388,12 @@ export class CanvasBridge {
 
   /** Non-null when the bridge port could not be bound. */
   get bridgeError() { return this.startupError; }
-  stop() { this.server.close(); }
+  stop() {
+    this.server.close();
+    this.flushTasksSync();
+    for (const timer of this.taskCleanupTimers.values()) clearTimeout(timer);
+    this.taskCleanupTimers.clear();
+  }
   list() { return [...this.tasks.values()].map(task => ({ ...task })); }
   isBusy(id: number) { return this.busyAccountIds.has(id); }
   /** Live view of accounts currently executing a task, shared with the gateway. */
@@ -321,11 +401,21 @@ export class CanvasBridge {
   /** The shared account pool, so the gateway and the canvas bridge agree on health. */
   get poolRef(): AccountPool { return this.pool; }
   task(id: string) { return this.tasks.get(id) ?? null; }
+  cancelTask(taskId: string): boolean {
+    const task = this.task(taskId);
+    if (!task) return false;
+    this.update(task, { status: 'cancelled', statusText: '已取消', error: null });
+    // dispatch 在途时不直接删账号锁：在途 dispatch 的 finally 会释放，
+    // 这里抢先删锁会让下一个任务立刻派上同一账号，两套自动化同页互踩。
+    if (task.accountId && !this.dispatchingTasks.has(task.id)) this.busyAccountIds.delete(task.accountId);
+    return true;
+  }
 
   completeFromDownload(accountId: number, videoPath: string) {
     const task = [...this.tasks.values()].find(candidate => candidate.accountId === accountId && candidate.status === 'downloading' && this.downloadPaths.get(candidate.id) === videoPath);
     if (!task || !existsSync(videoPath)) return false;
     this.update(task, { status: 'completed', statusText: task.sourceAccountId ? '视频已返回共享工作区' : '视频已下载并可回写画布', videoPath, error: null });
+    this.triggerExtractLastFrame(task, task.videoPath || '');
     this.busyAccountIds.delete(accountId);
     this.pool.markOk(accountId);
     this.dispatchNextQueuedTask();
@@ -350,6 +440,7 @@ export class CanvasBridge {
     if (!['awaiting_reply', 'awaiting_confirmation', 'generating', 'downloading', 'needs_attention'].includes(task.status)) throw new Error('该任务当前不能关联结果');
     Object.assign(task, { status: 'completed' as const, statusText: '已手动关联视频结果', videoPath, error: null, updatedAt: new Date().toISOString() });
     if (task.accountId) this.busyAccountIds.delete(task.accountId);
+    this.scheduleTaskEntryCleanup(task.id);
     this.persistTasks(); this.runtime.onTaskChanged(); this.dispatchNextQueuedTask();
   }
 
@@ -368,8 +459,8 @@ export class CanvasBridge {
     try {
       view = this.runtime.viewForAccount(task.accountId);
       if (!view || view.webContents.isDestroyed()) return false;
-      if (normalizeTaskUrl(view.webContents.getURL()) !== normalizeTaskUrl(task.pageUrl)) {
-        await view.webContents.loadURL(task.pageUrl);
+      if (!isPendingDoubaoChatUrl(task.pageUrl) && normalizeTaskUrl(view.webContents.getURL()) !== normalizeTaskUrl(task.pageUrl)) {
+        await loadURLWithTimeout(view, task.pageUrl);
         await waitForComposer(view);
       }
       await assertEmptyDraft(view);
@@ -377,6 +468,10 @@ export class CanvasBridge {
         await uploadTaskReferences(view, task.referencePaths);
         this.update(task, { referenceUploaded: true });
       }
+      if (task.duration && (await readComposerSettings(view)).mode === 'video') {
+        await selectDoubaoVideoSettings(view, { ratio: task.ratio, duration: task.duration });
+      }
+      if (task.duration) text = text.trim() + '。请严格保持视频时长 ' + task.duration + ' 秒、比例 ' + task.ratio + '，不要改成其他时长。';
       const snapshot = await runInPage(view, pageReplySnapshotScript) as PageReplySnapshot;
       const baseline = createPageReplyBaseline(snapshot, { prompt: text.trim() });
       await prepareText(view, text.trim());
@@ -404,6 +499,13 @@ export class CanvasBridge {
     }
     const result = collectPageReplies(baseline, snapshot);
     task.replyBaseline = result.baseline;
+    // Only a matching task turn proves that a client-only route became a server conversation.
+    if (isPendingDoubaoChatUrl(task.pageUrl) && isSpecificDoubaoChatUrl(snapshot.url)
+      && !isPendingDoubaoChatUrl(snapshot.url) && result.baseline.anchorId
+      && snapshot.messages.some(message => message.role === 'user' && message.id === result.baseline.anchorId)) {
+      this.taskPageRecoveryAttempts.delete(task.id);
+      this.update(task, { pageUrl: snapshot.url });
+    }
     if (result.latestText) {
       const state = videoReplyState(result.latestText);
       this.update(task, { latestReply: result.latestText, latestReplyId: result.replies.at(-1)?.id, ...state });
@@ -436,9 +538,9 @@ export class CanvasBridge {
       if (shouldRecoverTaskPage(currentUrl, task.pageUrl, attempts)) {
         this.taskPageRecoveryAttempts.set(task.id, attempts + 1);
         this.update(task, { statusText: '豆包页面意外回到首页，正在恢复本次任务页面' });
-        await view.webContents.loadURL(task.pageUrl as string);
+        await loadURLWithTimeout(view, task.pageUrl as string);
         await new Promise((resolve) => setTimeout(resolve, 1200));
-      } else if (task.pageUrl && normalizeTaskUrl(currentUrl) !== normalizeTaskUrl(task.pageUrl)) {
+      } else if (task.pageUrl && !isPendingDoubaoChatUrl(task.pageUrl) && normalizeTaskUrl(currentUrl) !== normalizeTaskUrl(task.pageUrl)) {
         this.busyAccountIds.delete(accountId);
         this.update(task, {
           status: 'needs_attention',
@@ -448,27 +550,28 @@ export class CanvasBridge {
         this.dispatchNextQueuedTask();
         return false;
       }
-      // Repeated evaluation failures mean the task page is unusable; stop waiting on it.
-      const stalls = (this.taskPageRecoveryAttempts.get(task.id) ?? 0);
-      if (stalls >= 8) {
-        this.busyAccountIds.delete(accountId);
-        this.update(task, { status: 'needs_attention', statusText: '豆包任务页面长时间无响应，请手动确认生成结果', error: this.lastPollError || '任务页面无响应' });
-        this.dispatchNextQueuedTask();
+      await this.syncTaskReply(task, view);
+      // 人机验证弹层不在聊天文本里：不处理的话消息停在发送失败、任务却一直显示等待回复。
+      // 自动唤起对应账号窗口供用户手动拖动滑块验证；验证完成前保持任务进行中。
+      const captchaVisible = await runInPage(view, CAPTCHA_VISIBLE_SCRIPT).catch(() => false);
+      const isCaptchaMessage = /710022004|人机验证|安全验证|滑块/.test(task.latestReply || '');
+      if (captchaVisible || isCaptchaMessage) {
+        this.runtime.popupAccountForCaptcha?.(accountId, '检测到豆包人机安全验证');
+        this.update(task, {
+          statusText: `⚠️ 豆包账号触发人机验证，已自动弹出窗口，请在弹出的豆包窗口中手动完成验证（账号 ${accountId}）`,
+        });
         return false;
       }
-      await this.syncTaskReply(task, view);
+      if (task.statusText?.includes('触发人机验证')) {
+        this.update(task, {
+          statusText: `人机验证已通过，继续等待视频生成（账号 ${accountId}）`,
+        });
+      }
       const message = task.latestReply || '';
       if (/免费次数用完|额度不足|额度用完|创作额度|额度已用|暂时无法使用.*视频|视频生成失败|生成失败/.test(message)) {
         this.busyAccountIds.delete(accountId);
         this.pool.markFailure(accountId, 'quota', '豆包页面提示：当前账号视频生成额度不足或不可用');
         this.update(task, { status: 'needs_attention', statusText: '豆包账号当前无可用视频额度，已标记该账号并自动切换其他账号', error: '豆包页面提示：当前账号视频生成额度不足或不可用' });
-        this.dispatchNextQueuedTask();
-        return false;
-      }
-      if (/710022004|人机验证|安全验证|滑块/.test(message)) {
-        this.busyAccountIds.delete(accountId);
-        this.pool.markFailure(accountId, 'captcha', '豆包要求人机验证，需要人工处理该账号');
-        this.update(task, { status: 'needs_attention', statusText: '该账号触发人机验证，已停用；请在豆包窗口完成验证后清除冷却', error: '豆包要求人机验证（710022004）' });
         this.dispatchNextQueuedTask();
         return false;
       }
@@ -485,6 +588,7 @@ export class CanvasBridge {
           if (hdPath && existsSync(hdPath)) {
             this.hdAttempts.delete(task.id);
             this.update(task, { status: 'completed', statusText: task.sourceAccountId ? '视频已返回共享工作区' : '视频已高清下载（无水印）', videoPath: hdPath, error: null });
+    this.triggerExtractLastFrame(task, task.videoPath || '');
             this.busyAccountIds.delete(accountId);
             this.dispatchNextQueuedTask();
             return true;
@@ -518,6 +622,7 @@ export class CanvasBridge {
           if (hdPath && existsSync(hdPath)) {
             this.hdAttempts.delete(task.id);
             this.update(task, { status: 'completed', statusText: task.sourceAccountId ? '视频已返回共享工作区' : '视频已高清下载（无水印）', videoPath: hdPath, error: null });
+    this.triggerExtractLastFrame(task, task.videoPath || '');
             this.busyAccountIds.delete(accountId);
             this.dispatchNextQueuedTask();
             return true;
@@ -585,6 +690,28 @@ export class CanvasBridge {
     Object.assign(task, patch, { updatedAt: new Date().toISOString() });
     this.persistTasks();
     this.runtime.onTaskChanged(task);
+    if (patch.status && terminal.has(patch.status)) this.scheduleTaskEntryCleanup(task.id);
+  }
+
+  /**
+   * 终态任务的 per-task Map 条目（下载匹配、基线、重试计数）只服务于活跃状态的
+   * 轮询/下载钩子，任务终态后若不清理会随使用次数慢性累积。延迟 5 分钟回收，
+   * 给在途轮询/迟到的下载匹配留安全余量。
+   */
+  private scheduleTaskEntryCleanup(taskId: string) {
+    if (this.taskCleanupTimers.has(taskId)) return;
+    const timer = setTimeout(() => {
+      this.taskCleanupTimers.delete(taskId);
+      this.downloadSources.delete(taskId);
+      this.downloadPaths.delete(taskId);
+      this.videoBaselines.delete(taskId);
+      this.downloadBaselines.delete(taskId);
+      this.hdAttempts.delete(taskId);
+      this.taskPageRecoveryAttempts.delete(taskId);
+      this.lastPolledAt.delete(taskId);
+    }, 5 * 60 * 1000);
+    timer.unref();
+    this.taskCleanupTimers.set(taskId, timer);
   }
 
 
@@ -600,6 +727,10 @@ export class CanvasBridge {
     for (const task of this.tasks.values()) {
       if (!task.accountId) continue;
       if (!['assigned', 'submitting', 'awaiting_reply', 'awaiting_confirmation', 'generating', 'downloading'].includes(task.status)) continue;
+      // dispatch 仍在执行（页面导航/上传可能长时间无进度更新）时不能假释放：
+      // 锁被提前删掉后，队列会把下一个任务派上同一账号，两套自动化驱动同一个
+      // 作曲器互相污染。loadURL 已带超时，卡死的 dispatch 最终会自行失败退出。
+      if (this.dispatchingTasks.has(task.id)) continue;
       const last = this.lastPolledAt.get(task.id);
       const idleMs = Date.now() - (last ?? Date.parse(task.updatedAt || task.createdAt));
       // A task that waits on the user's own answer ("豆包参数确认中") is not stuck: the
@@ -607,7 +738,9 @@ export class CanvasBridge {
       const waitingOnUser = task.status === 'awaiting_reply' || task.status === 'awaiting_confirmation';
       if (idleMs < (waitingOnUser ? 30 : 3) * 60 * 1000) continue;
       this.busyAccountIds.delete(task.accountId);
-      if (['awaiting_reply', 'awaiting_confirmation', 'generating', 'downloading'].includes(task.status)) {
+      // assigned/submitting 同样要落 needs_attention：只释放不落状态的话任务
+      // 永远停在"正在提交"，没有任何 poller 会再认领它。
+      if (['assigned', 'submitting', 'awaiting_reply', 'awaiting_confirmation', 'generating', 'downloading'].includes(task.status)) {
         this.update(task, { status: 'needs_attention', statusText: '任务长时间无进展，已释放账号；请重新发送或到豆包确认结果', error: '任务轮询中断' });
       }
     }
@@ -632,7 +765,17 @@ export class CanvasBridge {
           this.tasks.set(task.id, task);
           continue;
         }
-        if (!task.accountId || !['awaiting_reply', 'awaiting_confirmation', 'generating', 'downloading'].includes(task.status)) continue;
+        if (['assigned', 'submitting'].includes(task.status) || !task.accountId) {
+          // 重启前的提交没有存活的 dispatch/轮询可恢复：静默丢弃会让任务在
+          // 界面上永远停在"正在提交"。落成 needs_attention 并保留在列表里，
+          // 前端轮询会拿到明确的中断状态。
+          task.status = 'needs_attention';
+          task.statusText = '任务因应用重启而中断，请重新从画布提交';
+          task.error = '任务在上次运行中断';
+          this.tasks.set(task.id, task);
+          continue;
+        }
+        if (!['awaiting_reply', 'awaiting_confirmation', 'generating', 'downloading'].includes(task.status)) continue;
         // A task left 'generating' by a previous crash has no live polling loop behind it
         // anymore. tryDownloadCompletedVideo can still pick it up for a late download,
         // but it must NOT keep the account busy forever — a stuck task made every new
@@ -657,10 +800,40 @@ export class CanvasBridge {
     }
   }
 
+    private triggerExtractLastFrame(task: CanvasBridgeTask, videoPath: string) {
+    if (!videoPath || !existsSync(videoPath) || !this.runtime.extractLastFrame) return;
+    this.runtime.extractLastFrame(videoPath).then(framePath => {
+      if (framePath) {
+        task.lastFramePath = framePath;
+        this.persistTasks();
+        this.runtime.onTaskChanged(task);
+      }
+    }).catch(() => undefined);
+  }
+
   private persistTasks() {
-    const directory = path.dirname(this.taskStorePath);
-    mkdirSync(directory, { recursive: true });
-    writeFileSync(this.taskStorePath, JSON.stringify([...this.tasks.values()], null, 2), 'utf8');
+    // update() 在视频生成期间每 750ms 轮询都会触发，同步 writeFileSync 会在主进程
+    // 事件循环里造成频繁小写入（窗口/动画卡顿感）。合并为 500ms 内的一次异步写。
+    if (this.persistTimer) return;
+    this.persistTimer = setTimeout(() => {
+      this.persistTimer = null;
+      void this.flushTasks().catch(() => { /* 丢一次状态落盘不能阻断任务执行 */ });
+    }, 500);
+    this.persistTimer.unref();
+  }
+
+  private async flushTasks() {
+    await fsp.mkdir(path.dirname(this.taskStorePath), { recursive: true });
+    await fsp.writeFile(this.taskStorePath, JSON.stringify([...this.tasks.values()], null, 2), 'utf8');
+  }
+
+  /** 退出前同步落盘，防抖窗口里的最后状态不丢。 */
+  private flushTasksSync() {
+    if (this.persistTimer) { clearTimeout(this.persistTimer); this.persistTimer = null; }
+    try {
+      mkdirSync(path.dirname(this.taskStorePath), { recursive: true });
+      writeFileSync(this.taskStorePath, JSON.stringify([...this.tasks.values()], null, 2), 'utf8');
+    } catch { /* 丢状态不能阻断退出 */ }
   }
 
   async create(body: CanvasTaskRequest) {
@@ -668,7 +841,7 @@ export class CanvasBridge {
     if (!prompt) throw new Error('缺少视频提示词');
     const id = `canvas-video-${randomUUID()}`;
     const task: CanvasBridgeTask = { id, gatewayThreadId: body.gatewayThreadId, gatewayReplyMessageId: body.gatewayReplyMessageId, conversationId: body.conversationId, targetAccountId: body.targetAccountId, duration: body.duration, sourceAccountId: body.sourceAccountId, sourceUrl: body.sourceUrl, sourceDraftText: body.sourceDraftText, prompt, model: body.model, ratio: /^\d+:\d+$/.test(body.ratio || '') ? body.ratio! : '16:9', status: 'queued', statusText: '等待分配豆包账号', accountId: null, pageUrl: null, referencePaths: [], videoPath: null, error: null, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
-    task.referencePaths = [...(body.referencePaths ?? []), ...writeReferences(this.uploadRoot, id, body.referenceAssets ?? [])];
+    task.referencePaths = [...(body.referencePaths ?? []), ...await writeReferences(this.uploadRoot, id, body.referenceAssets ?? [])];
     this.tasks.set(id, task);
     this.persistTasks();
     void this.dispatch(task);
@@ -682,9 +855,17 @@ export class CanvasBridge {
     if (this.dispatchingTasks.has(task.id)) return;
     this.dispatchingTasks.add(task.id);
     const doubaoAccounts = this.runtime.accounts().filter((account) => account.platform === 'doubao');
-    const account = task.targetAccountId
+    const targetAccount = task.targetAccountId
       ? doubaoAccounts.find(a => a.id === task.targetAccountId)
-      : this.pool.pick(doubaoAccounts, this.busyAccountIds);
+      : null;
+    // 定向账号必须已登录：登录页/未登录页没有作曲器，跑到参考图上传才报
+    // "未找到作曲器输入框"，用户看到的错误完全指向不到根因。
+    if (targetAccount && !targetAccount.isLoggedIn) {
+      this.dispatchingTasks.delete(task.id);
+      this.update(task, { status: 'needs_attention', statusText: `执行账号 ${targetAccount.name} 未登录，请先在账号列表重新登录后重试`, error: '执行账号未登录' });
+      return;
+    }
+    const account = targetAccount ?? this.pool.pick(doubaoAccounts, this.busyAccountIds);
     if (account && this.busyAccountIds.has(account.id)) {
       this.update(task, { status: 'queued', statusText: `等待 ${account.name} 完成前一个任务` });
       this.dispatchingTasks.delete(task.id);
@@ -709,6 +890,10 @@ export class CanvasBridge {
     }
     this.busyAccountIds.add(account.id);
     this.update(task, { status: 'assigned', statusText: `已分配账号：${account.name}`, accountId: account.id });
+    // 用户在提交过程中取消后，后续步骤（尤其是发送！）必须中止。
+    const ensureActive = () => {
+      if (terminal.has(task.status)) throw new Error('任务已取消');
+    };
     let view: BrowserView | null = null;
     try {
       view = this.runtime.viewForAccount(account.id) ?? this.runtime.openAccount(account.id);
@@ -722,19 +907,31 @@ export class CanvasBridge {
         const targetUrl = `https://www.doubao.com/chat/${task.conversationId}`;
         const currentUrl = view.webContents.getURL() || '';
         if (normalizeTaskUrl(currentUrl) !== normalizeTaskUrl(targetUrl)) {
-          await view.webContents.loadURL(targetUrl);
+          await loadURLWithTimeout(view, targetUrl);
           await waitForComposer(view);
         }
       } else if (task.gatewayThreadId) {
         const currentUrl = view.webContents.getURL() || '';
         const isCleanNewChat = /^https?:\/\/(?:www\.)?doubao\.com\/chat\/?(?:[?#]|$)/i.test(currentUrl);
         if (!isCleanNewChat) {
-          await view.webContents.loadURL('https://www.doubao.com/chat/');
+          await loadURLWithTimeout(view, 'https://www.doubao.com/chat/');
+          await waitForComposer(view);
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+        }
+      } else {
+        // 豆包 3.0 画布任务（无 conversationId/gatewayThreadId）：账号页可能停在
+        // 上次任务的会话页、登录页或尚未渲染完的中间态——不导航的话参考图上传
+        // 会在任意页面上找作曲器直接失败。非干净新对话页先回新对话。
+        const currentUrl = view.webContents.getURL() || '';
+        const isCleanNewChat = /^https?:\/\/(?:www\.)?doubao\.com\/chat\/?(?:[?#]|$)/i.test(currentUrl);
+        if (!isCleanNewChat) {
+          await loadURLWithTimeout(view, 'https://www.doubao.com/chat/');
           await waitForComposer(view);
           await new Promise((resolve) => setTimeout(resolve, 1500));
         }
       }
       await new Promise((resolve) => setTimeout(resolve, 2500));
+      ensureActive();
       if (task.targetAccountId && task.targetAccountId !== task.sourceAccountId) {
         const draft = await runInPage(view, `(() => {
           try {
@@ -752,7 +949,7 @@ export class CanvasBridge {
       } catch (modeError) {
         // 当前页面（如历史对话页面）可能没有视频模式切换入口，自动回退到干净新对话页面重试进入视频模式
         try {
-          await view.webContents.loadURL('https://www.doubao.com/chat/');
+          await loadURLWithTimeout(view, 'https://www.doubao.com/chat/');
           await waitForComposer(view);
           await new Promise((resolve) => setTimeout(resolve, 1500));
           await ensureComposerMode(view, { mode: 'video' });
@@ -761,52 +958,73 @@ export class CanvasBridge {
         }
       }
       await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      const existingDownloads = await runInPage(view, `(() => {
-        try {
-          return [...document.querySelectorAll('button,a')].filter((node) => {
-            try { return /下载(视频)?|保存视频/.test((node.textContent || node.getAttribute('aria-label') || '').replace(/\\s+/g, '')); }
-            catch { return false; }
-          }).length;
-        } catch { return 0; }
-      })()`).catch(() => 0);
-      this.downloadBaselines.set(task.id, Number(existingDownloads) || 0);
-      const baseline = await runInPage(view, `(() => {
-        try {
-          return Array.from(document.querySelectorAll('video')).map(v => v.currentSrc || v.src);
-        } catch { return []; }
-      })()`).catch(() => [] as string[]);
-      this.videoBaselines.set(task.id, baseline);
-      this.update(task, { videoBaseline: baseline });
+      ensureActive();
 
       // Model, duration and ratio are doubao ability parameters.
       // Must be configured BEFORE uploading reference images, because dropdowns, settings popups
       // or Escape keys can reset/clear the composer's draft attachments!
-      const applied: string[] = [];
-      try {
-        await selectDoubaoVideoModel(view, task.model, task.duration);
-        applied.push(`模型 ${task.model || '默认'}`);
-      } catch (error) {
-        applied.push(`模型未切换（${error instanceof Error ? error.message : '页面无模型选项'}）`);
-      }
-      try {
-        await selectDoubaoVideoSettings(view, { ratio: task.ratio, duration: Number(task.duration ?? 0) });
-        if (task.ratio) applied.push(`比例 ${task.ratio}`);
-        if (task.duration) applied.push(`时长 ${task.duration} 秒`);
-      } catch (error) {
-        applied.push(`比例/时长未切换（${error instanceof Error ? error.message : '页面无比例/时长控件'}）`);
-      }
-
       const hasReferenceImages = Boolean(task.referencePaths && task.referencePaths.length > 0);
-      if (hasReferenceImages) {
-        this.update(task, { statusText: '正在上传参考图到豆包页面' });
-        await uploadTaskReferences(view, task.referencePaths);
-        this.update(task, { referenceUploaded: true });
+      const composerView = view;
+      const prepareComposer = async (): Promise<string[]> => {
+        const existingDownloads = await runInPage(composerView, `(() => {
+          try {
+            return [...document.querySelectorAll('button,a')].filter((node) => {
+              try { return /下载(视频)?|保存视频/.test((node.textContent || node.getAttribute('aria-label') || '').replace(/\\s+/g, '')); }
+              catch { return false; }
+            }).length;
+          } catch { return 0; }
+        })()`).catch(() => 0);
+        this.downloadBaselines.set(task.id, Number(existingDownloads) || 0);
+        const baseline = await runInPage(composerView, `(() => {
+          try {
+            return Array.from(document.querySelectorAll('video')).map(v => v.currentSrc || v.src);
+          } catch { return []; }
+        })()`).catch(() => [] as string[]);
+        this.videoBaselines.set(task.id, baseline);
+        this.update(task, { videoBaseline: baseline });
+        const applied: string[] = [];
+        try {
+          await selectDoubaoVideoModel(composerView, task.model, task.duration);
+          applied.push(`模型 ${task.model || '默认'}`);
+        } catch (error) {
+          applied.push(`模型未切换（${error instanceof Error ? error.message : '页面无模型选项'}）`);
+        }
+        try {
+          await selectDoubaoVideoSettings(composerView, { ratio: task.ratio, duration: Number(task.duration ?? 0) });
+          if (task.ratio) applied.push(`比例 ${task.ratio}`);
+          if (task.duration) applied.push(`时长 ${task.duration} 秒`);
+        } catch (error) {
+          throw new Error(`视频比例/时长设置失败：${error instanceof Error ? error.message : '页面无比例/时长控件'}`);
+        }
+        if (hasReferenceImages) {
+          this.update(task, { statusText: '正在上传参考图到豆包页面' });
+          await uploadTaskReferences(composerView, task.referencePaths);
+        }
+        return applied;
+      };
+      let applied: string[];
+      try {
+        applied = await prepareComposer();
+      } catch (prepareError) {
+        // 页面瞬时状态（尚未渲染完、中途跳转、引导浮层、残留附件卡住）会让作曲器
+        // 定位/上传失败。回到干净新对话页整体重备一次：新页面没有残留附件，
+        // 模型/比例/时长也一并重新应用，仍失败才交给上层报 needs_attention。
+        const detail = prepareError instanceof Error ? prepareError.message : String(prepareError);
+        this.update(task, { statusText: `作曲器页面异常，正在回到新对话页重试（${detail.slice(0, 60)}）` });
+        await loadURLWithTimeout(view, 'https://www.doubao.com/chat/');
+        await waitForComposer(view);
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        await ensureComposerMode(view, { mode: 'video' }).catch(() => undefined);
+        applied = await prepareComposer();
       }
+      if (hasReferenceImages) this.update(task, { referenceUploaded: true });
+      ensureActive();
       this.update(task, { statusText: `正在提交到豆包（${applied.join('，')}）` });
 
       const promptText = formatVideoPrompt(task.prompt, task.ratio, task.duration, task.model, hasReferenceImages);
       await prepareText(view, promptText);
+      if (task.duration) await assertVideoDuration(view, task.duration);
+      ensureActive();
       const beforeSend = await runInPage(view, pageReplySnapshotScript) as PageReplySnapshot;
       this.update(task, { sentPrompt: promptText, replyBaseline: createPageReplyBaseline(beforeSend, { prompt: promptText }) });
 
@@ -830,13 +1048,40 @@ export class CanvasBridge {
         await new Promise(resolve => setTimeout(resolve, 500));
       }
       if (!posted) throw new Error('豆包未确认提交：聊天记录中没有本次消息，请检查账号窗口；不会自动重复发送');
-      this.update(task, { status: 'awaiting_reply', statusText: '消息已提交，等待豆包回复', pageUrl: view.webContents.getURL() });
-      await this.syncTaskReply(task, view);
+      let initialUrl = view.webContents.getURL();
+      if (isPendingDoubaoChatUrl(initialUrl)) {
+        for (let waitUrl = 0; waitUrl < 6; waitUrl++) {
+          await new Promise(resolve => setTimeout(resolve, 350));
+          const probe = view.webContents.getURL();
+          if (isSpecificDoubaoChatUrl(probe) && !isPendingDoubaoChatUrl(probe)) {
+            initialUrl = probe;
+            break;
+          }
+        }
+      }
+      this.update(task, { status: 'awaiting_reply', statusText: '消息已提交，等待豆包回复', pageUrl: initialUrl });
+      try {
+        await this.syncTaskReply(task, view);
+        if (await runInPage(view, CAPTCHA_VISIBLE_SCRIPT).catch(() => false)) {
+          this.runtime.popupAccountForCaptcha?.(account.id, '提交任务后触发人机验证');
+          this.update(task, { statusText: `⚠️ 豆包账号触发人机验证，已自动弹出窗口，请在弹出的豆包窗口中手动完成验证（账号 ${account.id}）` });
+        }
+      } catch (confirmError) {
+        // 提交已确认成功（豆包收到了消息、生成已在进行）。此刻页面瞬间重渲染/导航
+        // 导致的确认快照失败只降级提示，绝不能把成功任务改判失败、更不能冷却健康账号。
+        const detail = confirmError instanceof Error ? confirmError.message : String(confirmError);
+        this.update(task, { statusText: `消息已提交，但回复确认暂时失败：${detail}` });
+      }
     } catch (error) {
       const detail = error instanceof Error ? error.message : '页面自动化失败';
-      this.busyAccountIds.delete(account.id);
-      this.pool.markFailure(account.id, classifyDispatchFailure(detail), detail);
-      this.update(task, { status: 'needs_attention', statusText: `需要在豆包窗口处理：${detail}`, error: detail });
+      if (terminal.has(task.status)) {
+        // 用户已取消（任务已终态）：只释放账号锁，不改写状态、不冷却账号。
+        this.busyAccountIds.delete(account.id);
+      } else {
+        this.busyAccountIds.delete(account.id);
+        this.pool.markFailure(account.id, classifyDispatchFailure(detail), detail);
+        this.update(task, { status: 'needs_attention', statusText: `需要在豆包窗口处理：${detail}`, error: detail });
+      }
     } finally {
       this.dispatchingTasks.delete(task.id);
       if (view && !view.webContents.isDestroyed()) view.webContents.send('account-send:bypass', false);
@@ -864,7 +1109,10 @@ export class CanvasBridge {
     if (request.method === 'GET' && taskMatch[2] === 'video') {
       if (task.status !== 'completed' || !task.videoPath || !existsSync(task.videoPath)) { json(response, 409, { error: '视频尚未完成' }); return; }
       response.writeHead(200, { 'Content-Type': contentType(task.videoPath), 'Content-Length': String(require('node:fs').statSync(task.videoPath).size), 'Cache-Control': 'no-store' });
-      createReadStream(task.videoPath).pipe(response); return;
+      const stream = createReadStream(task.videoPath);
+      // 视频文件可能在 existsSync 与读取之间被移动/清理，无监听的 error 会变成未捕获异常。
+      stream.once('error', () => { if (!response.writableEnded) response.destroy(); });
+      stream.pipe(response); return;
     }
     if (request.method === 'GET' && taskMatch[2] === 'screenshot') {
       const view = task.accountId ? this.runtime.viewForAccount(task.accountId) : null;
@@ -873,13 +1121,23 @@ export class CanvasBridge {
       // that was only warmed up. The runtime owns the window, so ask it whether the view
       // is attached instead of guessing from the webContents.
       if (!this.runtime.isViewAttached?.(view)) { json(response, 409, { error: '执行账号页面未显示，无法截图' }); return; }
-      const snapshot = await view.webContents.capturePage();
-      const image = snapshot.toPNG();
-      response.writeHead(200, { 'Content-Type': 'image/png', 'Cache-Control': 'no-store', 'Content-Length': String(image.length) });
-      response.end(image); return;
+      try {
+        // 附加检查与截图之间视图仍可能被关闭/移出窗口，这里兜底成 409 而不是主进程崩溃。
+        const snapshot = await view.webContents.capturePage();
+        const image = snapshot.toPNG();
+        response.writeHead(200, { 'Content-Type': 'image/png', 'Cache-Control': 'no-store', 'Content-Length': String(image.length) });
+        response.end(image);
+      } catch (error) {
+        json(response, 409, { error: `截图失败：${error instanceof Error ? error.message : String(error)}` });
+      }
+      return;
     }
     if (request.method === 'POST' && taskMatch[2] === 'cancel') {
-      this.update(task, { status: 'cancelled', statusText: '已取消', error: null }); if (task.accountId) this.busyAccountIds.delete(task.accountId); json(response, 200, { task }); return;
+      this.update(task, { status: 'cancelled', statusText: '已取消', error: null });
+      // dispatch 在途时账号锁由 dispatch 的 finally 统一释放，这里抢先删锁会让
+      // 下一个任务立刻派上同一账号，两套自动化同页互踩。
+      if (task.accountId && !this.dispatchingTasks.has(task.id)) this.busyAccountIds.delete(task.accountId);
+      json(response, 200, { task }); return;
     }
     if (request.method === 'GET' && !taskMatch[2]) { json(response, 200, { task, videoUrl: task.status === 'completed' ? `http://127.0.0.1:3219/tasks/${encodeURIComponent(task.id)}/video` : null }); return; }
     json(response, 405, { error: '不支持的方法' });

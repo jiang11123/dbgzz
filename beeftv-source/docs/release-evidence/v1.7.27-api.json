@@ -1,0 +1,96 @@
+{
+  "commit": "79cfae055190b9ec5d05d54c3e2435d043db4ea1",
+  "model": "minimax-music-v3.0",
+  "paid_submissions": 1,
+  "started_at": 1792424554,
+  "invalid_cases": [
+    {
+      "case": "empty-input",
+      "status": 400
+    },
+    {
+      "case": "unsupported-flac",
+      "status": 400
+    },
+    {
+      "case": "explicit-zero-bitrate",
+      "status": 400
+    }
+  ],
+  "http_status": 200,
+  "content_type": "text/event-stream",
+  "request_id": null,
+  "first_byte_seconds": 0.742,
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "mp3",
+        "sample_rate": "44100",
+        "bit_rate": "256000"
+      }
+    ],
+    "format": {
+      "duration": "88.270658",
+      "bit_rate": "256322"
+    }
+  },
+  "result": "passed",
+  "bytes": 2828215,
+  "sha256": "eaa9462d7ffb4a52073faa1ff0f255d910d5dfc75fd2fce4d7d536533d4dffa0",
+  "full_decode": "passed",
+  "elapsed_seconds": 76.093,
+  "heartbeat_seconds": [
+    0.742,
+    15.744,
+    30.744,
+    45.743,
+    60.744
+  ],
+  "billing_rows": [
+    {
+      "id": 2181771,
+      "type": 5,
+      "quota": 0,
+      "channel_id": 405,
+      "request_id": "202610191542351012075578268d9d69WTH0kA1",
+      "billing_currency": "CNY",
+      "use_time": 0
+    },
+    {
+      "id": 2181772,
+      "type": 5,
+      "quota": 0,
+      "channel_id": 405,
+      "request_id": "202610191542359192577338268d9d655NHA8O4",
+      "billing_currency": "CNY",
+      "use_time": 0
+    },
+    {
+      "id": 2181773,
+      "type": 5,
+      "quota": 0,
+      "channel_id": 405,
+      "request_id": "202610191542366538499528268d9d6aOiFukT1",
+      "billing_currency": "CNY",
+      "use_time": 0
+    },
+    {
+      "id": 2181794,
+      "type": 2,
+      "quota": 500000,
+      "channel_id": 405,
+      "request_id": "202610191542374026073218268d9d6WOKiP9u8",
+      "billing_currency": "CNY",
+      "use_time": 74
+    }
+  ],
+  "gateway_billed_cny": 1.0,
+  "invalid_cases_billed_cny": 0.0,
+  "billing_request_ids": [
+    "202610191542374026073218268d9d6WOKiP9u8"
+  ],
+  "supplier_final_bill_verified": false,
+  "cumulative_conservative_estimate_cny": 15
+}

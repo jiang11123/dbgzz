@@ -1,0 +1,47 @@
+.canvas-shortcuts-popover {
+    position: absolute;
+    bottom: var(--canvas-dock-popover-offset);
+    width: 360px;
+    max-width: 100%;
+    overflow: hidden;
+    border: 1px solid;
+    border-radius: var(--r-xl);
+    padding: var(--space-2);
+    box-shadow: var(--elevation-overlay);
+}
+
+.canvas-shortcuts-scroll {
+    max-height: min(264px, calc(100dvh - 140px));
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+}
+
+.canvas-shortcuts-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.canvas-shortcuts-scroll:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: -2px;
+    border-radius: var(--r-md);
+}
+
+.canvas-shortcut-entry {
+    display: flex;
+    height: 44px;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: 0 var(--space-2);
+    font-size: var(--fs-caption);
+}
+
+.canvas-shortcut-entry kbd {
+    flex: none;
+    color: var(--user-ink-muted, var(--muted-foreground));
+    font-family: inherit;
+    font-size: var(--fs-label);
+    white-space: nowrap;
+}

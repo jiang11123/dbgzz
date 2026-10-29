@@ -1,0 +1,387 @@
+/* Creation-specific geometry. Shared controls still use the workspace tokens. */
+.creation-mode-tabs { position: relative; isolation: isolate; display: grid; width: min(456px, 100%); margin: 0 auto 20px; padding: 4px; border-radius: 18px; background: var(--user-surface-muted); }
+.creation-mode-indicator { position: absolute; z-index: -1; inset: 0; border-radius: 14px; background: var(--user-surface); box-shadow: 0 2px 8px color-mix(in srgb, var(--user-ink) 5%, transparent); }
+.creation-mode-button { position: relative; isolation: isolate; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; height: 44px; padding: 0 12px; border: 0; border-radius: 14px; background: transparent; color: var(--user-ink-muted); font-size: 14px; font-weight: 600; cursor: pointer; transition: color var(--user-motion), transform var(--user-motion); }
+.creation-mode-button svg { width: 18px; height: 18px; stroke-width: 1.8; color: currentColor; }
+.creation-mode-button[aria-pressed="true"], .creation-mode-button:hover { color: var(--user-ink); }
+.creation-mode-button:active { transform: scale(.97); }
+.creation-mode-button:focus-visible { outline: 2px solid var(--user-accent); outline-offset: 2px; }
+
+.creation-home .creation-empty-composer[hidden] { display: none; }
+.creation-submit { margin-left: auto; flex: 0 0 auto; display: inline-flex; gap: 8px; }
+.app-product-workspace .creation-home .creation-reference-add-button.creation-chat-reference-add {
+    position: static;
+    display: grid;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: var(--user-surface-muted);
+    color: var(--user-ink-muted);
+    padding: 0;
+}
+.app-product-workspace .creation-home .creation-reference-add-button.creation-chat-reference-add:hover:not(:disabled) { background: var(--user-surface-hover); color: var(--user-ink); }
+.app-product-workspace .creation-home .creation-reference-add-button.creation-chat-reference-add svg { width: 16px; height: 16px; }
+.app-product-workspace .creation-home .creation-submit.is-icon-only.ant-btn { width: 44px; height: 44px; min-height: 44px; padding: 0; border: 0; border-radius: 50%; background: transparent !important; box-shadow: none; }
+.app-product-workspace .creation-home .creation-submit.is-icon-only .creation-submit-cost { display: none; }
+.app-product-workspace .creation-home .creation-submit.is-icon-only .creation-submit-action { display: grid; width: 44px; height: 44px; place-items: center; padding: 0; border-radius: 50%; background: var(--user-action-bg); color: var(--user-action-foreground); transition: background var(--user-motion), transform var(--user-motion); }
+.app-product-workspace .creation-home .creation-submit.is-icon-only .creation-submit-action span { display: none; }
+.app-product-workspace .creation-home .creation-submit.is-icon-only .creation-submit-action svg { width: 18px; height: 18px; }
+.app-product-workspace .creation-home .creation-submit.is-icon-only.ant-btn:disabled .creation-submit-action { background: var(--user-surface-hover); color: var(--user-ink-muted); opacity: .48; }
+.app-product-workspace .creation-home .creation-submit.is-icon-only.ant-btn:not(:disabled):hover .creation-submit-action { background: var(--user-action-bg-hover); transform: translateY(-1px); }
+.creation-submit-cost { display: inline-flex; align-items: center; gap: 4px; color: var(--user-ink-muted); font-size: 12px; padding-inline: 8px; }
+.creation-submit-cost svg { width: 14px; height: 14px; }
+@layer utilities {
+    .app-product-workspace .creation-home .creation-submit.ant-btn { height: auto; min-height: 40px; padding: 0; border: 0; background: transparent !important; box-shadow: none; border-radius: 999px; opacity: 1; }
+    .app-product-workspace .creation-home .creation-submit.ant-btn .creation-submit-action { position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; gap: 8px; width: auto; height: 40px; padding: 0 18px; border-radius: 999px; background: var(--user-action-bg); color: var(--user-action-foreground); transition: background var(--user-motion), transform var(--user-motion); }
+    .app-product-workspace .creation-home .creation-submit.ant-btn .creation-submit-action span { font-size: 13px; font-weight: 600; }
+    .app-product-workspace .creation-home .creation-submit.ant-btn .creation-submit-action svg { width: 17px; height: 17px; color: currentColor; transition: transform var(--user-motion); }
+    .app-product-workspace .creation-home .creation-submit.ant-btn:disabled .creation-submit-action { background: var(--user-surface-hover); color: var(--user-ink-muted); }
+    .app-product-workspace .creation-home .creation-submit.ant-btn:not(:disabled):hover .creation-submit-action { background: var(--user-action-bg-hover); transform: translateY(-1px); }
+    .app-product-workspace .creation-home .creation-submit.ant-btn:not(:disabled):hover .creation-submit-action svg { transform: translateY(-1px); }
+    .app-product-workspace .creation-home .creation-submit.ant-btn:not(:disabled):active .creation-submit-action { background: var(--user-action-bg-active); transform: scale(.97); }
+    .app-product-workspace .creation-home .creation-chat-composer.is-thread .creation-submit.ant-btn .creation-submit-action { height: 34px; padding: 0 14px; }
+}
+.creation-inspiration-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.creation-inspiration-filters button { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; min-height: 36px; border: 0; border-radius: 999px; color: var(--user-ink-muted); background: transparent; font-size: 13px; transition: background var(--user-motion), color var(--user-motion); }
+.creation-inspiration-filters button span { font-size: 11px; opacity: .65; font-variant-numeric: tabular-nums; }
+.creation-inspiration-filters button:hover { background: var(--user-surface-hover); }
+.creation-inspiration-filters button[aria-pressed="true"] { background: var(--user-ink); color: var(--user-surface); }
+.creation-inspiration-filters button:focus-visible { outline: 2px solid var(--user-accent); outline-offset: 2px; }
+.creation-inspiration-overlay { position: absolute; inset: auto 12px 12px; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; border-radius: var(--user-radius-control); background: var(--user-surface); color: var(--user-ink); font-size: 12px; transform: translateY(6px); opacity: 0; transition: opacity var(--user-motion), transform var(--user-motion); }
+.creation-inspiration-overlay svg { width: 14px; height: 14px; transform: rotate(45deg); }
+.creation-featured-card:hover .creation-inspiration-overlay, .creation-featured-card:focus-visible .creation-inspiration-overlay { opacity: 1; transform: translateY(0); }
+.creation-inspiration-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-top: 24px; color: var(--user-ink-muted); font-size: 12px; }
+.creation-inspiration-footer details { max-width: 60ch; }
+.creation-inspiration-footer summary { cursor: pointer; padding-block: 8px; }
+.creation-inspiration-footer p { line-height: 1.7; margin: 8px 0; }
+.creation-inspiration-footer a { color: var(--user-accent); }
+@media (max-width: 620px) {
+    .creation-mode-button { padding-inline: 6px; font-size: 12px; gap: 6px; }
+    .creation-inspiration-filters { gap: 4px; }
+    .creation-inspiration-filters button { padding-inline: 10px; }
+    .creation-inspiration-footer { align-items: flex-start; flex-direction: column; }
+    .creation-home .creation-chat-dock { flex-wrap: wrap; gap: 12px; }
+    .creation-home .creation-chat-controls { flex: 1 1 100%; width: 100%; }
+}
+.app-user-workspace .creation-voice-trigger.ant-btn {
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 36px !important;
+    border-radius: 999px !important;
+    background: var(--user-surface-muted) !important;
+    color: var(--user-ink-muted) !important;
+    transition: background var(--user-motion), color var(--user-motion), transform var(--user-motion), box-shadow var(--user-motion) !important;
+}
+.app-user-workspace .creation-voice-trigger.ant-btn:hover,
+.app-user-workspace .creation-voice-trigger.ant-btn:focus-visible {
+    background: var(--user-surface-hover) !important;
+    color: var(--user-ink) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--user-ink) 8%, transparent);
+}
+.app-user-workspace .creation-chat-control > svg:first-child,
+.app-user-workspace .creation-model-picker .canvas-model-picker-trigger-icon { transition: transform var(--user-motion), color var(--user-motion); color: currentColor; }
+.app-user-workspace .creation-chat-control:hover > svg:first-child,
+.app-user-workspace .creation-model-picker:hover .canvas-model-picker-trigger-icon { transform: scale(1.06); }
+.app-user-workspace .creation-chat-control.is-clear:hover { background: color-mix(in srgb, var(--status-error, #c45b5b) 12%, var(--user-surface)) !important; color: var(--status-error, #c45b5b) !important; }
+.app-user-workspace .creation-launchpad .creation-reference-add-button:hover:not(:disabled) {
+    border-style: solid;
+    border-color: var(--user-border-strong);
+    background: var(--user-surface-hover);
+    color: var(--user-ink);
+    transform: translateY(-1px);
+}
+.app-user-workspace .creation-launchpad .creation-reference-add-button:active:not(:disabled) { transform: scale(.97); }
+@media (prefers-reduced-motion: reduce) {
+    .creation-mode-button:active { transform: none; }
+    .app-user-workspace .creation-chat-composer,
+    .app-user-workspace .creation-chat-control,
+    .app-user-workspace .creation-voice-trigger.ant-btn,
+    .app-user-workspace .creation-submit-action { transition: none !important; transform: none !important; }
+    .app-product-workspace .creation-home .creation-submit.ant-btn:not(:disabled):hover .creation-submit-action::after { animation: none; }
+}
+
+/* 参数弹窗挂在 body overlays，必须直接用用户表面 token；描边由 Ant inner 的 1px border 造成。 */
+.app-user-overlays .creation-control-popover,
+.app-product-overlays .creation-control-popover {
+    --popover: var(--user-surface-raised);
+    --border: transparent;
+    --creation-text: var(--user-ink);
+    --creation-muted: var(--user-ink-muted);
+    --creation-faint: var(--user-ink-soft);
+    --control-selected-bg: var(--user-control-pressed);
+    --control-selected-fg: var(--user-ink);
+}
+
+.app-user-overlays .creation-control-popover .ant-popover-arrow,
+.app-product-overlays .creation-control-popover .ant-popover-arrow { display: none; }
+
+.app-user-overlays .creation-control-popover.ant-popover,
+.app-user-overlays .creation-control-popover .ant-popover-container,
+.app-user-overlays .creation-control-popover .ant-popover-inner,
+.app-user-overlays .creation-control-popover-surface,
+.app-product-overlays .creation-control-popover.ant-popover,
+.app-product-overlays .creation-control-popover .ant-popover-container,
+.app-product-overlays .creation-control-popover .ant-popover-inner,
+.app-product-overlays .creation-control-popover-surface {
+    border: 0 !important;
+    outline: 0 !important;
+    background: var(--user-surface-raised) !important;
+    background-image: none !important;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, .36) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-radius: 16px !important;
+}
+
+.app-user-overlays .creation-control-popover .ant-popover-inner,
+.app-product-overlays .creation-control-popover .ant-popover-inner {
+    overflow: hidden;
+    padding: 0 !important;
+}
+
+.app-user-overlays .creation-parameter-menu,
+.app-product-overlays .creation-parameter-menu { padding: 12px !important; }
+
+.app-user-overlays .creation-parameter-section h3,
+.app-user-overlays .creation-duration-heading > span,
+.app-product-overlays .creation-parameter-section h3,
+.app-product-overlays .creation-duration-heading > span { color: var(--user-ink-muted) !important; }
+
+.app-user-overlays .creation-parameter-section > header > span,
+.app-user-overlays .creation-duration-heading strong,
+.app-product-overlays .creation-parameter-section > header > span,
+.app-product-overlays .creation-duration-heading strong { color: var(--user-ink) !important; }
+
+.app-user-overlays .creation-choice-grid,
+.app-product-overlays .creation-choice-grid { gap: 6px !important; }
+
+.app-user-overlays .creation-choice-grid button,
+.app-user-overlays .creation-duration-choices button,
+.app-product-overlays .creation-choice-grid button,
+.app-product-overlays .creation-duration-choices button {
+    min-height: 40px !important;
+    border: 0 !important;
+    border-radius: 10px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: var(--user-ink-muted) !important;
+}
+
+.app-user-overlays .creation-choice-grid.is-resolution button,
+.app-user-overlays .creation-choice-grid.is-quality button,
+.app-user-overlays .creation-choice-grid.is-count button,
+.app-user-overlays .creation-duration-choices button,
+.app-product-overlays .creation-choice-grid.is-resolution button,
+.app-product-overlays .creation-choice-grid.is-quality button,
+.app-product-overlays .creation-choice-grid.is-count button,
+.app-product-overlays .creation-duration-choices button { min-height: 34px !important; }
+
+.app-user-overlays .creation-choice-grid button:hover,
+.app-user-overlays .creation-duration-choices button:hover,
+.app-product-overlays .creation-choice-grid button:hover,
+.app-product-overlays .creation-duration-choices button:hover {
+    background: var(--user-surface-hover) !important;
+    color: var(--user-ink) !important;
+}
+
+.app-user-overlays .creation-choice-grid button.is-selected,
+.app-user-overlays .creation-duration-choices button.is-selected,
+.app-product-overlays .creation-choice-grid button.is-selected,
+.app-product-overlays .creation-duration-choices button.is-selected {
+    background: var(--user-control-pressed) !important;
+    color: var(--user-ink) !important;
+}
+
+.app-user-overlays .creation-choice-grid .creation-ratio-preview > span,
+.app-product-overlays .creation-choice-grid .creation-ratio-preview > span {
+    border: 0 !important;
+    border-radius: 3px !important;
+    background: currentColor;
+    opacity: .55;
+}
+
+.app-user-overlays .creation-choice-grid button.is-selected .creation-ratio-preview > span,
+.app-product-overlays .creation-choice-grid button.is-selected .creation-ratio-preview > span { opacity: .92; }
+
+.app-user-overlays .creation-custom-value,
+.app-product-overlays .creation-custom-value {
+    border: 0 !important;
+    background: var(--user-surface-muted) !important;
+    color: var(--user-ink-muted) !important;
+}
+
+.app-user-overlays .creation-parameter-menu .image-size-tiers button,
+.app-user-overlays .creation-parameter-menu .image-size-ratios button,
+.app-user-overlays .creation-parameter-menu .image-size-auto,
+.app-product-overlays .creation-parameter-menu .image-size-tiers button,
+.app-product-overlays .creation-parameter-menu .image-size-ratios button,
+.app-product-overlays .creation-parameter-menu .image-size-auto {
+    border: 0 !important;
+    background: var(--user-surface-muted) !important;
+    box-shadow: none !important;
+    color: var(--user-ink-muted) !important;
+}
+
+.app-user-overlays .creation-parameter-menu .image-size-tiers button[aria-pressed="true"],
+.app-user-overlays .creation-parameter-menu .image-size-ratios button[aria-pressed="true"],
+.app-user-overlays .creation-parameter-menu .image-size-auto[aria-pressed="true"],
+.app-product-overlays .creation-parameter-menu .image-size-tiers button[aria-pressed="true"],
+.app-product-overlays .creation-parameter-menu .image-size-ratios button[aria-pressed="true"],
+.app-product-overlays .creation-parameter-menu .image-size-auto[aria-pressed="true"] {
+    background: var(--user-control-pressed) !important;
+    box-shadow: none !important;
+    color: var(--user-ink) !important;
+}
+
+.app-user-overlays .creation-parameter-menu .image-size-ratio-icon,
+.app-product-overlays .creation-parameter-menu .image-size-ratio-icon {
+    border: 0 !important;
+    background: currentColor;
+    opacity: .55;
+}
+
+html:not(.dark) .app-user-overlays .creation-control-popover.ant-popover,
+html:not(.dark) .app-user-overlays .creation-control-popover .ant-popover-container,
+html:not(.dark) .app-user-overlays .creation-control-popover .ant-popover-inner,
+html:not(.dark) .app-user-overlays .creation-control-popover-surface,
+html:not(.dark) .app-product-overlays .creation-control-popover.ant-popover,
+html:not(.dark) .app-product-overlays .creation-control-popover .ant-popover-container,
+html:not(.dark) .app-product-overlays .creation-control-popover .ant-popover-inner,
+html:not(.dark) .app-product-overlays .creation-control-popover-surface {
+    box-shadow: 0 16px 40px rgba(25, 25, 30, .12) !important;
+}
+
+.creation-demo-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: min(840px, calc(100% - 48px));
+    margin: 14px auto -2px;
+    padding: 8px 12px;
+    border: 1px solid rgba(48, 196, 232, .22);
+    border-radius: 10px;
+    color: rgba(160, 224, 240, .9);
+    background: rgba(35, 94, 108, .16);
+    font-size: 12px;
+}
+
+.creation-demo-banner svg {
+    width: 14px;
+    height: 14px;
+    color: #35c8e8;
+}
+
+@media (max-width: 720px) {
+    .creation-demo-banner { width: calc(100% - 28px); margin-top: 10px; }
+}
+
+.creation-conflict-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 10px 14px;
+    width: min(840px, calc(100% - 48px));
+    margin: 14px auto 8px;
+    padding: 12px 14px;
+    border: 1px solid color-mix(in srgb, var(--user-ink) 12%, transparent);
+    border-radius: 12px;
+    background: var(--user-surface);
+    color: var(--user-ink);
+    font-size: 13px;
+    line-height: 1.65;
+}
+.creation-conflict-banner p {
+    flex: 1 1 220px;
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.creation-conflict-banner-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.creation-conflict-banner-actions button,
+.creation-conflict-dialog-actions button {
+    min-height: 36px;
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--user-surface-muted);
+    color: var(--user-ink);
+    font-size: 13px;
+    line-height: 1.45;
+    cursor: pointer;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+.creation-conflict-banner-actions button:hover,
+.creation-conflict-dialog-actions button:hover {
+    background: var(--user-surface-hover);
+}
+.creation-conflict-dialog {
+    padding: 8px 20px 20px;
+}
+.creation-conflict-lead {
+    margin: 0 0 16px;
+    color: var(--user-ink-muted);
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+.creation-conflict-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+.creation-conflict-card {
+    min-width: 0;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--user-surface-muted);
+}
+.creation-conflict-card h3 {
+    margin: 0 0 8px;
+    color: var(--user-ink-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+.creation-conflict-title {
+    margin: 0 0 6px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+.creation-conflict-card p {
+    margin: 0;
+    color: var(--user-ink-muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+.creation-conflict-excerpt {
+    margin-top: 8px;
+    overflow-wrap: anywhere;
+}
+.creation-conflict-dialog-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+}
+.creation-conflict-dialog-actions button.is-primary {
+    background: var(--user-ink);
+    color: var(--user-surface);
+}
+.creation-conflict-dialog-actions button.is-quiet {
+    background: transparent;
+    color: var(--user-ink-muted);
+}
+@media (max-width: 620px) {
+    .creation-conflict-banner { width: calc(100% - 28px); }
+    .creation-conflict-cards { grid-template-columns: 1fr; }
+}

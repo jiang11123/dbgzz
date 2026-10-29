@@ -1,0 +1,91 @@
+package protocol
+
+import "context"
+
+// Adapter owns only protocol translation. The host owns credentials, outbound
+// security, polling leases, result downloads and task recovery.
+type Adapter interface {
+	Metadata() Metadata
+	BuildCreate(context.Context, RequestContext) (RequestSpec, error)
+	ParseCreate(context.Context, []byte) (CreateResult, error)
+	BuildPoll(context.Context, PollContext) (RequestSpec, error)
+	ParsePoll(context.Context, PollContext, []byte) (PollResult, error)
+	BuildCancel(context.Context, PollContext) (RequestSpec, error)
+}
+
+// AgentAdapter is the optional protocol surface for tool-capable text calls.
+// The host still owns credentials and outbound policy; a plugin only
+// maps the platform's agent request into the provider payload and parses the
+// provider response back into the platform tool-call contract.
+type AgentAdapter interface {
+	BuildAgent(context.Context, AgentRequestContext) (RequestSpec, error)
+	ParseAgent(context.Context, []byte) (AgentResult, error)
+}
+
+// AgentCapability lets the host distinguish a declarative provider that
+// actually declares an agent operation from one that only satisfies the Go
+// method set through the shared manifest adapter implementation.
+type AgentCapability interface {
+	AgentAvailable() bool
+}
+
+// ResultAdapter optionally resolves an authenticated binary result after an
+// asynchronous task succeeds without returning a public media URL.
+type ResultAdapter interface {
+	BuildResult(context.Context, PollContext) (RequestSpec, error)
+}
+
+type ResultCapability interface {
+	ResultAvailable() bool
+}
+
+// MediaAuthAdapter retains the selected provider's authentication format for
+// same-origin result URLs. The host never applies it to external media hosts.
+type MediaAuthAdapter interface {
+	MediaAuth() ManifestAuth
+}
+
+type AgentRequestContext struct {
+	BaseURL string
+	Model   string
+	Request map[string]any
+}
+
+type AgentToolCall struct {
+	ID               string
+	Name             string
+	Arguments        string
+	ThoughtSignature string
+}
+
+type AgentResult struct {
+	Text      string
+	Reasoning string
+	ToolCalls []AgentToolCall
+}
+
+type UnavailableAdapter struct {
+	Info Metadata
+}
+
+func (a UnavailableAdapter) Metadata() Metadata { return a.Info }
+
+func (a UnavailableAdapter) BuildCreate(context.Context, RequestContext) (RequestSpec, error) {
+	return RequestSpec{}, unavailable(a.Info)
+}
+
+func (a UnavailableAdapter) ParseCreate(context.Context, []byte) (CreateResult, error) {
+	return CreateResult{}, unavailable(a.Info)
+}
+
+func (a UnavailableAdapter) BuildPoll(context.Context, PollContext) (RequestSpec, error) {
+	return RequestSpec{}, unavailable(a.Info)
+}
+
+func (a UnavailableAdapter) ParsePoll(context.Context, PollContext, []byte) (PollResult, error) {
+	return PollResult{}, unavailable(a.Info)
+}
+
+func (a UnavailableAdapter) BuildCancel(context.Context, PollContext) (RequestSpec, error) {
+	return RequestSpec{}, unavailable(a.Info)
+}

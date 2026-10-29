@@ -1,0 +1,210 @@
+{
+  "version": "v1.7.21",
+  "sourceDigest": "eb664aef1a07681a4e4b7fdf6106dca9540a1849126c90610a928fac312fa77c",
+  "ownerException": {
+    "scope": "video-direct-delivery-single-native-20261014",
+    "approvedBy": "Ender",
+    "instruction": "你跑一次生视频成功就可以了",
+    "sourceDigest": "eb664aef1a07681a4e4b7fdf6106dca9540a1849126c90610a928fac312fa77c",
+    "evidence": [
+      "docs/release-evidence/v1.7.21-targeted.md"
+    ]
+  },
+  "releaseAuthorization": {
+    "scope": "v1.7.21 only",
+    "additionalHumanReplyRequired": false,
+    "paidSubmissionLimit": 1,
+    "sourceDigest": "eb664aef1a07681a4e4b7fdf6106dca9540a1849126c90610a928fac312fa77c",
+    "evidence": [
+      "docs/release-evidence/v1.7.21-targeted.md"
+    ]
+  },
+  "paidSubmissionLimit": 1,
+  "budgetCNY": null,
+  "spentCNY": null,
+  "pendingCNY": null,
+  "newBudgetCNY": 0.42625,
+  "newSpentCNY": 0.40594,
+  "newPendingCNY": 0,
+  "priorFinancialUncertainty": {
+    "status": "unresolved",
+    "carriedFromVersion": "v1.7.20",
+    "pendingCNY": null,
+    "evidence": [
+      "docs/release-evidence/v1.7.20.json"
+    ]
+  },
+  "liveMatrixStatus": "not_run_owner_waived",
+  "agentAcceptanceStatus": "not_run_owner_waived",
+  "acceptanceComplete": false,
+  "pricePreflight": {
+    "status": "passed",
+    "method": "price-quote",
+    "model": "seedance-2.0-mini",
+    "seconds": 4,
+    "resolution": "480p",
+    "aspectRatio": "16:9",
+    "checkedAt": "2026-10-14T04:49:56.601Z",
+    "maxCostCNY": 0.42625,
+    "maxCostMeaning": "Actual pre-reservation estimate; final billing uses actual usage. The one settled bill is below this estimate.",
+    "sourceDigest": "eb664aef1a07681a4e4b7fdf6106dca9540a1849126c90610a928fac312fa77c",
+    "evidence": [
+      "docs/release-evidence/v1.7.21-video-proof.json",
+      "docs/release-evidence/v1.7.21-review.md"
+    ]
+  },
+  "cases": [
+    {
+      "path": "text-video",
+      "method": "native",
+      "clientVersion": "v1.7.21",
+      "executedSourceDigest": "eb664aef1a07681a4e4b7fdf6106dca9540a1849126c90610a928fac312fa77c",
+      "executedCommit": "7685a7c8a8bd4576bce6e2822a5ea2b8db525af6",
+      "model": "seedance-2.0-mini",
+      "seconds": 4,
+      "resolution": "480p",
+      "aspectRatio": "16:9",
+      "taskId": "ee1291b1f8313491528acc2c585e67e1",
+      "gatewayTaskId": "task_NwgS6TK7jjgg1cax74tGdEQ43T71Cb7r",
+      "providerRequestId": "cgt-20261014050212-8cj6v",
+      "resourceId": "e104520550e682a1710e2f8d4eb46c24",
+      "platform": "darwin-arm64",
+      "createdAt": "2026-10-14T05:02:10.004597Z",
+      "completedAt": "2026-10-14T05:04:12.388902Z",
+      "freshSubmission": true,
+      "submissionCount": 1,
+      "status": "succeeded",
+      "billing": "settled",
+      "billingMarket": "enterprise",
+      "costCNY": 0.40594,
+      "bytes": 743509,
+      "artifactSHA256": "b1aa95b1c98c8fed4ec36edf70b903fde7c1f3296b078fb3cc50315a23b0a85f",
+      "clientSubmitted": true,
+      "downloaded": true,
+      "saved": true,
+      "canvasVerified": true,
+      "canvasFirstFrame": true,
+      "mediaDecoded": true,
+      "mediaOpened": true,
+      "playbackVerified": true,
+      "reopened": true,
+      "noDuplicateSubmission": true,
+      "reopenedTaskId": "ee1291b1f8313491528acc2c585e67e1",
+      "sourceDigest": "eb664aef1a07681a4e4b7fdf6106dca9540a1849126c90610a928fac312fa77c",
+      "evidence": [
+        "docs/release-evidence/v1.7.21-video-proof.json",
+        "docs/release-evidence/v1.7.21-review.md"
+      ]
+    }
+  ],
+  "billingAttempts": [
+    {
+      "id": "2114827+2114843",
+      "kind": "media",
+      "billing": "settled",
+      "taskId": "ee1291b1f8313491528acc2c585e67e1",
+      "providerRequestId": "cgt-20261014050212-8cj6v",
+      "executedSourceDigest": "eb664aef1a07681a4e4b7fdf6106dca9540a1849126c90610a928fac312fa77c",
+      "costCNY": 0.40594,
+      "evidence": [
+        "docs/release-evidence/v1.7.21-video-proof.json",
+        "docs/release-evidence/v1.7.21-review.md"
+      ]
+    }
+  ],
+  "review": {
+    "result": "approved",
+    "independent": true,
+    "reviewer": "Grok Build, 20261014-112902-continue-88a44966",
+    "sourceDigest": "eb664aef1a07681a4e4b7fdf6106dca9540a1849126c90610a928fac312fa77c",
+    "evidence": [
+      "docs/release-evidence/v1.7.21-video-proof.json",
+      "docs/release-evidence/v1.7.21-review.md"
+    ]
+  },
+  "upgrade": {
+    "preservedData": true,
+    "sourceDigest": "eb664aef1a07681a4e4b7fdf6106dca9540a1849126c90610a928fac312fa77c",
+    "evidence": [
+      "docs/release-evidence/v1.7.21-video-proof.json",
+      "docs/release-evidence/v1.7.21-review.md"
+    ]
+  },
+  "verification": {
+    "directAndBackupDelivery": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "eb664aef1a07681a4e4b7fdf6106dca9540a1849126c90610a928fac312fa77c",
+      "evidence": [
+        "docs/release-evidence/v1.7.21-video-proof.json",
+        "docs/release-evidence/v1.7.21-review.md"
+      ]
+    },
+    "signedURLRefresh": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "eb664aef1a07681a4e4b7fdf6106dca9540a1849126c90610a928fac312fa77c",
+      "evidence": [
+        "docs/release-evidence/v1.7.21-video-proof.json",
+        "docs/release-evidence/v1.7.21-review.md"
+      ]
+    },
+    "cancelAndStall": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "eb664aef1a07681a4e4b7fdf6106dca9540a1849126c90610a928fac312fa77c",
+      "evidence": [
+        "docs/release-evidence/v1.7.21-video-proof.json",
+        "docs/release-evidence/v1.7.21-review.md"
+      ]
+    },
+    "noDuplicateSubmission": {
+      "status": "passed",
+      "method": "test",
+      "sourceDigest": "eb664aef1a07681a4e4b7fdf6106dca9540a1849126c90610a928fac312fa77c",
+      "evidence": [
+        "docs/release-evidence/v1.7.21-video-proof.json",
+        "docs/release-evidence/v1.7.21-review.md"
+      ]
+    },
+    "localReleaseGate": {
+      "status": "passed",
+      "method": "local-script",
+      "sourceDigest": "eb664aef1a07681a4e4b7fdf6106dca9540a1849126c90610a928fac312fa77c",
+      "evidence": [
+        "docs/release-evidence/v1.7.21-video-proof.json",
+        "docs/release-evidence/v1.7.21-review.md"
+      ]
+    },
+    "ci": {
+      "status": "passed",
+      "method": "github-actions",
+      "sourceDigest": "eb664aef1a07681a4e4b7fdf6106dca9540a1849126c90610a928fac312fa77c",
+      "evidence": [
+        "https://github.com/glanderness/BeefTV/actions/runs/38506463149",
+        "https://github.com/glanderness/BeefTV/actions/runs/38506463047",
+        "https://github.com/glanderness/BeefTV/actions/runs/38506463153"
+      ]
+    }
+  },
+  "packages": {
+    "status": "pending_release_workflow",
+    "archives": null,
+    "platforms": [
+      "darwin-arm64",
+      "darwin-amd64",
+      "windows-amd64",
+      "linux-amd64"
+    ],
+    "windowsReleasedUpgradeAndRollbackBeforeUpload": true,
+    "finalArchiveSmokeBeforeUpload": true,
+    "linuxNativeWindowBeforeUpload": true,
+    "signedManifestBeforePublish": true,
+    "publicReadbackAfterPublish": true,
+    "workflowEvidence": [
+      ".github/workflows/release-desktop.yml"
+    ]
+  },
+  "releasePublished": false,
+  "releaseComplete": false
+}

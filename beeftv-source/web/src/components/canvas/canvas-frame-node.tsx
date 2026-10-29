@@ -1,0 +1,386 @@
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { MouseEvent as ReactMouseEvent } from "react";
+import { ChevronDown, ChevronRight, Video } from "lucide-react";
+
+import { CometCard } from "@/components/ui/aceternity/comet-card";
+import { CanvasFolderPreview } from "@/components/canvas/canvas-folder-preview";
+import { FRAME_HEADER_HEIGHT, FRAME_PADDING, isCanvasFolderNode } from "@/lib/canvas/canvas-frame";
+import { canvasNodeVideoPreviewUrl } from "@/lib/canvas/canvas-media-preview";
+import { canvasThemes, type CanvasTheme } from "@/lib/canvas-theme";
+import { useActiveTheme } from "@/stores/canvas/use-canvas-theme-store";
+import { CanvasNodeType, type CanvasFolderStyle, type CanvasFolderTheme, type CanvasNodeData, type Position } from "@/types/canvas";
+
+type ResizeCorner = "top-left" | "top-right" | "bottom-left" | "bottom-right";
+
+export const CanvasFrameNode = React.memo(function CanvasFrameNode({
+    data,
+    dragOffset,
+    childNodes,
+    scale,
+    isSelected,
+    isDropTarget,
+    onMouseDown,
+    onResize,
+    onToggleCollapsed,
+    onFolderStyleChange,
+    onFolderThemeChange = () => undefined,
+    onTitleChange,
+    onContextMenu,
+    readOnly = false,
+    onHoverStart,
+    onHoverEnd,
+}: {
+    data: CanvasNodeData;
+    dragOffset?: Position;
+    childNodes: CanvasNodeData[];
+    scale: number;
+    isSelected: boolean;
+    isDropTarget: boolean;
+    onMouseDown: (event: ReactMouseEvent, nodeId: string) => void;
+    onResize: (nodeId: string, width: number, height: number, position?: Position) => void;
+    onToggleCollapsed: (nodeId: string) => void;
+    onFolderStyleChange: (nodeId: string, style: CanvasFolderStyle) => void;
+    onFolderThemeChange?: (nodeId: string, theme: CanvasFolderTheme) => void;
+    onTitleChange: (nodeId: string, title: string) => void;
+    onContextMenu: (event: ReactMouseEvent, nodeId: string) => void;
+    readOnly?: boolean;
+    onHoverStart?: (nodeId: string) => void;
+    onHoverEnd?: (nodeId: string) => void;
+}) {
+    const theme = canvasThemes[useActiveTheme()];
+    const collapsed = Boolean(data.metadata?.frame?.collapsed);
+    const folder = isCanvasFolderNode(data);
+    const [editing, setEditing] = useState(false);
+    const [title, setTitle] = useState(data.title);
+    const resizeRef = useRef({
+        active: false,
+        corner: "bottom-right" as ResizeCorner,
+        startX: 0,
+        startY: 0,
+        startLeft: 0,
+        startTop: 0,
+        startWidth: 0,
+        startHeight: 0,
+        nodeId: data.id,
+        scale,
+        childBounds: null as { left: number; top: number; right: number; bottom: number } | null,
+        onResize,
+    });
+
+    useEffect(() => setTitle(data.title), [data.title]);
+
+    const commitTitle = () => {
+        const next = title.trim() || (folder ? "未命名文件夹" : "未命名背板");
+        setTitle(next);
+        setEditing(false);
+        onTitleChange(data.id, next);
+    };
+
+    const childBounds = useMemo(() => {
+        if (!childNodes.length) return null;
+        const left = Math.min(...childNodes.map((node) => node.position.x));
+        const top = Math.min(...childNodes.map((node) => node.position.y));
+        const right = Math.max(...childNodes.map((node) => node.position.x + node.width));
+        const bottom = Math.max(...childNodes.map((node) => node.position.y + node.height));
+        return { left, top, right, bottom };
+    }, [childNodes]);
+
+    const handleResizeMove = useCallback(
+        (event: MouseEvent) => {
+            const state = resizeRef.current;
+            if (!state.active) return;
+            const dx = (event.clientX - state.startX) / state.scale;
+            const dy = (event.clientY - state.startY) / state.scale;
+            const fromLeft = state.corner.includes("left");
+            const fromTop = state.corner.includes("top");
+            const startRight = state.startLeft + state.startWidth;
+            const startBottom = state.startTop + state.startHeight;
+            let left = fromLeft ? Math.min(state.startLeft + dx, startRight - 360) : state.startLeft;
+            let top = fromTop ? Math.min(state.startTop + dy, startBottom - 240) : state.startTop;
+            let right = fromLeft ? startRight : Math.max(state.startLeft + 360, startRight + dx);
+            let bottom = fromTop ? startBottom : Math.max(state.startTop + 240, startBottom + dy);
+
+            if (state.childBounds) {
+                if (fromLeft) left = Math.min(left, state.childBounds.left - FRAME_PADDING);
+                else right = Math.max(right, state.childBounds.right + FRAME_PADDING);
+                if (fromTop) top = Math.min(top, state.childBounds.top - FRAME_HEADER_HEIGHT - FRAME_PADDING);
+                else bottom = Math.max(bottom, state.childBounds.bottom + FRAME_PADDING);
+            }
+            state.onResize(state.nodeId, right - left, bottom - top, { x: left, y: top });
+        },
+        [],
+    );
+
+    const handleResizeUp = useCallback(() => {
+        resizeRef.current.active = false;
+        window.removeEventListener("mousemove", handleResizeMove);
+        window.removeEventListener("mouseup", handleResizeUp);
+    }, [handleResizeMove]);
+
+    useEffect(
+        () => () => {
+            window.removeEventListener("mousemove", handleResizeMove);
+            window.removeEventListener("mouseup", handleResizeUp);
+        },
+        [handleResizeMove, handleResizeUp],
+    );
+
+    const startResize = (event: ReactMouseEvent, corner: ResizeCorner) => {
+        event.preventDefault();
+        event.stopPropagation();
+        resizeRef.current = {
+            active: true,
+            corner,
+            startX: event.clientX,
+            startY: event.clientY,
+            startLeft: data.position.x,
+            startTop: data.position.y,
+            startWidth: data.width,
+            startHeight: data.height,
+            nodeId: data.id,
+            scale,
+            childBounds,
+            onResize,
+        };
+        window.addEventListener("mousemove", handleResizeMove);
+        window.addEventListener("mouseup", handleResizeUp);
+    };
+
+    const active = isSelected || isDropTarget;
+    const linkedFolder = Boolean(data.metadata?.folder?.assetFolderId);
+    const workflowLabel = frameWorkflowLabel(data.metadata?.workflowKind);
+    const workflow = data.type === CanvasNodeType.Workflow;
+    const headerInverseScale = workflow || scale < 0.5 ? 1 / Math.max(scale, 0.05) : 1;
+    const compactFrameTitle = scale < 0.5 && (data.metadata?.fixture === "libtv-storyboard" || workflowLabel === "分镜")
+        ? data.title.split("｜", 1)[0]
+        : data.title;
+
+    const header = (
+                <div data-canvas-frame-header
+                    className={`pointer-events-auto absolute left-0 z-10 flex items-center gap-1.5 px-1.5 ${workflow ? "bottom-full" : "inset-x-0 top-0"}`}
+                    style={{
+                        height: FRAME_HEADER_HEIGHT,
+                        width: workflow ? `calc(${data.width}px * var(--canvas-live-scale, ${scale}))` : headerInverseScale !== 1 ? data.width * scale : undefined,
+                        color: theme.node.text,
+                        transform: workflow ? `scale(var(--canvas-live-inverse-scale, ${headerInverseScale}))` : `scale(${headerInverseScale})`,
+                        transformOrigin: workflow ? "left bottom" : "left top",
+                    }}
+                >
+                    <button
+                        type="button"
+                        className="grid size-8 shrink-0 place-items-center rounded-md transition-colors hover:bg-black/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 dark:hover:bg-white/10"
+                        style={{ outlineColor: theme.frame.activeStroke }}
+                        aria-label={collapsed ? "展开背板" : "折叠背板"}
+                        onMouseDown={(event) => event.stopPropagation()}
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            onToggleCollapsed(data.id);
+                        }}
+                    >
+                        {collapsed ? <ChevronRight className="size-4" /> : <ChevronDown className="size-4" />}
+                    </button>
+                    {editing ? (
+                        <input
+                            autoFocus
+                            className="h-7 min-w-0 flex-1 rounded border bg-transparent px-1.5 text-sm font-semibold outline-none"
+                            style={{ borderColor: theme.frame.activeStroke, color: theme.node.text }}
+                            value={title}
+                            onChange={(event) => setTitle(event.target.value)}
+                            onBlur={commitTitle}
+                            onMouseDown={(event) => event.stopPropagation()}
+                            onKeyDown={(event) => {
+                                if (event.key === "Enter") commitTitle();
+                                if (event.key === "Escape") {
+                                    setTitle(data.title);
+                                    setEditing(false);
+                                }
+                            }}
+                        />
+                    ) : (
+                        <button
+                            type="button"
+                            className="min-w-0 truncate text-left text-sm font-semibold"
+                            title={data.title}
+                            onDoubleClick={(event) => {
+                                event.stopPropagation();
+                                if (readOnly) return;
+                                setEditing(true);
+                            }}
+                        >
+                            {compactFrameTitle}
+                        </button>
+                    )}
+                    {workflowLabel ? (
+                        <span
+                            className="shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] font-medium leading-none"
+                            style={{ borderColor: `${theme.frame.activeStroke}55`, color: theme.node.muted, background: `${theme.frame.activeStroke}12` }}
+                            title={data.metadata?.workflowTitle || workflowLabel}
+                        >
+                            {workflowLabel}
+                        </span>
+                    ) : null}
+                    {!workflow && <span data-canvas-frame-count className="ml-auto shrink-0 pr-1 text-[var(--fs-label)] tabular-nums" style={{ color: theme.node.muted }}>
+                        {childNodes.length}
+                    </span>}
+                </div>
+    );
+
+    return (
+        <div
+            data-node-id={data.id}
+            data-canvas-node-type={data.type}
+            data-canvas-parent-id={data.parentId || undefined}
+            data-canvas-frame-kind={folder ? "folder" : "frame"}
+            data-canvas-frame-collapsed={collapsed ? "true" : "false"}
+            data-canvas-child-count={String(childNodes.length)}
+            role={folder && collapsed ? "group" : undefined}
+            tabIndex={folder && collapsed ? 0 : undefined}
+            aria-label={folder && collapsed ? `${data.title}，文件夹，${childNodes.length} 项内容。按回车打开` : undefined}
+            className={`absolute z-0 select-none${folder && collapsed ? " canvas-folder-node" : ""} ${dragOffset ? "cursor-grabbing" : "cursor-default"}`}
+            style={{ transform: `translate(${data.position.x + (dragOffset?.x || 0)}px, ${data.position.y + (dragOffset?.y || 0)}px)`, width: data.width, height: data.height, contain: "layout style" }}
+            onMouseDown={(event) => onMouseDown(event, data.id)}
+            onDoubleClick={(event) => {
+                if (!collapsed || (event.target instanceof Element && event.target.closest("button,input"))) return;
+                event.stopPropagation();
+                onToggleCollapsed(data.id);
+            }}
+            onContextMenu={(event) => onContextMenu(event, data.id)}
+            onKeyDown={(event) => {
+                if (!folder || !collapsed || (event.target instanceof Element && event.target.closest("button,input"))) return;
+                if (event.key !== "Enter" && event.key !== " ") return;
+                event.preventDefault();
+                onToggleCollapsed(data.id);
+            }}
+            onMouseEnter={() => onHoverStart?.(data.id)}
+            onMouseLeave={() => onHoverEnd?.(data.id)}
+        >
+            {workflow && header}
+            {/* 帧节点同样禁用指针跟随 3D 位移，hover 使用 CSS 静态抬升 */}
+            <CometCard
+                containerClassName="h-full w-full"
+                className={folder && collapsed ? "canvas-folder-shell overflow-visible" : `canvas-frame-shell overflow-hidden rounded-[var(--dock-radius)] border${folder ? " canvas-folder-expanded" : ""}`}
+                disabled
+                data-canvas-frame-hover-locked={!collapsed || editing || Boolean(dragOffset) || scale < 0.32 ? "true" : "false"}
+                style={{
+                    background: folder && collapsed ? "transparent" : active ? theme.frame.activeFill : theme.frame.fill,
+                    borderColor: folder && collapsed ? "transparent" : active ? theme.frame.activeStroke : theme.frame.stroke,
+                    borderWidth: folder && collapsed ? 0 : 1 / Math.max(scale, 0.05),
+                    // 原版公开画布的分组更接近“空间分区”而不是浮起的卡片：
+                    // 默认只保留很轻的环境阴影，选中时再用描边承担反馈，避免密集节点被大面积阴影吞掉。
+                    boxShadow: folder && collapsed ? "none" : isSelected ? `0 0 0 ${1 / Math.max(scale, 0.05)}px ${theme.frame.activeStroke}33, 0 10px 28px color-mix(in srgb, ${theme.spatial.shadow} 52%, transparent)` : `0 8px 24px color-mix(in srgb, ${theme.spatial.shadow} 40%, transparent)`,
+                }}
+            >
+                {folder && collapsed ? (
+                    // 素材库目录是单一事实源；画布节点只负责浏览和调用，避免本地改名后被同步结果覆盖。
+                    <CanvasFolderPreview
+                        data={data}
+                        childNodes={childNodes}
+                        active={active}
+                        isDropTarget={isDropTarget}
+                        readOnly={readOnly || linkedFolder}
+                        onToggleCollapsed={onToggleCollapsed}
+                        onTitleChange={onTitleChange}
+                        onStyleChange={onFolderStyleChange}
+                        onThemeChange={onFolderThemeChange}
+                    />
+                ) : (
+                    <>
+                {!workflow && header}
+
+
+                {collapsed ? <FramePreview nodes={childNodes} frame={data} theme={theme} /> : null}
+                    </>
+                )}
+            </CometCard>
+            {!readOnly && !collapsed && isSelected && !data.metadata?.locked ? (
+                <>
+                    <ResizeHandle corner="top-left" scale={scale} theme={theme} onMouseDown={startResize} />
+                    <ResizeHandle corner="top-right" scale={scale} theme={theme} onMouseDown={startResize} />
+                    <ResizeHandle corner="bottom-left" scale={scale} theme={theme} onMouseDown={startResize} />
+                    <ResizeHandle corner="bottom-right" scale={scale} theme={theme} onMouseDown={startResize} />
+                </>
+            ) : null}
+        </div>
+    );
+});
+
+function frameWorkflowLabel(kind?: NonNullable<CanvasNodeData["metadata"]>["workflowKind"]) {
+    if (kind === "storyboard") return "分镜";
+    if (kind === "reference_set") return "引用";
+    if (kind === "character") return "角色";
+    if (kind === "styleboard") return "画风";
+    return undefined;
+}
+
+function FramePreview({ nodes, frame, theme }: { nodes: CanvasNodeData[]; frame: CanvasNodeData; theme: CanvasTheme }) {
+    const layout = useMemo(() => {
+        if (!nodes.length) return [];
+        const previewNodes = nodes.slice(0, 24);
+        const left = Math.min(...previewNodes.map((node) => node.position.x));
+        const top = Math.min(...previewNodes.map((node) => node.position.y));
+        const right = Math.max(...previewNodes.map((node) => node.position.x + node.width));
+        const bottom = Math.max(...previewNodes.map((node) => node.position.y + node.height));
+        const width = Math.max(right - left, 1);
+        const height = Math.max(bottom - top, 1);
+        const previewWidth = Math.max(frame.width - 16, 1);
+        const previewHeight = Math.max(frame.height - FRAME_HEADER_HEIGHT - 8, 1);
+        const scale = Math.min(previewWidth / width, previewHeight / height);
+        const offsetX = (previewWidth - width * scale) / 2;
+        const offsetY = (previewHeight - height * scale) / 2;
+        return previewNodes.map((node) => ({
+            node,
+            left: offsetX + (node.position.x - left) * scale,
+            top: offsetY + (node.position.y - top) * scale,
+            width: Math.max(node.width * scale, 12),
+            height: Math.max(node.height * scale, 10),
+        }));
+    }, [frame.height, frame.width, nodes]);
+
+    return (
+        <div className="pointer-events-none absolute inset-x-2 bottom-2 overflow-hidden rounded-md" style={{ top: FRAME_HEADER_HEIGHT, background: theme.frame.preview }}>
+            {layout.length ? (
+                layout.map(({ node, ...style }) => {
+                    const videoPreview = canvasNodeVideoPreviewUrl(node);
+                    return <div key={node.id} className="absolute overflow-hidden rounded-[var(--r-xs)] border" style={{ ...style, background: theme.node.fill, borderColor: theme.node.stroke }}>
+                        {node.type === CanvasNodeType.Image && node.metadata?.content ? <img src={node.metadata.content} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" draggable={false} /> : null}
+                        {videoPreview ? <img src={videoPreview} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" draggable={false} /> : null}
+                        {node.type === CanvasNodeType.Video && !videoPreview ? <Video className="m-auto size-4 h-full opacity-40" /> : null}
+                        {node.type === CanvasNodeType.Text ? <div className="line-clamp-3 p-1 text-[var(--fs-nano)] leading-[9px]" style={{ color: theme.node.text }}>{node.metadata?.content || node.title}</div> : null}
+                        {node.type === CanvasNodeType.Script ? <div className="p-1 text-[var(--fs-nano)] leading-[9px]" style={{ color: theme.node.text }}>分镜脚本 · {node.metadata?.storyboard?.rows.length || 0} 镜</div> : null}
+                    </div>;
+                })
+            ) : (
+                <div className="grid h-full place-items-center text-[var(--fs-label)]" style={{ color: theme.node.faint }}>空背板</div>
+            )}
+        </div>
+    );
+}
+
+function ResizeHandle({ corner, scale, theme, onMouseDown }: { corner: ResizeCorner; scale: number; theme: CanvasTheme; onMouseDown: (event: ReactMouseEvent, corner: ResizeCorner) => void }) {
+    const inverseScale = 1 / Math.max(scale, 0.05);
+    const size = 14 * inverseScale;
+    const offset = -size / 2;
+    const fromTop = corner.includes("top");
+    const fromLeft = corner.includes("left");
+    const cursor = corner === "top-left" || corner === "bottom-right" ? "nwse-resize" : "nesw-resize";
+
+    return (
+        <button
+            type="button"
+            aria-label="调整背板尺寸"
+            className="pointer-events-auto absolute z-20 rounded-sm shadow-sm"
+            style={{
+                top: fromTop ? offset : undefined,
+                bottom: fromTop ? undefined : offset,
+                left: fromLeft ? offset : undefined,
+                right: fromLeft ? undefined : offset,
+                width: size,
+                height: size,
+                cursor,
+                background: theme.frame.activeStroke,
+                border: `${2 * inverseScale}px solid ${theme.canvas.background}`,
+            }}
+            onMouseDown={(event) => onMouseDown(event, corner)}
+        />
+    );
+}

@@ -1,0 +1,71 @@
+{
+  "repository": "https://github.com/enderzcx/desktop-environment-cases",
+  "revision": "01b5f0c83c0fa9a1cd19d0573b1db2af729a2038",
+  "cases": [
+    {
+      "id": "ENV-0001",
+      "title": "旧 WebView 缺少 Array.toSorted 导致画布加载失败",
+      "status": "confirmed"
+    },
+    {
+      "id": "ENV-0006",
+      "title": "运行中的临时文件阻止整个存储目录迁移",
+      "status": "confirmed"
+    },
+    {
+      "id": "ENV-0007",
+      "title": "迁移或重启后数据目录发现错误导致工作区看似丢失",
+      "status": "confirmed"
+    },
+    {
+      "id": "ENV-0009",
+      "title": "本地磁盘写满导致生成结果保存或取回失败",
+      "status": "confirmed"
+    },
+    {
+      "id": "ENV-0010",
+      "title": "桌面启动未继承终端代理导致更新或组件下载失败",
+      "status": "confirmed"
+    },
+    {
+      "id": "ENV-0011",
+      "title": "本地深度子进程补下载模型时没有继承桌面代理",
+      "status": "confirmed"
+    },
+    {
+      "id": "ENV-0014",
+      "title": "Windows 无法解码 HEVC 且缺少可用 FFmpeg 预览工具",
+      "status": "confirmed"
+    },
+    {
+      "id": "ENV-0015",
+      "title": "构建目录已有媒体运行时但最终更新 ZIP 漏装",
+      "status": "confirmed"
+    },
+    {
+      "id": "ENV-0016",
+      "title": "已发布旧更新器拒绝新增 CLI 或媒体目录",
+      "status": "confirmed"
+    },
+    {
+      "id": "ENV-0022",
+      "title": "成功升级后的暂存目录长期累积占用磁盘",
+      "status": "confirmed"
+    },
+    {
+      "id": "ENV-0029",
+      "title": "远端视频取帧的凭据策略与解码能力不匹配",
+      "status": "confirmed"
+    },
+    {
+      "id": "ENV-0046",
+      "title": "同一进程并发首次安装深度组件共写下载缓存",
+      "status": "confirmed"
+    },
+    {
+      "id": "ENV-0051",
+      "title": "多视频画布平移触发无效重渲染和模糊合成开销",
+      "status": "confirmed"
+    }
+  ]
+}

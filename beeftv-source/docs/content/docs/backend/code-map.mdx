@@ -1,0 +1,58 @@
+---
+title: 本地后端代码地图
+---
+
+# 本地后端代码地图
+
+BeefTV 是单用户、本地优先的桌面应用。项目、画布、素材和任务落到本地 SQLite 与工作区目录；模型生成仍可通过 Provider/Protocol 适配器访问外部 API。旧内置 Agent 已从产品运行面退场，其历史运行/偏好/记忆数据仍保留在本地数据库。
+
+## 运行链路
+
+模型服务设置由 `web/src/pages/settings/model-service-editor.tsx` 管理添加和编辑草稿；`model-service-presets.ts` 依据已启用的协议插件填写初始配置。`model-connection-test.ts` 通过正常后端生成任务验证结果。`internal/workspace/provider_config.go` 持有配置版本、保存冲突和文件读写，`internal/localcrypto` 统一工作区凭据加解密格式。
+
+```text
+Wails / local dev
+  -> internal/bootstrap        组合根、数据库、HTTP 生命周期
+  -> internal/localapp        本地能力端口
+  -> internal/{task,asset,project,workspace}
+  -> internal/app             跨域编排与尚未拆分的核心实现
+  -> internal/{generation,provider,protocol,outbound}
+  -> external model APIs
+```
+
+## 主要目录
+
+| 边界 | 位置 | 职责 |
+| --- | --- | --- |
+| 组合根 | `backend/internal/bootstrap` | 打开本地数据、组合窄服务、启停 HTTP 与 worker |
+| 本地应用 | `backend/internal/localapp` | 定义 workspace/project/asset/task/generation/provider-config 端口（旧 Agent 空端口已移除） |
+| 工作区 | `backend/internal/workspace` | 本地身份、模型配置快照；ZIP 导入导出不在此包 |
+| 任务域 | `backend/internal/task` | 本地任务命令、列表读模型、生命周期，以及本机 ffmpeg/转写/深度捕捉的准入 |
+| 生成结果交付 | `backend/internal/taskdelivery` | 第一段把生成 dataURL/字节写入本地资源并改写 ResultJSON；第二段在任务成功后物化素材。不发起新的上游生成。远端产物经 `outbound.DownloadResumable` 断点续传下载：无总超时，只有头部与空闲超时，半成品在 `<data>/cache/artifact-downloads` 下按身份复用 |
+| 生成结果绑定 | `backend/internal/taskbinding` | 将已交付产物绑定到原先指定的画布节点；多张图片按创建前记录的 `outputNodeIds` 与输出序号逐项核对，不新建上游任务 |
+| 生成域 | `backend/internal/generation` | 统一生成输入、引用、能力、registry 协议调度和失败归类 |
+| 视频结果取回 | `backend/internal/generation/video_delivery.go` | 所有视频入口共用下载重试、10 秒无进展检测和原任务结果刷新；BeefAPI 取备用存储，自接供应商只查询自己的原任务。认证由所选协议提供，跨域媒体请求清除供应商凭据 |
+| 供应商适配 | `backend/internal/provider`, `protocol`, `outbound` | 外部模型 API、自定义渠道和插件协议 |
+| 模型目录 | `backend/internal/modelcatalog` | 能力合同、渠道目录校验/解析/合并与 BeefAPI/WhatsToken overlay；出站 HTTP 仍走 outbound |
+| 协议插件 | `backend/internal/plugins` | registry、安装/启用和渠道设置用的 provider 能力目录；live 快照按 Runtime 隔离 |
+| Seedance 参考素材预上传 | `backend/internal/app/beefapi_seedance_preupload.go` | 仅内置 BeefAPI Seedance：本机后端把参考图片/视频/音频换成短期 HTTPS 链接后再提交 `/v1/videos`；本机文件在上传完成前保持本地引用 |
+| 数据 | `backend/internal/database`, `repository` | SQLite schema、迁移和持久化 |
+| 支持诊断 | `backend/internal/diagnostics`、`supporttrace`、`assistantdiagnostics` | schema 3 脱敏 ZIP、各来源完整性、本地 OTel 记录、只读官方助手元数据及离线阶段分析；不参与生成、重试或恢复决策 |
+| 剪辑语义计划 | `backend/internal/editing` | 版本化时间线渲染计划：选择、顺序、空隙、裁剪、音量、字幕与输出宽高/帧率/采样率。不依赖 `internal/app`，不接受本地路径或 ffmpeg 参数 |
+| 视频预览与工具 | `backend/internal/playback`、`backend/internal/mediatools` | 按需 H.264 预览、单任务转码、用户预览缓存清理；播放和剪辑共用随包 FFmpeg 解析，显式路径优先于随包工具，最后查 PATH |
+| HTTP | `backend/internal/handler` | 本地 `/api` 合同、输入限制和响应封装 |
+| 企业连接 | `backend/internal/beefapi` | 设备授权、本机密钥和连接状态 |
+| 本机 MCP | `backend/cmd/beeftv` | `beeftv mcp serve` 使用官方 MCP SDK，经 `/api/ops` 访问本机工作区 |
+| 远程 Skill 市场 | `backend/internal/skillhub`、`skillhubcli` | `beeftv skills` 直接访问统一市场，不发现或连接本地运行时；共享版本清单、完整性校验与专用投稿授权 |
+| 内置 Skill 接入 | `backend/internal/skills/market*.go`、`operations/skill*.go`、`assistantturns/skill_context.go` | Go 管理本地安装、确切版本、活动上下文和投稿确认；模型只获得查询、草稿和准备操作。详见 [接口交接](../../../refactor/skill-market-agent-access.md) |
+| 桌面更新发布 | `backend/cmd/update-release` | 生成更新密钥、打包 zip、签署 `desktop-update.json` |
+| 前端 | `web/src` | React 画布、项目、素材、模型配置与插件 UI |
+
+## 硬边界
+
+- 不提供登录、注册、计费、支付、公开分享或云存储路由。
+- 内置 BeefAPI 密钥保存在本机加密连接存储中；其他手动渠道密钥仍在本地模型配置中。密钥不进入画布快照或日志响应。
+- 外部 API 是生成能力，不是 SaaS 数据面；不得在“本地化清理”中删除 Provider、Protocol、自定义渠道或插件扩展点。
+- worker 并发策略由任务运行时管理，架构整理不得顺带改变其行为。
+
+HTTP 稳定合同见 [HTTP API](/docs/backend/http-api) 和 `backend/internal/handler/openapi.yaml`。

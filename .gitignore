@@ -1,5 +1,4 @@
 node_modules/
-/verification/
 dist/
 release/
 exports/
@@ -39,3 +38,14 @@ temp_*.py
 docs/*.json
 docs/*.jsonl
 docs/*.err
+
+# One-off diagnostic probes
+scripts/debug/
+release-new/
+build/beeftv-plugins/
+build/cli/
+build/beeftv-web/
+build/beeftv-backend.exe
+build/agent-host/
+build/agent-host-node_modules.zip
+build/*.exe~

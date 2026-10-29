@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import type { Account } from '../shared/types';
-import { CanvasBridge, videoConversationForAccount, shouldRecoverTaskPage, normalizeTaskUrl, formatVideoPrompt, VIDEO_COMPLETION_PATTERN } from './canvas-bridge';
+import { CanvasBridge, type CanvasBridgeTask, isPendingDoubaoChatUrl, videoConversationForAccount, shouldRecoverTaskPage, normalizeTaskUrl, isRootDoubaoChatUrl, isSpecificDoubaoChatUrl, formatVideoPrompt, VIDEO_COMPLETION_PATTERN } from './canvas-bridge';
 
 test('video switches start a new conversation while the same account continues its own conversation', () => {
   const thread = { accountId: 1, doubaoConversationId: 'account-one-conversation' };
@@ -101,6 +101,17 @@ test('does not recover when already on the expected task page', () => {
   assert.equal(shouldRecoverTaskPage('https://www.doubao.com/chat/local_1', 'https://www.doubao.com/chat/local_1', 0), false);
 });
 
+test('does not recover when task page was root chat and naturally progressed to specific conversation', () => {
+  // Sending a message from /chat/ leads to /chat/<id>; this is not page loss
+  assert.equal(shouldRecoverTaskPage('https://www.doubao.com/chat/38447157636539650', 'https://www.doubao.com/chat/', 0), false);
+  assert.equal(shouldRecoverTaskPage('https://www.doubao.com/chat/38447157636539650', 'https://www.doubao.com/chat', 0), false);
+  assert.equal(isRootDoubaoChatUrl('https://www.doubao.com/chat/'), true);
+  assert.equal(isRootDoubaoChatUrl('https://www.doubao.com/chat'), true);
+  assert.equal(isRootDoubaoChatUrl('https://www.doubao.com/chat/38447157636539650'), false);
+  assert.equal(isSpecificDoubaoChatUrl('https://www.doubao.com/chat/38447157636539650'), true);
+  assert.equal(isSpecificDoubaoChatUrl('https://www.doubao.com/chat/'), false);
+});
+
 test('never recovers when there is no task page to return to', () => {
   assert.equal(shouldRecoverTaskPage('https://www.doubao.com/', null, 0), false);
 });
@@ -154,3 +165,104 @@ test('VIDEO_COMPLETION_PATTERN recognizes Doubao video completion messages', () 
   assert.equal(VIDEO_COMPLETION_PATTERN.test('正在生成视频中，请稍候'), false);
   assert.equal(VIDEO_COMPLETION_PATTERN.test('请确认参数后开始生成'), false);
 });
+
+
+test('temporary task routes are never loaded during SPA conversation creation', () => {
+  const local = 'https://www.doubao.com/chat/local_1051722523543109';
+  assert.equal(isPendingDoubaoChatUrl(local), true);
+  assert.equal(shouldRecoverTaskPage('https://www.doubao.com/chat/123', local, 0), false);
+  assert.equal(shouldRecoverTaskPage('https://www.doubao.com/chat/', local, 0), false);
+  assert.equal(shouldRecoverTaskPage('https://www.doubao.com/chat/456', 'https://www.doubao.com/chat/123', 0), false);
+});
+
+for (const provisional of ['https://www.doubao.com/chat/', 'https://www.doubao.com/chat/local_1051722523543109']) {
+  test('poll follows a verified server conversation without reloading ' + provisional, async t => {
+    const directory = mkdtempSync(path.join(tmpdir(), 'canvas-route-regression-'));
+    let currentUrl = 'https://www.doubao.com/chat/123';
+    const loads: string[] = [];
+    const view = { webContents: {
+      isDestroyed: () => false, getURL: () => currentUrl,
+      loadURL: async (url: string) => { loads.push(url); currentUrl = url; },
+      executeJavaScript: async () => ({ url: currentUrl, messages: [{ id: 'server-user-turn', role: 'user', text: '让他们拥抱' }] }),
+    } };
+    const bridge = new CanvasBridge({ accounts: () => [], openAccount: () => null,
+      viewForAccount: () => view as never, onTaskChanged: () => {} }, directory);
+    t.after(() => { bridge.stop(); rmSync(directory, { recursive: true, force: true }); });
+    const state = bridge as unknown as { tasks: Map<string, CanvasBridgeTask>; busyAccountIds: Set<number>; taskPageRecoveryAttempts: Map<string, number> };
+    const task: CanvasBridgeTask = { id: 'route-regression', prompt: '让他们拥抱', ratio: '16:9', status: 'awaiting_reply', statusText: '', accountId: 2,
+      pageUrl: provisional, referencePaths: [], videoPath: null, error: null,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), sentPrompt: '让他们拥抱',
+      replyBaseline: { url: provisional, messages: [], prompt: '让他们拥抱', anchorId: 'client-user-turn', emitted: {} } };
+    state.tasks.set(task.id, task); state.busyAccountIds.add(2);
+    // A different conversation must not become the target until this task turn is visible.
+    view.webContents.executeJavaScript = async () => ({ url: currentUrl, messages: [] as {id:string;role:string;text:string}[] });
+    await bridge.tryDownloadCompletedVideo(2);
+    assert.equal(task.pageUrl, provisional);
+    view.webContents.executeJavaScript = async () => ({ url: currentUrl, messages: [{ id: 'server-user-turn', role: 'user', text: '让他们拥抱' }] });
+    for (let poll = 0; poll < 12; poll++) await bridge.tryDownloadCompletedVideo(2);
+    assert.equal(task.pageUrl, currentUrl);
+    assert.equal(task.status, 'awaiting_reply');
+    assert.equal(bridge.isBusy(2), true);
+    assert.deepEqual(loads, []);
+    // Reaching eight navigation attempts is not evidence of an unresponsive page.
+    state.taskPageRecoveryAttempts.set(task.id, 8);
+    await bridge.tryDownloadCompletedVideo(2);
+    assert.equal(task.status, 'awaiting_reply');
+    assert.equal(task.error, null);
+  });
+
+  test('pops up account window and updates status text when captcha is visible', async (t) => {
+    const popups: { accountId: number; reason?: string }[] = [];
+    const directory = mkdtempSync(path.join(tmpdir(), 'doubao-bridge-captcha-test-'));
+    const dummyView = {
+      webContents: {
+        isDestroyed: () => false,
+        getURL: () => 'https://www.doubao.com/chat/test-conv',
+        executeJavaScript: async (script: string) => {
+          if (script.includes('captcha_container')) return true;
+          return { url: 'https://www.doubao.com/chat/test-conv', messages: [] };
+        },
+      },
+    } as any;
+    const bridge = new CanvasBridge({
+      accounts: () => [{ id: 3, name: '账号3', platform: 'doubao', isLoggedIn: true, sessionName: 'doubao_03', note: '' }],
+      openAccount: () => dummyView,
+      viewForAccount: () => dummyView,
+      onTaskChanged: () => {},
+      popupAccountForCaptcha: (accountId, reason) => { popups.push({ accountId, reason }); },
+    }, directory);
+    t.after(() => { bridge.stop(); rmSync(directory, { recursive: true, force: true }); });
+    const state = bridge as unknown as { tasks: Map<string, CanvasBridgeTask>; busyAccountIds: Set<number> };
+    const task: CanvasBridgeTask = {
+      id: 'captcha-task',
+      prompt: '跳起来',
+      ratio: '16:9',
+      status: 'awaiting_reply',
+      statusText: '',
+      accountId: 3,
+      pageUrl: 'https://www.doubao.com/chat/test-conv',
+      referencePaths: [],
+      videoPath: null,
+      error: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      sentPrompt: '跳起来',
+    };
+    state.tasks.set(task.id, task);
+    state.busyAccountIds.add(3);
+
+    const handled = await bridge.tryDownloadCompletedVideo(3);
+    assert.equal(handled, false);
+    assert.equal(popups.length, 1);
+    assert.equal(popups[0].accountId, 3);
+    assert.match(task.statusText, /触发人机验证.*已自动弹出窗口/);
+
+    // 验证完成滑块消失后，恢复提示
+    dummyView.webContents.executeJavaScript = async (script: string) => {
+      if (script.includes('captcha_container')) return false;
+      return { url: 'https://www.doubao.com/chat/test-conv', messages: [] };
+    };
+    await bridge.tryDownloadCompletedVideo(3);
+    assert.match(task.statusText, /人机验证已通过/);
+  });
+}

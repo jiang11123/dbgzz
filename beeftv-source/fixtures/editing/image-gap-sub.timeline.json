@@ -1,0 +1,21 @@
+{
+  "timeline": {
+    "version": 2,
+    "durationMs": 3000,
+    "tracks": [
+      { "id": "v", "kind": "video" },
+      { "id": "a", "kind": "audio" },
+      { "id": "s", "kind": "subtitle" }
+    ],
+    "clips": [
+      { "id": "still", "kind": "image", "nodeId": "still", "trackId": "v", "startMs": 0, "durationMs": 2000, "volume": 1, "directMedia": { "id": "still", "kind": "image", "storageKey": "resource:still" } },
+      { "id": "voice", "kind": "audio", "nodeId": "voice", "trackId": "a", "startMs": 0, "durationMs": 2000, "volume": 1, "directMedia": { "id": "voice", "kind": "audio", "storageKey": "resource:voice" } },
+      { "id": "sub", "kind": "subtitle", "nodeId": "sub", "trackId": "s", "startMs": 500, "durationMs": 1000, "text": "图片" }
+    ]
+  },
+  "sources": [
+    { "id": "still", "hasVideo": true, "hasAudio": false, "durationMs": 0 },
+    { "id": "voice", "hasAudio": true, "durationMs": 2000 }
+  ],
+  "options": { "width": 320, "height": 180, "fps": 30, "sampleRate": 44100, "burnSubtitles": true }
+}

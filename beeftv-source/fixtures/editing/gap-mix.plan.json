@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "output": { "width": 1280, "height": 720, "fps": 30, "sampleRate": 44100, "burnSubtitles": true },
+  "durationMs": 40000,
+  "segments": [
+    { "kind": "video", "clipId": "a", "sourceId": "node-a", "startMs": 0, "durationMs": 15000, "volume": 1, "hasAudio": true },
+    { "kind": "gap", "startMs": 15000, "durationMs": 10000, "volume": 1, "hasAudio": false },
+    { "kind": "video", "clipId": "b", "sourceId": "node-b", "startMs": 25000, "durationMs": 15000, "volume": 1, "hasAudio": true }
+  ],
+  "audio": [
+    { "clipId": "voice", "sourceId": "voice", "startMs": 500, "durationMs": 1500, "sourceStartMs": 100, "volume": 0, "fadeInMs": 100, "fadeOutMs": 200 }
+  ],
+  "subtitles": [
+    { "clipId": "sub", "startMs": 0, "durationMs": 3000, "text": "中文" }
+  ],
+  "subtitleSrt": "1\n00:00:00,000 --> 00:00:03,000\n中文\n\n"
+}

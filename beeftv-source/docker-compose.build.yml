@@ -1,0 +1,14 @@
+services:
+  backend:
+    image: beeftv-backend:server
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      args:
+        GOPROXY: ${GOPROXY:-https://proxy.golang.org,direct}
+
+  web:
+    image: beeftv-web:server
+    build:
+      context: .
+      dockerfile: Dockerfile
