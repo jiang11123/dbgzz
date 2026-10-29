@@ -7,6 +7,7 @@
 - Node.js 22、npm、Bun。
 - Go 1.25+，以及支持 CGO 的 gcc/clang；`go-sqlite3` 需要 C 编译器。
 - 用 `npm ci` 安装宿主依赖；在 `beeftv-source/web` 用 `bun install --frozen-lockfile` 安装前端依赖，不用 npm 改写其 Bun 锁文件。
+- 首次从源码启动前运行 `npm run rebuild`，将 `better-sqlite3` 编译为当前 Electron 使用的原生模块。
 - Agent 源码和锁文件在 `beeftv-source/agent-host`。打包工具见 `beeftv-source/scripts/package-agent-host.mjs`，其 Windows Node 运行时由 `BEEFTV_NODE_RUNTIME` 指定，版本须符合脚本钉选值。媒体运行时按 `beeftv-source/licenses/ffmpeg-windows.json` 准备并保留许可。
 - 宿主要求 `build/agent-host/runtime/node.exe`、`server.mjs` 和依赖目录，以及对应媒体运行时。构建脚本可复用本机已准备的 BeefTV Agent 运行时；首次从源码构建需先按上述脚本准备。仓库不携带作者机器的运行环境或数据。
 

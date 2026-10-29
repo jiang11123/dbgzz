@@ -46,6 +46,7 @@ Electron 宿主位于 `src/`，对应的画布、Go 后端、Agent 和协议源�
 git clone https://github.com/jiang11123/dbgzz.git
 cd dbgzz
 npm ci
+npm run rebuild
 cd beeftv-source/web
 bun install --frozen-lockfile
 cd ../..
