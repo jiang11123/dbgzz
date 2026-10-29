@@ -73,7 +73,11 @@ if (agentHostSource) {
 const nodeModulesSource = path.join(root, 'build', 'agent-host', 'node_modules');
 const nodeModulesZip = path.join(root, 'build', 'agent-host-node_modules.zip');
 if (existsSync(nodeModulesSource)) {
-  execFileSync('powershell', ['-NoProfile', '-Command', `Compress-Archive -Path "${nodeModulesSource}" -DestinationPath "${nodeModulesZip}" -Force`], { stdio: 'inherit' });
+  if (process.env.BEEFTV_7ZA) {
+    run(process.env.BEEFTV_7ZA, ['a', '-tzip', '-mx=5', nodeModulesZip, 'node_modules'], { cwd: path.dirname(nodeModulesSource) });
+  } else {
+    execFileSync('powershell', ['-NoProfile', '-Command', `Compress-Archive -Path "${nodeModulesSource}" -DestinationPath "${nodeModulesZip}" -Force`], { stdio: 'inherit' });
+  }
   console.log('[build-beeftv] agent-host node_modules -> build/agent-host-node_modules.zip');
 }
 

@@ -22,6 +22,8 @@ npm test
 
 `build:beeftv` 生成 Go 后端、CLI、协议包、Agent 依赖压缩包与 `build/beeftv-web` 前端。缺少 Go、Agent 或前端依赖时请先补齐，不能把缺组件产物作为完整安装包发布。
 
+Windows 上可通过 `BEEFTV_7ZA` 指定已安装的 7-Zip 命令行程序，加快 Agent 依赖压缩；未指定时使用 PowerShell `Compress-Archive`。
+
 ```powershell
 npm run package:win
 ```
