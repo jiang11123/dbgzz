@@ -4,7 +4,7 @@
 
 面向 Windows 的本地 AI 创作画布，把文字、图片、视频、素材和豆包多账号放在同一个工作区。由奶蛙课堂维护，基于 BeefTV 二次开发；非豆包或 BeefTV 官方产品。
 
-**[下载最新版](https://github.com/jiang11123/dbgzz/releases/latest) · [使用教程](docs/user-guide.md) · [更新记录](CHANGELOG.md) · [来源与许可](NOTICE.md)**
+**[下载最新版](https://github.com/jiang11123/dbgzz/releases/latest) · [下载 2.0 旧版](https://github.com/jiang11123/doubao-workstation-2.0) · [使用教程](docs/user-guide.md) · [更新记录](CHANGELOG.md) · [来源与许可](NOTICE.md)**
 
 ## 下载安装
 
@@ -34,7 +34,7 @@
 
 已经下载旧版的用户需先手动安装本版本，之后才能接收软件内的更新提示。更新需要联网连接 GitHub；发布者修改本地代码或仅推送源码不会触发客户端升级。[自动更新与发布说明](docs/automatic-updates.md)。
 
-2.0 系列及 Dola 修复版保留在 [历史版本](https://github.com/jiang11123/dbgzz/releases)。3.0 的操作方式以 [当前教程](docs/user-guide.md) 为准；[2.0 教程归档](docs/archive/2.0-user-guide.md) 供历史版本使用。
+想用原来经典界面的粉丝，请前往 [豆包工作站 2.0 旧版独立仓库](https://github.com/jiang11123/doubao-workstation-2.0)，其中提供 2.0.3 便携版、安装版、2.0.2 经典版及其他 2.0 历史版本。原仓库的 [历史版本](https://github.com/jiang11123/dbgzz/releases) 和下载链接也继续保留。3.0 的操作方式以 [当前教程](docs/user-guide.md) 为准。
 
 ## 源码与构建
 
