@@ -90,3 +90,10 @@ const api = {
   beeftvLaunch: () => ipcRenderer.invoke('beeftv:launch'),
 };
 contextBridge.exposeInMainWorld('workspace', api);
+
+ipcRenderer.on('workspace:model-config-updated', () => {
+  window.dispatchEvent(new CustomEvent('workspace:model-config-updated'));
+});
+ipcRenderer.on('workspace:changed', () => {
+  window.dispatchEvent(new CustomEvent('workspace:changed'));
+});

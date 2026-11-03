@@ -234,8 +234,7 @@ function hostAccountInScanWindow(account: { id: number; name: string; platform: 
       if (!cookies.some(item => item.name === 'sessionid' || item.name === 'sid_guard')) return;
       clearInterval(cookieTimer);
       db.updateAccount(account.id, { isLoggedIn: true });
-      windowRef?.webContents.send('workspace:changed');
-      void syncAccountsToBeefTv(db.accounts(), ensureGatewayApiKey(), { hostBaseUrl: beeftvHost?.url, gatewayBaseUrl: gateway?.url });
+      syncAccountsAndNotify();
       if (!wasLoggedIn) setTimeout(() => { if (!win.isDestroyed()) win.close(); }, 1500);
     }).catch(() => undefined);
   }, 2000);
@@ -282,6 +281,19 @@ function fitScanView(win: BrowserWindow, view: BrowserView) {
   const [width, height] = win.getContentSize();
   view.setAutoResize({ width: true, height: true });
   view.setBounds({ x: 0, y: 0, width: Math.max(1, width), height: Math.max(1, height) });
+}
+
+
+function syncAccountsAndNotify() {
+  const accounts = db.accounts();
+  const apiKey = ensureGatewayApiKey();
+  broadcast('workspace:changed');
+  broadcast('gateway:changed');
+  void syncAccountsToBeefTv(accounts, apiKey, { hostBaseUrl: beeftvHost?.url, gatewayBaseUrl: gateway?.url }).then((result) => {
+    if (result.ok) {
+      broadcast('workspace:model-config-updated');
+    }
+  });
 }
 
 function openAccountBrowser(accountId: number, background = false, preloadOnly = false) {
@@ -697,11 +709,11 @@ function setupIpc() {
     if (save) db.setSetting('accountBarHeight', String(accountBarHeight));
     return accountBarHeight;
   });
-  ipcMain.handle('accounts:update', (_e, id, patch) => { const next = db.updateAccount(id, patch); broadcast('workspace:changed'); return next; });
+  ipcMain.handle('accounts:update', (_e, id, patch) => { const next = db.updateAccount(id, patch); syncAccountsAndNotify(); return next; });
   ipcMain.handle('accounts:move', (event, id: number, targetId: number, before: boolean) => {
     if (!BrowserWindow.fromWebContents(event.sender)) throw new Error('只能在工作站窗口操作');
     const accounts = db.moveAccount(id, targetId, before);
-    broadcast('workspace:changed');
+    syncAccountsAndNotify();
     return accounts;
   });
   const deleteAccount = (id: number) => {
@@ -727,7 +739,7 @@ function setupIpc() {
         catch (error) { windowRef?.webContents.send('browser:error', `账号已删除，打开下一个账号失败：${error instanceof Error ? error.message : String(error)}`); }
       }
     }
-    void syncAccountsToBeefTv(db.accounts(), ensureGatewayApiKey(), { gatewayBaseUrl: gateway?.url });
+    syncAccountsAndNotify();
     return removed;
   };
   ipcMain.handle('accounts:delete', (_event, id: number) => deleteAccount(id));
@@ -745,8 +757,7 @@ function setupIpc() {
   });
   ipcMain.handle('accounts:create', (_e, data) => {
     const next = db.createAccount(data);
-    broadcast('workspace:changed');
-    void syncAccountsToBeefTv(db.accounts(), ensureGatewayApiKey(), { gatewayBaseUrl: gateway?.url });
+    syncAccountsAndNotify();
     return next;
   });
   ipcMain.handle('beeftv:sync', () => syncAccountsToBeefTv(db.accounts(), ensureGatewayApiKey(), { syncNative: true, gatewayBaseUrl: gateway?.url }));
@@ -989,8 +1000,7 @@ function setupGateway() {
       const nextNum = existing.length + 1;
       const account = db.createAccount({ name: `账号${nextNum}`, platform: 'doubao' });
       openAccountBrowser(account.id);
-      windowRef?.webContents.send('workspace:changed');
-      void syncAccountsToBeefTv(db.accounts(), apiKey, { hostBaseUrl: beeftvHost?.url, gatewayBaseUrl: gateway?.url });
+      syncAccountsAndNotify();
       return account;
     },
     createVideoTask: async (options) => {

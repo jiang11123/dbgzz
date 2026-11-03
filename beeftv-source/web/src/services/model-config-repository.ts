@@ -98,8 +98,23 @@ export function createModelConfigRepository(dependencies: ModelConfigRepositoryD
         return scheduleDrain();
     };
 
+    const reload = async () => {
+        try {
+            const result = await dependencies.read();
+            if (!state.dirty) {
+                latestConfig = null;
+                state = { status: "saved", revision: result.revision, dirty: false, error: "" };
+                publish(state);
+            }
+            return result;
+        } catch {
+            return null;
+        }
+    };
+
     return {
         hydrate,
+        reload,
         commit,
         flush: scheduleDrain,
         getState: () => state,
@@ -132,6 +147,7 @@ const repository = createModelConfigRepository({
 });
 
 export const hydrateModelConfig = repository.hydrate;
+export const reloadModelConfig = repository.reload;
 export const commitModelConfig = repository.commit;
 export const flushModelConfig = repository.flush;
 export const getModelConfigPersistenceState = repository.getState;

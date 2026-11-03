@@ -7,7 +7,7 @@ import { appPathname } from "@/lib/app-routing";
 import { preloadWorkspaceRoute } from "@/lib/workspace-route-modules";
 import { applyUserSession, localWorkspaceConfig } from "@/lib/user-session";
 import { getWorkspaceBootstrap, type WorkspaceBootstrapPayload } from "@/services/api/workspace";
-import { commitModelConfig, flushModelConfig, hydrateModelConfig } from "@/services/model-config-repository";
+import { commitModelConfig, flushModelConfig, hydrateModelConfig, reloadModelConfig } from "@/services/model-config-repository";
 import { normalizeConfigSnapshot, useConfigStore } from "@/stores/use-config-store";
 import { useUserStore } from "@/stores/use-user-store";
 
@@ -52,6 +52,7 @@ export function WorkspaceBootstrapHydrator({ children }: { children: ReactNode }
     useEffect(() => {
         let ready = false;
         const unsubscribe = useConfigStore.subscribe((state) => {
+            if (reloadingModelConfig) return;
             if (!shouldSaveLocalModelConfig({ subscriptionReady: ready, modelConfigReady: modelConfigReady.current, channelCount: state.config.channels.length })) return;
             void commitModelConfig(state.config);
         });
@@ -60,9 +61,19 @@ export function WorkspaceBootstrapHydrator({ children }: { children: ReactNode }
         const markReady = () => { ready = true; };
         if (modelConfigReady.current) markReady();
         else window.setTimeout(markReady, 0);
+
+        const handleRemoteUpdate = () => {
+            void refreshWorkspaceModelConfig();
+        };
+        window.addEventListener("workspace:model-config-updated", handleRemoteUpdate);
+        window.addEventListener("workspace:changed", handleRemoteUpdate);
+        window.addEventListener("gateway:changed", handleRemoteUpdate);
         return () => {
             unsubscribe();
             window.removeEventListener("pagehide", flush);
+            window.removeEventListener("workspace:model-config-updated", handleRemoteUpdate);
+            window.removeEventListener("workspace:changed", handleRemoteUpdate);
+            window.removeEventListener("gateway:changed", handleRemoteUpdate);
             void flushModelConfig();
         };
     }, []);
@@ -95,6 +106,24 @@ export async function initializeWorkspaceState<T>({
         // Browser persistence may be corrupt or unavailable; that must never
         // prevent configured channels and credentials from being restored.
         await restoreModelConfig();
+    }
+}
+
+let reloadingModelConfig = false;
+
+export async function refreshWorkspaceModelConfig(): Promise<boolean> {
+    if (reloadingModelConfig) return false;
+    reloadingModelConfig = true;
+    try {
+        const result = await reloadModelConfig();
+        if (!result?.config) return false;
+        const normalizedConfig = localWorkspaceConfig(normalizeConfigSnapshot({ config: result.config }).config);
+        useConfigStore.getState().replaceConfig(normalizedConfig);
+        return true;
+    } catch {
+        return false;
+    } finally {
+        reloadingModelConfig = false;
     }
 }
 

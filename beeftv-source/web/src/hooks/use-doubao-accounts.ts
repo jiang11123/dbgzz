@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { DoubaoGatewayError, fetchDoubaoAccounts, type DoubaoGatewayAccount } from "@/services/api/doubao-gateway";
+import { refreshWorkspaceModelConfig } from "@/components/workspace/workspace-bootstrap-hydrator";
 
 const POLL_INTERVAL_MS = 15_000;
 
@@ -31,9 +32,17 @@ export function useDoubaoAccounts(): DoubaoAccountsState {
         try {
             const next = await fetchDoubaoAccounts();
             if (!mountedRef.current) return;
-            setAccounts(next);
+            setAccounts((prev) => {
+                const prevKeys = prev.map(a => `${a.id}:${a.name}:${a.isLoggedIn}`).join(',');
+                const nextKeys = next.map(a => `${a.id}:${a.name}:${a.isLoggedIn}`).join(',');
+                if (prevKeys !== nextKeys && prev.length > 0) {
+                    void refreshWorkspaceModelConfig();
+                }
+                return next;
+            });
             setGatewayOffline(false);
             setError(undefined);
+            void refreshWorkspaceModelConfig();
         } catch (cause) {
             if (!mountedRef.current) return;
             setGatewayOffline(cause instanceof DoubaoGatewayError && cause.statusCode === 0);

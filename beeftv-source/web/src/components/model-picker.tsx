@@ -9,6 +9,7 @@ import { modelDisplayName, modelIcon, modelOptionName, resolveModelChannel, sele
 import { useActiveTheme } from "@/stores/canvas/use-canvas-theme-store";
 import { ModelLogo } from "@/components/model-logo";
 import { portraitPriceLines, seedancePortraitLabel, seedancePortraitModel } from "@/lib/seedance-portrait";
+import { refreshWorkspaceModelConfig } from "@/components/workspace/workspace-bootstrap-hydrator";
 
 type ModelPickerProps = {
     config: AiConfig;
@@ -116,6 +117,7 @@ export function ModelPicker({
         if (nextOpen) {
             setPreviewedModel(current || options[0] || "");
             setActiveGroupKey(null);
+            void refreshWorkspaceModelConfig();
         }
         setOpen(nextOpen);
     };
