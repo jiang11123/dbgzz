@@ -110,7 +110,7 @@ function doubaoImageCapabilityConfig() {
   return {
     version: 1,
     image: {
-      references: { promptMaxChars: 4000, maxImages: 4, maxImageBytes: 20 * 1024 * 1024, maskSupported: false },
+      references: { promptMaxChars: 4000, maxImages: 12, maxImageBytes: 20 * 1024 * 1024, maskSupported: false },
       size: { parameter: 'aspect_ratio', values: DOUBAO_IMAGE_PRESETS.map(item => item.ratio), default: '1:1', allowCustom: false, presets: DOUBAO_IMAGE_PRESETS },
       quality: { supported: false, values: [], default: 'auto' },
       transparentBackground: { supported: false, default: false },
@@ -128,7 +128,7 @@ function doubaoVideoCapabilityConfig() {
     version: 1,
     video: {
       references: {
-        promptMaxChars: 0, minImages: 0, maxImages: 4, maxImageBytes: 20 * 1024 * 1024,
+        promptMaxChars: 0, minImages: 0, maxImages: 12, maxImageBytes: 20 * 1024 * 1024,
         maxVideos: 0, maxVideoBytes: 0, maxVideoDurationSeconds: 0,
         maxAudios: 0, maxAudioBytes: 0, maxAudioDurationSeconds: 0,
       },
@@ -139,7 +139,7 @@ function doubaoVideoCapabilityConfig() {
       defaultResolution: '720p',
       generateAudio: { supported: false, default: false },
       watermark: { supported: false, default: false },
-      operations: ['text_to_video', 'image_to_video'],
+      operations: ['text_to_video', 'image_to_video', 'reference_to_video'],
       defaultOperation: 'text_to_video',
     },
   };
@@ -377,11 +377,14 @@ function syncIntoNativeDb(dbPath: string, accounts: Account[], apiKey: string, g
       updated_at: now,
     });
 
+    const videoConfigJson = JSON.stringify(doubaoVideoCapabilityConfig());
+    const imageConfigJson = JSON.stringify(doubaoImageCapabilityConfig());
+
     const modelEntries = [
-      { id: `${channelId}-doubao`, model_key: 'doubao', display_name: '豆包对话 (自动调度)', capability: 'text', protocol: 'chat-completion', sort_order: 1 },
-      { id: `${channelId}-doubao-pro`, model_key: 'doubao-pro', display_name: '豆包 Pro (深度思考)', capability: 'text', protocol: 'chat-completion', sort_order: 2 },
-      { id: `${channelId}-doubao-image`, model_key: 'doubao-image', display_name: '即梦生图 (自动调度)', capability: 'image', protocol: 'openai-image', sort_order: 3 },
-      { id: `${channelId}-doubao-video`, model_key: 'doubao-video', display_name: 'Seedance 视频生成 (自动调度)', capability: 'video', protocol: 'newapi-channel-2', sort_order: 4 },
+      { id: `${channelId}-doubao`, model_key: 'doubao', display_name: '豆包对话 (自动调度)', capability: 'text', protocol: 'chat-completion', capability_config_json: '{}', sort_order: 1 },
+      { id: `${channelId}-doubao-pro`, model_key: 'doubao-pro', display_name: '豆包 Pro (深度思考)', capability: 'text', protocol: 'chat-completion', capability_config_json: '{}', sort_order: 2 },
+      { id: `${channelId}-doubao-image`, model_key: 'doubao-image', display_name: '即梦生图 (自动调度)', capability: 'image', protocol: DOUBAO_IMAGE_PROTOCOL, capability_config_json: imageConfigJson, sort_order: 3 },
+      { id: `${channelId}-doubao-video`, model_key: 'doubao-video', display_name: 'Seedance 视频生成 (自动调度)', capability: 'video', protocol: DOUBAO_VIDEO_PROTOCOL, capability_config_json: videoConfigJson, sort_order: 4 },
     ];
 
     let sortIdx = 10;
@@ -393,6 +396,7 @@ function syncIntoNativeDb(dbPath: string, accounts: Account[], apiKey: string, g
         display_name: `豆包账号: ${accLabel}`,
         capability: 'text',
         protocol: 'chat-completion',
+        capability_config_json: '{}',
         sort_order: sortIdx++,
       });
       modelEntries.push({
@@ -400,7 +404,17 @@ function syncIntoNativeDb(dbPath: string, accounts: Account[], apiKey: string, g
         model_key: `doubao-video-account-${acc.id}`,
         display_name: `视频专属: ${accLabel}`,
         capability: 'video',
-        protocol: 'newapi-channel-2',
+        protocol: DOUBAO_VIDEO_PROTOCOL,
+        capability_config_json: videoConfigJson,
+        sort_order: sortIdx++,
+      });
+      modelEntries.push({
+        id: `${channelId}-doubao-image-account-${acc.id}`,
+        model_key: `doubao-image-account-${acc.id}`,
+        display_name: `生图专属: ${accLabel}`,
+        capability: 'image',
+        protocol: DOUBAO_IMAGE_PROTOCOL,
+        capability_config_json: imageConfigJson,
         sort_order: sortIdx++,
       });
     }
@@ -409,12 +423,13 @@ function syncIntoNativeDb(dbPath: string, accounts: Account[], apiKey: string, g
       INSERT INTO channel_models (
         id, channel_id, model_key, provider_model_key, display_name, sort_order, icon, capability, protocol, enabled, capability_config_json, capability_version, created_at, updated_at
       ) VALUES (
-        @id, @channel_id, @model_key, @model_key, @display_name, @sort_order, '', @capability, @protocol, 1, '{}', 1, @created_at, @updated_at
+        @id, @channel_id, @model_key, @model_key, @display_name, @sort_order, '', @capability, @protocol, 1, @capability_config_json, 1, @created_at, @updated_at
       )
       ON CONFLICT(id) DO UPDATE SET
         display_name = excluded.display_name,
         capability = excluded.capability,
         protocol = excluded.protocol,
+        capability_config_json = excluded.capability_config_json,
         enabled = 1,
         updated_at = excluded.updated_at
     `);

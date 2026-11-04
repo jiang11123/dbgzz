@@ -124,8 +124,8 @@ export function normalizeCapabilityString(value: unknown) {
     return normalized.startsWith("string:") ? normalized.slice("string:".length) : normalized;
 }
 
-function normalizeCapabilityStrings(values: unknown[]) {
-    return Array.from(new Set(values.map(normalizeCapabilityString)));
+function normalizeCapabilityStrings(values?: unknown[]) {
+    return Array.from(new Set((values || []).map(normalizeCapabilityString)));
 }
 
 export function normalizeModelCapabilityConfig(config: ModelCapabilityConfig): ModelCapabilityConfig {
@@ -436,6 +436,20 @@ export function defaultImageCapabilityConfig(protocol?: ModelProtocol, model = "
         image.responseFormat = { supported: true };
         image.outputFormat = { supported: false };
         image.maxOutputs = 1;
+    } else if (protocol === "doubao-gateway-image" || (protocol as string) === "doubao-image" || String(model ?? "").trim().toLowerCase().startsWith("doubao-image")) {
+        image.references.maxImages = 12;
+        image.references.maskSupported = false;
+        image.size = {
+            parameter: "aspect_ratio",
+            values: ["1:1", "4:3", "3:4", "16:9", "9:16", "3:2", "2:3"],
+            default: "1:1",
+            allowCustom: false,
+        };
+        image.quality = { supported: false, values: [], default: "auto" };
+        image.transparentBackground = { supported: false, default: false };
+        image.responseFormat = { supported: false };
+        image.outputFormat = { supported: false };
+        image.maxOutputs = 1;
     } else if (protocol === "volcengine-ark-image" || protocol === "volcengine-ark-agent-plan-image") {
         image.references.maskSupported = false;
         image.quality.supported = false;
@@ -653,6 +667,21 @@ export function defaultModelCapabilityConfig(protocol?: ModelProtocol, model = "
         video.ratios = [...video.ratios, "adaptive"];
         if (isSeedance25Model(model)) video.operations = [...video.operations, "inpaint", "extend"];
     }
+    if (
+        protocol === "doubao-gateway-video" ||
+        (protocol as string) === "doubao-video" ||
+        String(model).startsWith("doubao-video") ||
+        /^doubao-video-account-/.test(String(model))
+    ) {
+        video.references.maxImages = 12;
+        video.references.minImages = 0;
+        video.duration = { selection: "range", min: 4, max: 30, step: 1, default: 5 };
+        video.ratios = ["16:9", "9:16", "1:1", "4:3", "3:4"];
+        video.defaultRatio = "16:9";
+        video.resolutions = ["720p"];
+        video.defaultResolution = "720p";
+        video.operations = Array.from(new Set([...video.operations, "reference_to_video"]));
+    }
     Object.assign(video.references, videoPromptLimits(protocol, model));
     return { version: 1, text, image: defaultImageCapabilityConfig(protocol, model), video };
 }
@@ -708,6 +737,14 @@ export function modelCapabilityConfigFor(
     const text = capabilityConfig.text ? { ...fallback.text!, ...capabilityConfig.text, references: { ...fallback.text!.references, ...capabilityConfig.text.references } } : fallback.text;
     const video = (capabilityConfig.video ? { ...fallback.video!, ...capabilityConfig.video, references: { ...fallback.video!.references, ...capabilityConfig.video.references, promptMaxUtf16Units: capabilityConfig.video.references.promptMaxUtf16Units ?? 0 } } : fallback.video)!;
     alignMaterialPixels(video);
+    const isDoubaoVideo = protocol === "doubao-gateway-video" || (protocol as string) === "doubao-video" || String(modelName).startsWith("doubao-video") || /^doubao-video-account-/.test(String(modelName));
+    if (isDoubaoVideo && video) {
+        video.references.maxImages = Math.max(video.references.maxImages || 0, 12);
+        video.references.minImages = 0;
+        if (!video.operations.includes("reference_to_video")) {
+            video.operations.push("reference_to_video");
+        }
+    }
     const configuredImage = capabilityConfig.image;
     const image = configuredImage
         ? (() => {
@@ -731,6 +768,10 @@ export function modelCapabilityConfigFor(
               };
           })()
         : fallback.image;
+    const isDoubaoImage = protocol === "doubao-gateway-image" || (protocol as string) === "doubao-image" || String(modelName).startsWith("doubao-image") || /^doubao-image-account-/.test(String(modelName));
+    if (isDoubaoImage && image) {
+        image.references.maxImages = Math.max(image.references.maxImages || 0, 12);
+    }
     return { ...fallback, ...capabilityConfig, text, image, video };
 }
 
