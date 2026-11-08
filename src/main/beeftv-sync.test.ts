@@ -181,3 +181,19 @@ test('encrypted guard detects old configuration and stays idle once it is remove
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('includes account note in model display name when present', () => {
+  const desire = {
+    apiKey: 'gw-key',
+    accounts: [
+      { id: 1, name: '主号', platform: 'doubao' as const, note: '主力生图', sessionName: 's1', isLoggedIn: true },
+      { id: 2, name: '副号', platform: 'doubao' as const, note: '', sessionName: 's2', isLoggedIn: true },
+    ],
+  };
+  const channel = buildDoubaoAssistantChannel(desire)!;
+  const profiles = channel.modelProfiles as any[];
+  const acc1Text = profiles.find((p: any) => p.model === 'doubao-account-1');
+  const acc2Text = profiles.find((p: any) => p.model === 'doubao-account-2');
+  assert.equal(acc1Text.displayName, '豆包账号: 主号 (主力生图)');
+  assert.equal(acc2Text.displayName, '豆包账号: 副号');
+});

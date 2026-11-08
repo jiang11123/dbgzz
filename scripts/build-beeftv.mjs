@@ -50,8 +50,15 @@ for (const go of goCandidates) {
 }
 if (!backendBuilt) console.warn('[build-beeftv] 跳过后端构建：宿主将仅提供静态服务，/api 需外部后端');
 
-// agent-host：优先从本机 BeefTV 发行版复制（带 Node 运行时），exe 旁布局是 BundledConfig 的硬约定
-const agentHostSources = ['E:\\beeftv\\agent-host', 'D:\\beeftv\\agent-host', 'C:\\Program Files\\BeefTV\\agent-host'];
+// agent-host：优先从本机 BeefTV 发行版或已有安装/解压产物复制（带 Node 运行时），exe 旁布局是 BundledConfig 的硬约定
+const agentHostSources = [
+  path.join(process.env.LOCALAPPDATA || '', 'Programs', 'doubao-video-workspace', 'resources', 'agent-host'),
+  path.join(root, 'release-new', 'win-unpacked', 'resources', 'agent-host'),
+  path.join(root, 'release', 'win-unpacked', 'resources', 'agent-host'),
+  'E:\\beeftv\\agent-host',
+  'D:\\beeftv\\agent-host',
+  'C:\\Program Files\\BeefTV\\agent-host',
+];
 const agentHostSource = agentHostSources.find((dir) => existsSync(`${dir}\\runtime\\node.exe`) && existsSync(`${dir}\\server.mjs`));
 if (agentHostSource) {
   cpSync(agentHostSource, path.join(root, 'build', 'agent-host'), { recursive: true });
@@ -72,11 +79,23 @@ if (agentHostSource) {
 // agent-host 的运行时依赖必须以 zip 携带、安装时由 NSIS customInstall 解压。
 const nodeModulesSource = path.join(root, 'build', 'agent-host', 'node_modules');
 const nodeModulesZip = path.join(root, 'build', 'agent-host-node_modules.zip');
-if (existsSync(nodeModulesSource)) {
+const existingZip = [
+  path.join(root, 'release-new', 'win-unpacked', 'resources', 'agent-host-node_modules.zip'),
+  path.join(root, 'release', 'win-unpacked', 'resources', 'agent-host-node_modules.zip'),
+].find(p => existsSync(p));
+
+if (!existsSync(nodeModulesZip) && existingZip) {
+  cpSync(existingZip, nodeModulesZip);
+  console.log(`[build-beeftv] 沿用已有依赖包：${existingZip} -> build/agent-host-node_modules.zip`);
+} else if (existsSync(nodeModulesSource) && !existsSync(nodeModulesZip)) {
   if (process.env.BEEFTV_7ZA) {
     run(process.env.BEEFTV_7ZA, ['a', '-tzip', '-mx=5', nodeModulesZip, 'node_modules'], { cwd: path.dirname(nodeModulesSource) });
   } else {
-    execFileSync('powershell', ['-NoProfile', '-Command', `Compress-Archive -Path "${nodeModulesSource}" -DestinationPath "${nodeModulesZip}" -Force`], { stdio: 'inherit' });
+    try {
+      execFileSync('tar.exe', ['-a', '-c', '-f', nodeModulesZip, 'node_modules'], { cwd: path.dirname(nodeModulesSource), stdio: 'inherit' });
+    } catch {
+      execFileSync('powershell', ['-NoProfile', '-Command', `Compress-Archive -Path "${nodeModulesSource}" -DestinationPath "${nodeModulesZip}" -Force`], { stdio: 'inherit' });
+    }
   }
   console.log('[build-beeftv] agent-host node_modules -> build/agent-host-node_modules.zip');
 }

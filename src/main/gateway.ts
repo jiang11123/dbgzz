@@ -18,6 +18,7 @@ export type GatewayRuntime = {
   openAccount: (accountId: number) => unknown | null;
   /** Optional handler to trigger adding a new Doubao account from the UI/API. */
   addAccount?: () => Promise<Account | null>;
+  updateAccount?: (id: number, patch: Partial<Account>) => Promise<Account | null> | Account | null;
   prepareNewConversation?: (accountId: number) => Promise<void>;
   generateVideo?: (prompt: string, options: { model?: string; ratio?: string; duration?: number; accountId?: number | null; referencePaths?: string[] }) => Promise<{ url?: string; path?: string; name?: string }[]>;
 
@@ -428,7 +429,7 @@ export class DoubaoGateway {
 
       this.requests += 1;
       try {
-        if (referencePaths.length && this.runtime.prepareNewConversation) {
+        if (this.runtime.prepareNewConversation) {
           await this.runtime.prepareNewConversation(account.id);
         }
         const uploaded: unknown[] = [];
@@ -596,6 +597,7 @@ export class DoubaoGateway {
             return {
               id: a.id,
               name: a.name,
+              note: a.note || '',
               avatar: '',
               platform: a.platform,
               isLoggedIn: Boolean(a.isLoggedIn),
@@ -617,23 +619,46 @@ export class DoubaoGateway {
         return;
       }
 
+      if (request.method === 'POST' && url.pathname === '/v1/accounts/update') {
+        const body = await readBody(request).catch(() => ({}) as Record<string, unknown>);
+        const id = Number(body.id);
+        if (!Number.isFinite(id) || id <= 0) {
+          json(response, 400, { ok: false, error: '缺少或无效的账号 id' });
+          return;
+        }
+        const patch: Partial<Account> = {};
+        if (typeof body.name === 'string') patch.name = body.name.trim();
+        if (typeof body.note === 'string') patch.note = body.note.trim();
+        const updated = await Promise.resolve(this.runtime.updateAccount?.(id, patch) ?? null);
+        json(response, 200, { ok: Boolean(updated), account: updated });
+        return;
+      }
+
       if (request.method === 'GET' && url.pathname === '/v1/models') {
         if (!this.authorized(request)) return openAiError(response, 401, '无效的 API Key', 'authentication_error');
         const doubaoAccounts = this.runtime.accounts().filter(a => a.platform === 'doubao');
-        const accountChatModels = doubaoAccounts.map(a => ({
-          id: `doubao-account-${a.id}`,
-          object: 'model',
-          created: 0,
-          owned_by: 'doubao-workspace',
-          description: `豆包账号: ${a.name || `账号${a.id}`}${a.isLoggedIn ? ' (在线)' : ' (离线)'}`,
-        }));
-        const accountVideoModels = doubaoAccounts.map(a => ({
-          id: `doubao-video-account-${a.id}`,
-          object: 'model',
-          created: 0,
-          owned_by: 'doubao-workspace',
-          description: `视频专属: ${a.name || `账号${a.id}`}`,
-        }));
+        const accountChatModels = doubaoAccounts.map(a => {
+          const label = a.name || `账号${a.id}`;
+          const noteText = a.note ? ` (${a.note})` : '';
+          return {
+            id: `doubao-account-${a.id}`,
+            object: 'model',
+            created: 0,
+            owned_by: 'doubao-workspace',
+            description: `豆包账号: ${label}${noteText}${a.isLoggedIn ? ' (在线)' : ' (离线)'}`,
+          };
+        });
+        const accountVideoModels = doubaoAccounts.map(a => {
+          const label = a.name || `账号${a.id}`;
+          const noteText = a.note ? ` (${a.note})` : '';
+          return {
+            id: `doubao-video-account-${a.id}`,
+            object: 'model',
+            created: 0,
+            owned_by: 'doubao-workspace',
+            description: `视频专属: ${label}${noteText}`,
+          };
+        });
 
         json(response, 200, {
           object: 'list',
@@ -844,6 +869,9 @@ export class DoubaoGateway {
       const heartbeat = setInterval(() => { if (!response.writableEnded) response.write(': keep-alive\n\n'); }, 15_000);
       response.write(`data: ${JSON.stringify(completionChunk(id, model, { role: 'assistant', content: '' }))}\n\n`);
       try {
+        if (this.runtime.prepareNewConversation) {
+          await this.runtime.prepareNewConversation(account.id);
+        }
         const result = await this.withAccount(account.id, () => streamChat(view, prompt, {
           deepThink: MODEL_ALIASES[model]?.deepThink,
           onDelta: chunk => { if (!response.writableEnded) response.write(`data: ${JSON.stringify(completionChunk(id, model, { content: chunk }))}\n\n`); },
@@ -886,6 +914,9 @@ export class DoubaoGateway {
       }
 
       try {
+        if (this.runtime.prepareNewConversation) {
+          await this.runtime.prepareNewConversation(currentAccount.id);
+        }
         const { answer } = await this.withAccount(currentAccount.id, () => streamChat(currentView, prompt, { deepThink: MODEL_ALIASES[model]?.deepThink }));
         this.pool.markOk(currentAccount.id);
         json(response, 200, {

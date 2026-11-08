@@ -21,6 +21,7 @@ import { CanvasNodeType, type CanvasNodeData, type DoubaoAccountNodeState, type 
 
 import { useCanvasNodeActions } from "../canvas-node-action-context";
 import { useUpstreamNodes } from "../canvas-node-graph-context";
+import { useDoubaoPreferencesStore } from "@/stores/use-doubao-preferences-store";
 
 type DoubaoAccountNodeContentProps = {
     node: CanvasNodeData;
@@ -108,6 +109,8 @@ export function DoubaoAccountNodeContent({ node, theme }: DoubaoAccountNodeConte
         }));
     }, [node.id, updateNode]);
 
+    const autoConfirmVideo = useDoubaoPreferencesStore((s) => s.autoConfirmVideo);
+    const autoConfirmedRef = useRef<Set<string>>(new Set());
     const account = accounts.find((item) => item.id === state.accountId);
     const accountMeta = account ? doubaoAccountStatusMeta(account.status) : undefined;
     const busy = state.status === "running";
@@ -242,6 +245,25 @@ export function DoubaoAccountNodeContent({ node, theme }: DoubaoAccountNodeConte
                 if (isWait) {
                     if (replyText) {
                         setConfirmQuestion(replyText);
+                    }
+                    const isConfirmation = task.status === "awaiting_confirmation" || /请[^。！？]*确认|确认[^。！？]*(?:后|再)[^。！？]*(?:生成|开始)|是否[^。！？]*(?:生成|上传|开始)/.test(replyText);
+                    if (autoConfirmVideo && isConfirmation) {
+                        const confirmKey = `${taskId}:${replyText || "confirm"}`;
+                        if (!autoConfirmedRef.current.has(confirmKey)) {
+                            autoConfirmedRef.current.add(confirmKey);
+                            patchState({
+                                statusText: "检测到确认请求，正在自动确认生成…",
+                                ...(replyText ? { latestReply: replyText } : {}),
+                            });
+                            try {
+                                await doubaoConfirmVideoTask(taskId, "确认，开始生成");
+                                message.success("检测到视频生成确认请求，已自动确认继续生成");
+                            } catch (e) {
+                                console.warn("自动确认失败，转为等待手动确认", e);
+                            }
+                            await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+                            continue;
+                        }
                     }
                     // 等用户回复的时间不计入生成总超时：豆包问一句、用户可能想很久。
                     startedAt = Date.now();
@@ -434,7 +456,7 @@ export function DoubaoAccountNodeContent({ node, theme }: DoubaoAccountNodeConte
                         label: (
                             <span className="flex items-center gap-1.5">
                                 <span className="inline-block size-1.5 rounded-full" style={{ background: doubaoAccountStatusMeta(item.status).color }} />
-                                {item.name}
+                                {item.name}{item.note ? ` (${item.note})` : ''}
                             </span>
                         ),
                     }))}

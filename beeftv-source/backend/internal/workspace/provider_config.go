@@ -330,6 +330,10 @@ func (s *ProviderConfig) loadPrimaryDocument() (ProviderStateDocument, error) {
 	}
 	document, _, decodeErr := s.decodeStoredDocument(body)
 	if decodeErr != nil {
+		recovered, _, recoverErr := s.loadDocument()
+		if recoverErr == nil {
+			return recovered, nil
+		}
 		return ProviderStateDocument{}, fmt.Errorf("本地模型配置损坏: %w", decodeErr)
 	}
 	return document, nil

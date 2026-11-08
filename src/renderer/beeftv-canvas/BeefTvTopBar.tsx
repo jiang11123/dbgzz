@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Plus, Sparkles, Film, Image, Server, Users, 
-  Bot, Volume2, FileText, Layout, User, ChevronDown, Check
+  Bot, Volume2, FileText, Layout, User, ChevronDown, Check, Edit2
 } from 'lucide-react';
 import type { CanvasNodeType } from './types';
 import type { Account } from '../../shared/types';
@@ -13,6 +13,7 @@ interface BeefTvTopBarProps {
   onAddNode: (type: CanvasNodeType) => void;
   onOpenAccount: (account: Account) => void;
   onAddAccount: () => void;
+  onEditAccount?: (account: Account) => void;
   onSwitchMode: (mode: 'beeftv' | 'account') => void;
   activeMode: 'beeftv' | 'account';
 }
@@ -24,6 +25,7 @@ export function BeefTvTopBar({
   onAddNode,
   onOpenAccount,
   onAddAccount,
+  onEditAccount,
   onSwitchMode,
   activeMode,
 }: BeefTvTopBarProps) {
@@ -169,32 +171,80 @@ export function BeefTvTopBar({
 
         {/* 快捷账号标签：点击可切换到网页版完成登录或滑块验证 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          {accounts.map(acc => (
-            <button
-              key={acc.id}
-              className="beeftv-btn"
-              style={{
-                padding: '2px 8px',
-                fontSize: '11px',
-                borderColor: activeMode === 'account' && currentAccountId === acc.id ? '#e86c36' : undefined,
-                background: activeMode === 'account' && currentAccountId === acc.id ? 'rgba(232, 108, 54, 0.2)' : undefined,
-              }}
-              onClick={() => onOpenAccount(acc)}
-              title={`点击切换到 ${acc.name} 网页窗口 (可进行手动登录或滑块验证)`}
-            >
-              <span
+          {accounts.map(acc => {
+            const isCurrent = activeMode === 'account' && currentAccountId === acc.id;
+            return (
+              <div
+                key={acc.id}
                 style={{
-                  display: 'inline-block',
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  background: acc.isLoggedIn ? '#22c55e' : '#ef4444',
-                  marginRight: '4px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '2px 4px 2px 8px',
+                  fontSize: '11px',
+                  borderRadius: '4px',
+                  border: isCurrent ? '1px solid #e86c36' : '1px solid rgba(255,255,255,0.1)',
+                  background: isCurrent ? 'rgba(232, 108, 54, 0.2)' : 'rgba(255,255,255,0.04)',
+                  gap: '4px',
                 }}
-              />
-              {acc.name}
-            </button>
-          ))}
+              >
+                <button
+                  type="button"
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#e5e7eb',
+                    fontSize: '11px',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    padding: 0,
+                  }}
+                  onClick={() => onOpenAccount(acc)}
+                  onDoubleClick={() => onEditAccount?.(acc)}
+                  title={`点击切换到 ${acc.name}${acc.note ? ` (${acc.note})` : ''} 网页窗口；双击或点击铅笔修改备注`}
+                >
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '50%',
+                      background: acc.isLoggedIn ? '#22c55e' : '#ef4444',
+                      marginRight: '4px',
+                    }}
+                  />
+                  {acc.name}
+                  {acc.note && (
+                    <span style={{ color: '#34d399', fontSize: '10px', marginLeft: '3px', opacity: 0.9 }}>
+                      ({acc.note})
+                    </span>
+                  )}
+                </button>
+                {onEditAccount && (
+                  <button
+                    type="button"
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#9ca3af',
+                      padding: '1px',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      opacity: 0.65,
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditAccount(acc);
+                    }}
+                    title={`修改【${acc.name}】的备注与名称`}
+                  >
+                    <Edit2 size={10} />
+                  </button>
+                )}
+              </div>
+            );
+          })}
           <button
             className="beeftv-btn"
             style={{ padding: '2px 6px', fontSize: '11px' }}

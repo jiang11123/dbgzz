@@ -62,7 +62,11 @@ export const videoReferenceDomScript = videoReferenceLocatorScript + String.raw`
 export const videoReferenceClearScript = "(()=>{" + videoReferenceLocatorScript + String.raw`
   let cleared=0;
   if(area){
-    for(const button of [...area.querySelectorAll('[data-testid=attachment-delete-btn]')]){
+    const buttons = [...area.querySelectorAll('[data-testid=attachment-delete-btn], button, [role=button]')].filter(el => {
+      const text = (el.getAttribute('aria-label') || el.getAttribute('title') || el.innerText || '').trim();
+      return el.getAttribute('data-testid') === 'attachment-delete-btn' || /删除|移除|delete|remove|close/i.test(text) || /close|delete|remove/i.test(el.className || '');
+    });
+    for(const button of buttons){
       try{button.click();cleared+=1;}catch(error){break;}
     }
   }

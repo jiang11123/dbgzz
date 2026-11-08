@@ -3,23 +3,39 @@ import { scopedLocalStorage, subscribeUserScope } from "@/lib/user-scope";
 
 const key = "dbgzz:doubao-node-preferences:v1";
 
-function readShowDoubaoNodes(): boolean {
+function readPreferences(): { showDoubaoNodes: boolean; autoConfirmVideo: boolean } {
     try {
-        return JSON.parse(scopedLocalStorage.getItem(key) || "null")?.showDoubaoNodes === true;
+        const parsed = JSON.parse(scopedLocalStorage.getItem(key) || "null");
+        return {
+            showDoubaoNodes: parsed?.showDoubaoNodes === true,
+            autoConfirmVideo: parsed?.autoConfirmVideo !== false, // 默认开启
+        };
     } catch {
-        return false;
+        return {
+            showDoubaoNodes: false,
+            autoConfirmVideo: true,
+        };
     }
 }
 
 export const useDoubaoPreferencesStore = create<{
     showDoubaoNodes: boolean;
     setShowDoubaoNodes: (show: boolean) => void;
-}>((set) => ({
-    showDoubaoNodes: readShowDoubaoNodes(),
+    autoConfirmVideo: boolean;
+    setAutoConfirmVideo: (auto: boolean) => void;
+}>((set, get) => ({
+    ...readPreferences(),
     setShowDoubaoNodes: (showDoubaoNodes) => {
-        scopedLocalStorage.setItem(key, JSON.stringify({ showDoubaoNodes }));
+        const next = { ...readPreferences(), showDoubaoNodes, autoConfirmVideo: get().autoConfirmVideo };
+        scopedLocalStorage.setItem(key, JSON.stringify(next));
         set({ showDoubaoNodes });
+    },
+    setAutoConfirmVideo: (autoConfirmVideo) => {
+        const next = { ...readPreferences(), showDoubaoNodes: get().showDoubaoNodes, autoConfirmVideo };
+        scopedLocalStorage.setItem(key, JSON.stringify(next));
+        set({ autoConfirmVideo });
     },
 }));
 
-subscribeUserScope(() => useDoubaoPreferencesStore.setState({ showDoubaoNodes: readShowDoubaoNodes() }));
+subscribeUserScope(() => useDoubaoPreferencesStore.setState(readPreferences()));
+

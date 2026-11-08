@@ -24,6 +24,7 @@ export function doubaoGatewayBaseUrl(): string {
 export type DoubaoGatewayAccount = {
     id: number;
     name: string;
+    note?: string;
     avatar?: string;
     status: string;
     quota: string;
@@ -100,6 +101,16 @@ export async function fetchDoubaoAccounts(signal?: AbortSignal): Promise<DoubaoG
 export async function requestAddDoubaoAccount(): Promise<void> {
     await gatewayJson("/v1/accounts/add", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
 }
+
+export async function updateDoubaoAccount(accountId: number, patch: { name?: string; note?: string }): Promise<DoubaoGatewayAccount> {
+    const payload = await gatewayJson<{ ok: boolean; account: DoubaoGatewayAccount }>("/v1/accounts/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: accountId, ...patch }),
+    });
+    return payload.account;
+}
+
 
 /** 复用桌面端的确认、忙碌校验与账号清理流程。取消时返回 false。 */
 export async function confirmDeleteDoubaoAccount(accountId: number): Promise<boolean> {

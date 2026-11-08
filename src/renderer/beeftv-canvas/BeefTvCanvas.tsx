@@ -2,7 +2,7 @@ import React, { useRef, useState, useCallback, useMemo } from 'react';
 import { 
   Film, Image, Sparkles, Play, Plus, Trash2, ArrowRight, 
   Maximize2, ZoomIn, ZoomOut, RotateCcw, Send, Bot, 
-  Volume2, FileText, Layout, CheckCircle2, User, RefreshCw, FastForward
+  Volume2, FileText, Layout, CheckCircle2, User, RefreshCw, FastForward, Edit2
 } from 'lucide-react';
 import type { 
   CanvasNode, CanvasConnection, VideoNodeData, 
@@ -30,6 +30,7 @@ interface BeefTvCanvasProps {
   onGenerateVideo: (nodeId: string) => void;
   onSendToDoubaoAccount: (nodeId: string) => void;
   onResetView: () => void;
+  onEditAccount?: (account: Account) => void;
 }
 
 export function BeefTvCanvas({
@@ -50,6 +51,7 @@ export function BeefTvCanvas({
   onGenerateVideo,
   onSendToDoubaoAccount,
   onResetView,
+  onEditAccount,
 }: BeefTvCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPanning, setIsPanning] = useState(false);
@@ -240,10 +242,42 @@ export function BeefTvCanvas({
                         <option value="">-- 请选择豆包账号 --</option>
                         {accounts.map(acc => (
                           <option key={acc.id} value={acc.id}>
-                            {acc.name} {acc.isLoggedIn ? '(已登录)' : '(未登录)'}
+                            {acc.name}{acc.note ? ` (${acc.note})` : ''} {acc.isLoggedIn ? '(已登录)' : '(未登录)'}
                           </option>
                         ))}
                       </select>
+                      {accData.selectedAccountId && (() => {
+                        const currentAcc = accounts.find(a => a.id === accData.selectedAccountId);
+                        if (!currentAcc) return null;
+                        return (
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
+                            <div style={{ fontSize: '11px', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '2px 6px', borderRadius: '4px' }}>
+                              {currentAcc.note ? `备注：${currentAcc.note}` : '暂无备注'}
+                            </div>
+                            {onEditAccount && (
+                              <button
+                                type="button"
+                                style={{
+                                  background: 'transparent',
+                                  border: 'none',
+                                  color: '#60a5fa',
+                                  fontSize: '11px',
+                                  cursor: 'pointer',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '3px',
+                                  padding: '1px 4px',
+                                }}
+                                onClick={() => onEditAccount(currentAcc)}
+                                title="修改此账号的备注或名称"
+                              >
+                                <Edit2 size={11} />
+                                <span>{currentAcc.note ? '改备注' : '加备注'}</span>
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     <textarea

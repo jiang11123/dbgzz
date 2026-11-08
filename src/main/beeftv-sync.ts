@@ -163,30 +163,34 @@ export function buildDoubaoAssistantChannel(desire: DoubaoChannelDesire): Record
     apiFormat: 'openai',
     concurrencyLimit: 5,
     models: doubaoAccounts.flatMap(account => [`doubao-account-${account.id}`, `doubao-video-account-${account.id}`, `doubao-image-account-${account.id}`]),
-    modelProfiles: doubaoAccounts.flatMap(account => [
-      {
-        model: `doubao-account-${account.id}`,
-        displayName: `豆包账号: ${account.name || `账号${account.id}`}`,
-        capability: 'text',
-        protocol: 'chat-completion',
-      },
-      {
-        model: `doubao-video-account-${account.id}`,
-        displayName: `豆包账号: ${account.name || `账号${account.id}`}`,
-        capability: 'video',
-        protocol: DOUBAO_VIDEO_PROTOCOL,
-        capabilityConfig: doubaoVideoCapabilityConfig(),
-        defaultOptions: { video_model: DOUBAO_DEFAULT_VIDEO_MODEL },
-      },
-      {
-        model: `doubao-image-account-${account.id}`,
-        displayName: `豆包账号: ${account.name || `账号${account.id}`}`,
-        capability: 'image',
-        protocol: DOUBAO_IMAGE_PROTOCOL,
-        capabilityConfig: doubaoImageCapabilityConfig(),
-        defaultOptions: { image_model: DOUBAO_DEFAULT_IMAGE_MODEL },
-      },
-    ]),
+    modelProfiles: doubaoAccounts.flatMap(account => {
+      const label = account.name || `账号${account.id}`;
+      const displayName = account.note ? `豆包账号: ${label} (${account.note})` : `豆包账号: ${label}`;
+      return [
+        {
+          model: `doubao-account-${account.id}`,
+          displayName,
+          capability: 'text',
+          protocol: 'chat-completion',
+        },
+        {
+          model: `doubao-video-account-${account.id}`,
+          displayName,
+          capability: 'video',
+          protocol: DOUBAO_VIDEO_PROTOCOL,
+          capabilityConfig: doubaoVideoCapabilityConfig(),
+          defaultOptions: { video_model: DOUBAO_DEFAULT_VIDEO_MODEL },
+        },
+        {
+          model: `doubao-image-account-${account.id}`,
+          displayName,
+          capability: 'image',
+          protocol: DOUBAO_IMAGE_PROTOCOL,
+          capabilityConfig: doubaoImageCapabilityConfig(),
+          defaultOptions: { image_model: DOUBAO_DEFAULT_IMAGE_MODEL },
+        },
+      ];
+    }),
     enabled: true,
     scope: 'user',
     headers: [],

@@ -49,9 +49,13 @@ func Decrypt(dataDir, value string) (string, error) {
 	if !strings.HasPrefix(value, Prefix) {
 		return "", errors.New("本地密钥密文格式无效")
 	}
-	payload, err := base64.RawStdEncoding.DecodeString(strings.TrimPrefix(value, Prefix))
+	rawPayload := strings.TrimPrefix(value, Prefix)
+	payload, err := base64.RawStdEncoding.DecodeString(rawPayload)
 	if err != nil {
-		return "", errors.New("本地密钥密文格式无效")
+		payload, err = base64.StdEncoding.DecodeString(rawPayload)
+		if err != nil {
+			return "", errors.New("本地密钥密文格式无效")
+		}
 	}
 	// Decryption must never create a replacement key for existing ciphertext.
 	key, err := readKey(filepath.Join(dataDir, ".settings-key"))

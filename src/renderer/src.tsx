@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Check, FolderOpen, Plus, Settings, Play, RefreshCw, LayoutGrid, Globe, ShieldCheck } from 'lucide-react';
+import { Check, FolderOpen, Plus, Settings, Play, RefreshCw, LayoutGrid, Globe, ShieldCheck, Edit2 } from 'lucide-react';
 import type { Account, DownloadStatus } from '../shared/types';
 import './style.css';
 import './theme.css';
@@ -25,6 +25,7 @@ function App() {
   const [data, setData] = useState<Workspace | null>(null);
   const [currentAccountId, setCurrentAccountId] = useState<number | null>(null);
   const [showNewAccount, setShowNewAccount] = useState(false);
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [downloadNotice, setDownloadNotice] = useState<DownloadStatus | null>(null);
   const [toast, setToast] = useState('');
   const [mode, setMode] = useState<'account' | 'beeftv'>('account');
@@ -150,31 +151,64 @@ function App() {
 
         {/* 账号快速切换标签 */}
         <div className="account-tabs" style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1, overflowX: 'auto', padding: '0 4px' }}>
-          {data.accounts.map(acc => (
-            <button
-              key={acc.id}
-              className={`account ${acc.id === currentAccountId && mode === 'account' ? 'active' : ''}`}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                height: '32px',
-                padding: '0 10px',
-                borderRadius: '6px',
-                border: acc.id === currentAccountId && mode === 'account' ? '1px solid #3b82f6' : '1px solid #30363d',
-                background: acc.id === currentAccountId && mode === 'account' ? '#1e293b' : '#21262d',
-                color: acc.id === currentAccountId && mode === 'account' ? '#60a5fa' : '#c9d1d9',
-                fontSize: '12px',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-              }}
-              onClick={() => void openAccount(acc)}
-              title={`点击切换到【${acc.name}】进行网页扫码登录或对话`}
-            >
-              <span className={`login-dot ${acc.isLoggedIn ? 'on' : ''}`} style={{ width: '7px', height: '7px', borderRadius: '50%', background: acc.isLoggedIn ? '#22c55e' : '#f59e0b' }} />
-              <span>{acc.name}</span>
-            </button>
-          ))}
+          {data.accounts.map(acc => {
+            const isActive = acc.id === currentAccountId && mode === 'account';
+            return (
+              <div
+                key={acc.id}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  height: '32px',
+                  padding: '0 6px 0 10px',
+                  borderRadius: '6px',
+                  border: isActive ? '1px solid #3b82f6' : '1px solid #30363d',
+                  background: isActive ? '#1e293b' : '#21262d',
+                  color: isActive ? '#60a5fa' : '#c9d1d9',
+                  fontSize: '12px',
+                  gap: '6px',
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  transition: 'border-color 0.15s, background 0.15s',
+                }}
+                onClick={() => void openAccount(acc)}
+                onDoubleClick={(e) => { e.stopPropagation(); setEditingAccount(acc); }}
+                onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setEditingAccount(acc); }}
+                title={`点击切换到【${acc.name}${acc.note ? `（${acc.note}）` : ''}】网页；点击右侧铅笔或双击可修改备注与名称`}
+              >
+                <span className={`login-dot ${acc.isLoggedIn ? 'on' : ''}`} style={{ width: '7px', height: '7px', borderRadius: '50%', background: acc.isLoggedIn ? '#22c55e' : '#f59e0b', flexShrink: 0 }} />
+                <span style={{ fontWeight: isActive ? 600 : 400 }}>{acc.name}</span>
+                {acc.note ? (
+                  <span style={{ fontSize: '11px', color: '#34d399', background: 'rgba(52, 211, 153, 0.12)', padding: '1px 5px', borderRadius: '4px', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {acc.note}
+                  </span>
+                ) : null}
+                <button
+                  type="button"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#8b949e',
+                    padding: '2px',
+                    borderRadius: '3px',
+                    cursor: 'pointer',
+                    marginLeft: '2px',
+                    opacity: 0.65,
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditingAccount(acc);
+                  }}
+                  title={`修改【${acc.name}】的备注与名称`}
+                >
+                  <Edit2 size={12} />
+                </button>
+              </div>
+            );
+          })}
 
           {/* + 添加账号按钮 */}
           <button
@@ -330,12 +364,39 @@ function App() {
               fontSize: '12px',
               color: '#94a3b8',
               boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
-              pointerEvents: 'none',
             }}
           >
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#38bdf8' }}>
               <ShieldCheck size={14} />
               当前活跃账号：<strong style={{ color: '#fff' }}>{currentAccount?.name || '未选择'}</strong>
+              {currentAccount?.note && (
+                <span style={{ color: '#34d399', fontSize: '11px', background: 'rgba(52, 211, 153, 0.15)', padding: '1px 6px', borderRadius: '4px' }}>
+                  {currentAccount.note}
+                </span>
+              )}
+              {currentAccount && (
+                <button
+                  type="button"
+                  style={{
+                    background: 'rgba(56, 189, 248, 0.12)',
+                    border: '1px solid rgba(56, 189, 248, 0.3)',
+                    color: '#38bdf8',
+                    borderRadius: '12px',
+                    padding: '2px 8px',
+                    fontSize: '11px',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    marginLeft: '4px',
+                  }}
+                  onClick={() => setEditingAccount(currentAccount)}
+                  title="修改当前账号备注与名称"
+                >
+                  <Edit2 size={11} />
+                  <span>{currentAccount.note ? '修改备注' : '添加备注'}</span>
+                </button>
+              )}
             </span>
             <span style={{ color: '#475569' }}>|</span>
             <span>💡 扫码登录后该账号即自动同步进入 BeefTV 节点模型库，可直接在原生态 BeefTV 任意画布中被选用！</span>
@@ -364,6 +425,7 @@ function App() {
               onAddNode={canvas.addNode}
               onOpenAccount={openAccount}
               onAddAccount={() => setShowNewAccount(true)}
+              onEditAccount={setEditingAccount}
               onSwitchMode={(m) => (m === 'account' ? void switchToAccount() : void switchToCanvas())}
               activeMode={mode}
             />
@@ -386,6 +448,7 @@ function App() {
               onGenerateVideo={canvas.generateVideoForNode}
               onSendToDoubaoAccount={canvas.sendPromptToDoubaoAccount}
               onResetView={canvas.resetViewport}
+              onEditAccount={setEditingAccount}
             />
 
             <BeefTvDrawer
@@ -394,6 +457,14 @@ function App() {
               nodes={canvas.nodes}
               accounts={data.accounts}
               onOpenAccount={openAccount}
+              onAddAccount={() => setShowNewAccount(true)}
+              onEditAccount={setEditingAccount}
+              onUpdateNote={async (accountId, note) => {
+                await window.workspace.updateAccount(accountId, { note });
+                await refresh();
+                await syncToBeefTv();
+                message('账号备注已更新并同步');
+              }}
               onLocateNode={(nodeId) => {
                 canvas.setSelectedNodeId(nodeId);
                 setActiveTab('canvas');
@@ -412,7 +483,23 @@ function App() {
             await refresh();
             await openAccount(account);
             await syncToBeefTv();
-            message(`已添加账号【${account.name}】！请在下方扫码登录豆包，该账号已同步至 BeefTV。`);
+            const noteSuffix = account.note ? `（备注：${account.note}）` : '';
+            message(`已添加账号【${account.name}】${noteSuffix}！请在下方扫码登录豆包，该账号已同步至 BeefTV。`);
+          }}
+        />
+      )}
+
+      {/* 修改账号备注与名称弹窗 */}
+      {editingAccount && (
+        <EditAccountModal
+          account={editingAccount}
+          onClose={() => setEditingAccount(null)}
+          onSaved={async updated => {
+            setEditingAccount(null);
+            await refresh();
+            await syncToBeefTv();
+            const noteText = updated.note ? `备注：“${updated.note}”` : '无备注';
+            message(`已更新账号【${updated.name}】（${noteText}）并同步至 BeefTV！`);
           }}
         />
       )}
@@ -426,6 +513,7 @@ function SettingsPage() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [dir, setDir] = useState('');
   const [toast, setToast] = useState('');
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null);
 
   const message = (text: string) => { setToast(text); window.setTimeout(() => setToast(''), 2400); };
   const refresh = async () => {
@@ -467,23 +555,160 @@ function SettingsPage() {
         <h3>豆包账号池管理</h3>
         <div className="accounts-list">
           {accounts.map(acc => (
-            <div key={acc.id} className="account-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #30363d' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div key={acc.id} className="account-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #30363d' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
                 <span className={`status-dot ${acc.isLoggedIn ? '' : 'warning'}`} style={{ width: '8px', height: '8px', borderRadius: '50%', background: acc.isLoggedIn ? '#22c55e' : '#f59e0b' }} />
                 <span style={{ fontWeight: 600 }}>{acc.name}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {acc.note ? (
+                    <span style={{ color: '#34d399', fontSize: '12px', background: 'rgba(52, 211, 153, 0.12)', padding: '2px 8px', borderRadius: '4px' }}>
+                      {acc.note}
+                    </span>
+                  ) : (
+                    <span style={{ color: '#6e7681', fontSize: '11px', fontStyle: 'italic' }}>无备注</span>
+                  )}
+                  <button
+                    className="outline"
+                    style={{ minHeight: '24px', height: '24px', padding: '0 8px', fontSize: '11px', border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: '#58a6ff', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                    onClick={() => setEditingAccount(acc)}
+                    title="修改账号备注与名称"
+                  >
+                    <Edit2 size={11} />
+                    <span>修改备注/名称</span>
+                  </button>
+                </div>
               </div>
               <button className="outline danger" onClick={() => void deleteAccount(acc.id)}>删除</button>
             </div>
           ))}
         </div>
       </section>
+
+      {editingAccount && (
+        <EditAccountModal
+          account={editingAccount}
+          onClose={() => setEditingAccount(null)}
+          onSaved={async (updated) => {
+            setEditingAccount(null);
+            await refresh();
+            await window.workspace.beeftvSync();
+            message(`已更新账号【${updated.name}】并同步至 BeefTV`);
+          }}
+        />
+      )}
+
       {toast && <div className="toast"><Check size={16} />{toast}</div>}
+    </div>
+  );
+}
+
+function EditAccountModal({
+  account,
+  onClose,
+  onSaved,
+}: {
+  account: Account;
+  onClose: () => void;
+  onSaved: (account: Account) => Promise<void>;
+}) {
+  const [name, setName] = useState(account.name);
+  const [note, setNote] = useState(account.note || '');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) return setError('账号名称不能为空');
+    setBusy(true);
+    try {
+      const updated = await window.workspace.updateAccount(account.id, {
+        name: name.trim(),
+        note: note.trim(),
+      });
+      await onSaved(updated);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal" style={{ maxWidth: '440px', background: '#1e2228', border: '1px solid #30363d', borderRadius: '8px', padding: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+          <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>修改账号备注与名称</h3>
+          <span style={{ fontSize: '11px', color: account.isLoggedIn ? '#34d399' : '#f59e0b', background: account.isLoggedIn ? 'rgba(52, 211, 153, 0.12)' : 'rgba(245, 158, 11, 0.12)', padding: '2px 8px', borderRadius: '10px' }}>
+            {account.isLoggedIn ? '● 已登录' : '○ 未登录'}
+          </span>
+        </div>
+        <form onSubmit={submit}>
+          <div style={{ marginBottom: '14px' }}>
+            <label style={{ display: 'block', fontSize: '12px', color: '#8b949e', marginBottom: '6px' }}>
+              账号名称
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="例如：主号、生图A、账号1"
+              style={{
+                width: '100%',
+                boxSizing: 'border-box',
+                background: '#161b22',
+                border: '1px solid #30363d',
+                borderRadius: '6px',
+                padding: '8px 12px',
+                color: '#c9d1d9',
+                fontSize: '13px',
+              }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', fontSize: '12px', color: '#8b949e', marginBottom: '6px' }}>
+              账号备注
+            </label>
+            <input
+              type="text"
+              value={note}
+              onChange={e => setNote(e.target.value)}
+              placeholder="例如：主力生图、手机尾号1234、专门跑分镜"
+              autoFocus
+              style={{
+                width: '100%',
+                boxSizing: 'border-box',
+                background: '#161b22',
+                border: '1px solid #30363d',
+                borderRadius: '6px',
+                padding: '8px 12px',
+                color: '#c9d1d9',
+                fontSize: '13px',
+              }}
+            />
+            <div style={{ fontSize: '11px', color: '#6e7681', marginTop: '4px' }}>
+              支持修改名称和备注，保存后顶部标签、画布节点及 BeefTV 将立即同步呈现
+            </div>
+          </div>
+
+          {error && <div style={{ color: '#f85149', fontSize: '12px', marginBottom: '12px' }}>{error}</div>}
+
+          <div className="modal-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '16px' }}>
+            <button type="button" className="outline" onClick={onClose} disabled={busy} style={{ height: '32px', padding: '0 12px', fontSize: '12px', cursor: 'pointer' }}>
+              取消
+            </button>
+            <button type="submit" className="primary" disabled={busy} style={{ height: '32px', padding: '0 14px', fontSize: '12px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+              {busy ? '正在保存...' : '保存并同步'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
 
 function NewAccount({ onClose, onCreated }: { onClose: () => void; onCreated: (account: Account) => Promise<void> }) {
   const [name, setName] = useState('');
+  const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -492,7 +717,11 @@ function NewAccount({ onClose, onCreated }: { onClose: () => void; onCreated: (a
     if (!name.trim()) return setError('请输入账号名称');
     setBusy(true);
     try {
-      const created = await window.workspace.createAccount({ name: name.trim(), platform: 'doubao', note: '' });
+      const created = await window.workspace.createAccount({
+        name: name.trim(),
+        platform: 'doubao',
+        note: note.trim(),
+      });
       await onCreated(created);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -501,24 +730,67 @@ function NewAccount({ onClose, onCreated }: { onClose: () => void; onCreated: (a
   };
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal-card">
-        <h3>添加新豆包账号</h3>
+    <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal" style={{ maxWidth: '440px', background: '#1e2228', border: '1px solid #30363d', borderRadius: '8px', padding: '20px' }}>
+        <h3 style={{ margin: '0 0 16px', fontSize: '16px', color: '#f0f6fc' }}>添加新豆包账号</h3>
         <form onSubmit={submit}>
-          <div className="form-item">
-            <label>账号名称</label>
+          <div style={{ marginBottom: '14px' }}>
+            <label style={{ display: 'block', fontSize: '12px', color: '#8b949e', marginBottom: '6px' }}>
+              账号名称 <span style={{ color: '#ef4444' }}>*</span>
+            </label>
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="例如：主号、生图号A、视频号B"
               autoFocus
+              style={{
+                width: '100%',
+                boxSizing: 'border-box',
+                background: '#161b22',
+                border: '1px solid #30363d',
+                borderRadius: '6px',
+                padding: '8px 12px',
+                color: '#c9d1d9',
+                fontSize: '13px',
+              }}
             />
           </div>
-          {error && <div className="error-text">{error}</div>}
-          <div className="modal-actions">
-            <button type="button" className="outline" onClick={onClose} disabled={busy}>取消</button>
-            <button type="submit" className="primary" disabled={busy}>创建并开始扫码登录</button>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', fontSize: '12px', color: '#8b949e', marginBottom: '6px' }}>
+              账号备注（可选）
+            </label>
+            <input
+              type="text"
+              value={note}
+              onChange={e => setNote(e.target.value)}
+              placeholder="例如：138****0000、主力生图、专门跑剧本"
+              style={{
+                width: '100%',
+                boxSizing: 'border-box',
+                background: '#161b22',
+                border: '1px solid #30363d',
+                borderRadius: '6px',
+                padding: '8px 12px',
+                color: '#c9d1d9',
+                fontSize: '13px',
+              }}
+            />
+            <div style={{ fontSize: '11px', color: '#6e7681', marginTop: '4px' }}>
+              添加备注可在画布 3.0 中快速识别账号用途或对应手机号
+            </div>
+          </div>
+
+          {error && <div style={{ color: '#f85149', fontSize: '12px', marginBottom: '12px' }}>{error}</div>}
+
+          <div className="modal-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '16px' }}>
+            <button type="button" className="outline" onClick={onClose} disabled={busy} style={{ height: '32px', padding: '0 12px', fontSize: '12px', cursor: 'pointer' }}>
+              取消
+            </button>
+            <button type="submit" className="primary" disabled={busy} style={{ height: '32px', padding: '0 14px', fontSize: '12px', background: '#238636', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+              {busy ? '正在创建...' : '创建并扫码登录'}
+            </button>
           </div>
         </form>
       </div>

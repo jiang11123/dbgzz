@@ -115,6 +115,72 @@ export function isRootDoubaoChatUrl(url: string | null | undefined): boolean {
   return /^https?:\/\/(?:www\.)?doubao\.com(?:\/chat)?$/i.test(normalized);
 }
 
+/**
+ * 确保页面处于干净的全新对话状态：
+ * 每一个任务发送前重置为新对话，清空输入框草稿与残留附件卡片，杜绝会话与附件残留报错。
+ */
+export async function prepareFreshNewConversation(view: BrowserView): Promise<void> {
+  const contents = view?.webContents;
+  if (!contents || contents.isDestroyed()) {
+    throw new Error('账号页面不可用，请确认该账号已登录');
+  }
+  const currentUrl = contents.getURL() || '';
+  const isRootChat = isRootDoubaoChatUrl(currentUrl);
+
+  // 1. 如果当前页面不在根会话页面，直接导航回根页面
+  if (!isRootChat) {
+    await loadURLWithTimeout(view, 'https://www.doubao.com/chat/').catch(() => undefined);
+  } else {
+    // 2. 如果已在 /chat/，优先尝试点击页面上的“新对话”或“开启新对话”按钮
+    const clicked = await contents.executeJavaScript(`(() => {
+      try {
+        const btns = [...document.querySelectorAll('button, [role="button"], a')].filter(el => {
+          const r = el.getBoundingClientRect();
+          return r.width > 0 && r.height > 0;
+        });
+        const btn = btns.find(el => {
+          const t = (el.innerText || el.getAttribute('aria-label') || el.getAttribute('title') || '').trim();
+          return /^(?:开启|新建)?新对话$/i.test(t) || /new[_-]?chat/i.test(el.className || '');
+        });
+        if (btn) { btn.click(); return true; }
+      } catch {}
+      return false;
+    })()`).catch(() => false);
+
+    // 若未点中新对话按钮，为了彻底清空单页应用的残留状态，加载带唯一参数的根路由
+    if (!clicked) {
+      await loadURLWithTimeout(view, `https://www.doubao.com/chat/?_fresh=${Date.now()}`).catch(() => undefined);
+    }
+  }
+
+  await waitForComposer(view).catch(() => undefined);
+  await new Promise((resolve) => setTimeout(resolve, 800));
+
+  // 3. 强力清空任何可能残留的附件卡片和输入框草稿，杜绝残留报错
+  await contents.executeJavaScript(`(() => {
+    try {
+      const removeButtons = [...document.querySelectorAll('button, [role="button"]')].filter(el => {
+        const t = (el.getAttribute('aria-label') || el.getAttribute('title') || el.innerText || '').trim();
+        return el.getAttribute('data-testid') === 'attachment-delete-btn' || /^(?:删除|移除|delete|remove|close)$/i.test(t) || /close|delete|remove/i.test(el.className || '');
+      });
+      removeButtons.forEach(btn => { try { btn.click(); } catch {} });
+
+      const inputs = document.querySelectorAll('[contenteditable=true], textarea');
+      inputs.forEach(el => {
+        try {
+          if (el.tagName === 'TEXTAREA') {
+            (el as HTMLTextAreaElement).value = '';
+          } else {
+            el.innerHTML = '';
+            el.textContent = '';
+          }
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+        } catch {}
+      });
+    } catch {}
+  })()`).catch(() => undefined);
+}
+
 export function isSpecificDoubaoChatUrl(url: string | null | undefined): boolean {
   if (!url) return false;
   const normalized = normalizeTaskUrl(url);
@@ -903,6 +969,7 @@ export class CanvasBridge {
         return;
       }
       this.update(task, { status: 'submitting', statusText: '正在向豆包工作台提交任务' });
+      // 每一个画布发起的任务，在豆包中都重置为一段全新的对话，杜绝历史对话与残留卡片干扰
       if (task.conversationId) {
         const targetUrl = `https://www.doubao.com/chat/${task.conversationId}`;
         const currentUrl = view.webContents.getURL() || '';
@@ -910,47 +977,29 @@ export class CanvasBridge {
           await loadURLWithTimeout(view, targetUrl);
           await waitForComposer(view);
         }
-      } else if (task.gatewayThreadId) {
-        const currentUrl = view.webContents.getURL() || '';
-        const isCleanNewChat = /^https?:\/\/(?:www\.)?doubao\.com\/chat\/?(?:[?#]|$)/i.test(currentUrl);
-        if (!isCleanNewChat) {
-          await loadURLWithTimeout(view, 'https://www.doubao.com/chat/');
-          await waitForComposer(view);
-          await new Promise((resolve) => setTimeout(resolve, 1500));
-        }
       } else {
-        // 豆包 3.0 画布任务（无 conversationId/gatewayThreadId）：账号页可能停在
-        // 上次任务的会话页、登录页或尚未渲染完的中间态——不导航的话参考图上传
-        // 会在任意页面上找作曲器直接失败。非干净新对话页先回新对话。
-        const currentUrl = view.webContents.getURL() || '';
-        const isCleanNewChat = /^https?:\/\/(?:www\.)?doubao\.com\/chat\/?(?:[?#]|$)/i.test(currentUrl);
-        if (!isCleanNewChat) {
-          await loadURLWithTimeout(view, 'https://www.doubao.com/chat/');
-          await waitForComposer(view);
-          await new Promise((resolve) => setTimeout(resolve, 1500));
-        }
+        await prepareFreshNewConversation(view);
       }
-      await new Promise((resolve) => setTimeout(resolve, 2500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
       ensureActive();
-      if (task.targetAccountId && task.targetAccountId !== task.sourceAccountId) {
-        const draft = await runInPage(view, `(() => {
-          try {
-            const input=[...document.querySelectorAll('[contenteditable=true],textarea')].find(n => {
-              try { return n.getBoundingClientRect().width > 0; } catch { return false; }
-            });
-            return input ? (input.value || input.innerText || '').trim() : '';
-          } catch { return ''; }
-        })()`).catch(() => '');
-        if (draft) throw new Error('执行账号已有未发送草稿，请先处理该草稿再重试');
-      }
+      // 强力清空残留输入草稿，避免残留草稿阻断提交
+      await runInPage(view, `(() => {
+        try {
+          const inputs = document.querySelectorAll('[contenteditable=true],textarea');
+          inputs.forEach(el => {
+            if (el.tagName === 'TEXTAREA') (el as HTMLTextAreaElement).value = '';
+            else el.innerHTML = '';
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+          });
+        } catch {}
+      })()`).catch(() => '');
       await waitForComposer(view);
       try {
         await ensureComposerMode(view, { mode: 'video' });
       } catch (modeError) {
-        // 当前页面（如历史对话页面）可能没有视频模式切换入口，自动回退到干净新对话页面重试进入视频模式
+        // 当前页面（如历史对话页面）可能没有视频模式切换入口，自动重置到干净新对话页面重试进入视频模式
         try {
-          await loadURLWithTimeout(view, 'https://www.doubao.com/chat/');
-          await waitForComposer(view);
+          await prepareFreshNewConversation(view);
           await new Promise((resolve) => setTimeout(resolve, 1500));
           await ensureComposerMode(view, { mode: 'video' });
         } catch (retryError) {
@@ -1010,9 +1059,8 @@ export class CanvasBridge {
         // 定位/上传失败。回到干净新对话页整体重备一次：新页面没有残留附件，
         // 模型/比例/时长也一并重新应用，仍失败才交给上层报 needs_attention。
         const detail = prepareError instanceof Error ? prepareError.message : String(prepareError);
-        this.update(task, { statusText: `作曲器页面异常，正在回到新对话页重试（${detail.slice(0, 60)}）` });
-        await loadURLWithTimeout(view, 'https://www.doubao.com/chat/');
-        await waitForComposer(view);
+        this.update(task, { statusText: `作曲器页面异常，正在重置为全新对话重试（${detail.slice(0, 60)}）` });
+        await prepareFreshNewConversation(view);
         await new Promise((resolve) => setTimeout(resolve, 1500));
         await ensureComposerMode(view, { mode: 'video' }).catch(() => undefined);
         applied = await prepareComposer();

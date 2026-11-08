@@ -389,6 +389,10 @@ function openAccountBrowser(accountId: number, background = false, preloadOnly =
   activeAccountId = accountId;
   hostAccountInScanWindow(account, view, Boolean(account.isLoggedIn));
   windowRef?.webContents.send('account:opened', accountId);
+  
+  if (!background && account.isLoggedIn) {
+    void prepareAccountNewConversation(accountId).catch(() => undefined);
+  }
   return view;
 }
 /**
@@ -417,11 +421,10 @@ async function prepareAccountNewConversation(accountId: number): Promise<void> {
     throw new Error('账号页面不可用，请确认该账号已登录');
   }
   const currentUrl = view.webContents.getURL() || '';
-  const isCleanNewChat = /^https?:\/\/(?:www\.)?doubao\.com\/chat\/?(?:[?#]|$)/i.test(currentUrl);
-  if (!isCleanNewChat) {
-    await view.webContents.loadURL('https://www.doubao.com/chat/');
+  const isRootChat = /^https?:\/\/(?:www\.)?doubao\.com\/chat\/?(?:[?#]|$)/i.test(currentUrl);
+  if (!isRootChat) {
+    await view.webContents.loadURL('https://www.doubao.com/chat/').catch(() => undefined);
   } else {
-    // If already on /chat/, try clicking "开启新对话" / "新对话" button if available, or reload /chat/
     const clicked = await view.webContents.executeJavaScript(`(() => {
       try {
         const btns = [...document.querySelectorAll('button, [role="button"], a')].filter(el => {
@@ -430,18 +433,40 @@ async function prepareAccountNewConversation(accountId: number): Promise<void> {
         });
         const btn = btns.find(el => {
           const t = (el.innerText || el.getAttribute('aria-label') || el.getAttribute('title') || '').trim();
-          return /^(?:开启)?新对话$/i.test(t);
+          return /^(?:开启|新建)?新对话$/i.test(t) || /new[_-]?chat/i.test(el.className || '');
         });
         if (btn) { btn.click(); return true; }
       } catch {}
       return false;
     })()`).catch(() => false);
     if (!clicked) {
-      await view.webContents.loadURL('https://www.doubao.com/chat/').catch(() => undefined);
+      await view.webContents.loadURL(`https://www.doubao.com/chat/?_fresh=${Date.now()}`).catch(() => undefined);
     }
   }
   await waitForPageReady(view);
   await waitForComposer(view).catch(() => undefined);
+  await new Promise((resolve) => setTimeout(resolve, 800));
+  await view.webContents.executeJavaScript(`(() => {
+    try {
+      const removeButtons = [...document.querySelectorAll('button, [role="button"]')].filter(el => {
+        const t = (el.getAttribute('aria-label') || el.getAttribute('title') || el.innerText || '').trim();
+        return el.getAttribute('data-testid') === 'attachment-delete-btn' || /^(?:删除|移除|delete|remove|close)$/i.test(t) || /close|delete|remove/i.test(el.className || '');
+      });
+      removeButtons.forEach(btn => { try { btn.click(); } catch {} });
+      const inputs = document.querySelectorAll('[contenteditable=true], textarea');
+      inputs.forEach(el => {
+        try {
+          if (el.tagName === 'TEXTAREA') {
+            el.value = '';
+          } else {
+            el.innerHTML = '';
+            el.textContent = '';
+          }
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+        } catch {}
+      });
+    } catch {}
+  })()`).catch(() => undefined);
 }
 
 /**
@@ -1002,6 +1027,11 @@ function setupGateway() {
       openAccountBrowser(account.id);
       syncAccountsAndNotify();
       return account;
+    },
+    updateAccount: (id, patch) => {
+      const next = db.updateAccount(id, patch);
+      syncAccountsAndNotify();
+      return next;
     },
     createVideoTask: async (options) => {
       const task = await canvasBridge!.create({

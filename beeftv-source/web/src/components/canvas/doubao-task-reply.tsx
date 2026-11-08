@@ -1,10 +1,11 @@
-import { useEffect, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { Check, Send } from "lucide-react";
 
 import type { CanvasTheme } from "@/lib/canvas-theme";
 import { isDoubaoVideoModel } from "@/lib/doubao-video-model";
 import { doubaoConfirmVideoTask, doubaoPollVideoTask, type DoubaoVideoTaskState } from "@/services/api/doubao-gateway";
 import { queryGenerationTask } from "@/services/api/task-center";
+import { useDoubaoPreferencesStore } from "@/stores/use-doubao-preferences-store";
 import { CanvasNodeType, type CanvasNodeData } from "@/types/canvas";
 
 const POLL_INTERVAL_MS = 3000;
@@ -65,15 +66,15 @@ export function DoubaoTaskReply({ node, theme }: Props) {
     const backendTaskId = node.metadata?.taskId;
     const active = node.type === CanvasNodeType.Video && isDoubaoVideoModel(node.metadata?.model) && Boolean(backendTaskId);
     const { gatewayTaskId, state } = useDoubaoGatewayTask(backendTaskId, active);
+    const autoConfirmVideo = useDoubaoPreferencesStore((s) => s.autoConfirmVideo);
+    const autoConfirmedRef = useRef<Set<string>>(new Set());
     const [draft, setDraft] = useState("");
     const [busy, setBusy] = useState(false);
     const [notice, setNotice] = useState("");
 
-    if (!active) return null;
     const reply = state?.latest_reply?.trim();
     const needsAttention = state?.status === "needs_attention";
-    // 豆包没有回复时不占位，避免只有一个空框
-    if (!reply && !needsAttention) return null;
+    const isWaitingConfirmation = state?.status === "awaiting_confirmation" || (Boolean(reply) && /请[^。！？]*确认|确认[^。！？]*(?:后|再)[^。！？]*(?:生成|开始)|是否[^。！？]*(?:生成|上传|开始)/.test(reply || ""));
 
     const send = async (text: string) => {
         const value = text.trim();
@@ -90,6 +91,22 @@ export function DoubaoTaskReply({ node, theme }: Props) {
             setBusy(false);
         }
     };
+
+    useEffect(() => {
+        if (!autoConfirmVideo || !active || !gatewayTaskId || busy || !isWaitingConfirmation) return;
+        const confirmKey = `${gatewayTaskId}:${reply || "confirm"}`;
+        if (autoConfirmedRef.current.has(confirmKey)) return;
+        autoConfirmedRef.current.add(confirmKey);
+
+        const timer = window.setTimeout(() => {
+            void send(CONFIRM_TEXT);
+        }, 800);
+        return () => window.clearTimeout(timer);
+    }, [autoConfirmVideo, active, gatewayTaskId, busy, isWaitingConfirmation, reply]);
+
+    if (!active) return null;
+    // 豆包没有回复时不占位，避免只有一个空框
+    if (!reply && !needsAttention) return null;
     // 画布快捷键（空格、删除等）不能抢走输入框里的按键
     const stopKeys = (event: KeyboardEvent) => event.stopPropagation();
     const stopPointer = { onMouseDown: (event: { stopPropagation: () => void }) => event.stopPropagation(), onPointerDown: (event: { stopPropagation: () => void }) => event.stopPropagation() };
@@ -104,7 +121,12 @@ export function DoubaoTaskReply({ node, theme }: Props) {
             {...stopPointer}
         >
             <div className="flex items-center justify-between gap-2 text-[var(--fs-tiny)]" style={{ color: theme.node.muted }}>
-                <span className="font-medium">豆包回复</span>
+                <span className="font-medium flex items-center gap-1.5">
+                    <span>豆包回复</span>
+                    <span className="rounded px-1 py-0.5 text-[9px] font-normal" style={{ background: autoConfirmVideo ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.06)", color: autoConfirmVideo ? "#10b981" : "inherit" }}>
+                        {autoConfirmVideo ? "自动确认中" : "手动确认"}
+                    </span>
+                </span>
                 {state?.status_text ? <span className="truncate">{state.status_text}</span> : null}
             </div>
             {reply ? <div className="max-h-28 overflow-y-auto whitespace-pre-wrap break-words text-xs leading-5">{reply}</div> : null}
